@@ -1,13 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import CursorLight from "@/components/CursorLight";
 import Header from "@/components/Header";
 import Reveal from "@/components/Reveal";
 
 /* ═══════════════════════════════════════════════════════════
-   BEIGE NEON — Главная страница Школа ПК v2
-   Логотип-дерево, heading-sweep, AI-консультант, облако тегов
+   BEIGE NEON — Главная страница Школа ПК v3
+   Логотип-дерево, heading-sweep (color sweep), AI-консультант,
+   облако тегов, услуги, аккордеон о школе, расширенный FAQ
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── Data ─── */
@@ -40,12 +40,39 @@ const aboutCards = [
   { icon: "👥", title: "Сообщество 500+", desc: "Более 500 участников из 40 регионов России", color: "orange" },
 ];
 
+/* ─── Услуги ─── */
+const services = [
+  { icon: "🎓", title: "Обучение потребительской кооперации", desc: "Полный курс от основ до практики. Четыре пакета обучения: Базовый, Стандарт, Премиум и VIP. Разбираем налоги, устав, регистрацию и ведение ПК.", color: "orange", price: "от 15 000 ₽" },
+  { icon: "⚖️", title: "Консалтинг и аудит устава", desc: "Проверка уставных документов действующих кооперативов. Аудит на соответствие ФЗ-3085, рекомендации по устранению рисков. Защита от претензий ФНС.", color: "green", price: "от 25 000 ₽" },
+  { icon: "📝", title: "Регистрация ПК под ключ", desc: "Полный цикл: разработка устава, целевой программы, протокола учредительного собрания, подача в ФНС. Результат — ЕГРЮЛ запись за 10-14 дней.", color: "blue", price: "от 50 000 ₽" },
+  { icon: "🛡️", title: "Защита активов через ПК", desc: "Структурирование имущества через потребительский кооператив. Личное имущество пайщика защищено от взысканий. Юридически чистая схема по закону РФ.", color: "orange", price: "от 35 000 ₽" },
+  { icon: "📊", title: "Бухгалтерский учёт ПК", desc: "Настройка бухгалтерии кооператива: учёт паевых взносов, возвратов, целевых программ. Автоматизация отчётности. Обучение бухгалтера.", color: "green", price: "от 20 000 ₽" },
+  { icon: "🤝", title: "Сопровождение 12 месяцев", desc: "Постоянная юридическая и бухгалтерская поддержка после регистрации. Ответы на вопросы, внесение изменений в устав, представительство в ФНС.", color: "blue", price: "включено в Премиум" },
+];
+
+/* ─── Аккордеон «О Школе ПК» ─── */
+const aboutAccordion = [
+  { title: "Миссия Школы ПК", content: "Наша миссия — сделать потребительскую кооперацию доступной для каждого предпринимателя в России. Мы верим, что кооперативная модель — это честный и законный способ защитить активы, снизить налоговую нагрузку и объединить усилия единомышленников. С 2015 года мы обучили более 500 человек из 40 регионов страны." },
+  { title: "Методология С500", content: "Модель С500 — это авторская пятиступенчатая методика создания и развития потребительского кооператива, разработанная Велеславом Старковым. Этапы: 1) Анализ потребностей и целей участников, 2) Разработка устава и целевой программы, 3) Регистрация в ФНС, 4) Запуск деятельности, 5) Сопровождение и масштабирование. Ни один кооператив, созданный по этой модели, не был ликвидирован ФНС." },
+  { title: "Правовая база", content: "Вся деятельность основана на Законе РФ № 3085-1 «О потребительской кооперации», Гражданском кодексе РФ (ст. 123.2, 123.3), Налоговом кодексе РФ (ст. 149 — освобождение от НДС). Наши юристы отслеживают все изменения в законодательстве и оперативно адаптируют документы и учебные программы." },
+  { title: "Формат обучения", content: "Обучение проходит в онлайн-формате: видеоуроки, практические задания, вебинары с ответами на вопросы. Каждый студент получает готовые шаблоны документов для регистрации ПК. После прохождения курса — сертификат и 12 месяцев поддержки (в пакетах Премиум и VIP). Доступ к материалам — бессрочный." },
+  { title: "Гарантии и результаты", content: "Мы гарантируем: юридически безупречный пакет документов для регистрации ПК, полное соответствие ФЗ-3085, сопровождение до получения выписки из ЕГРЮЛ. Если ФНС откажет по нашей вине — бесплатная доработка и повторная подача. 100+ успешных регистраций, 0 ликвидаций по модели С500." },
+];
+
+/* ─── FAQ (расширенный) ─── */
 const faqItems = [
   { q: "Что такое потребительский кооператив?", a: "Потребительский кооператив (ПК) — некоммерческая организация, созданная для удовлетворения материальных и иных потребностей участников. В отличие от ООО, ПК не преследует извлечение прибыли, освобождён от НДС, налога на прибыль и НДФЛ с паевых взносов (Закон РФ № 3085-1)." },
   { q: "Сколько времени занимает создание ПК под ключ?", a: "Полный цикл занимает от 3 до 7 рабочих дней. Включает разработку устава, протокол учредительного собрания, целевую программу. Регистрация в ФНС — 3-5 рабочих дней. Итого от обращения до ЕГРЮЛ-записи — 10-14 дней." },
   { q: "Какие налоги платит потребительский кооператив?", a: "ПК по Закону № 3085-1 освобождён от НДС (ст. 149 НК РФ), налога на прибыль, НДФЛ с доходов от паевых взносов. Уплачиваются: госпошлина при регистрации, налог на имущество, земельный и транспортный налог." },
   { q: "Сколько человек нужно для создания ПК?", a: "Минимум 5 физических лиц или 3 юридических лица для учреждения потребительского кооператива. Физлицо может быть пайщиком с 16 лет." },
   { q: "Онлайн-касса нужна для ПК?", a: "Нет. Поскольку ПК не осуществляет реализацию товаров, а производит возврат паевых взносов, применение ККТ не требуется (ст. 1.1 ФЗ-54)." },
+  { q: "Чем ПК отличается от ООО?", a: "ООО — коммерческая организация, платит НДС, налог на прибыль, НДФЛ. ПК — некоммерческая, освобождена от этих налогов. В ООО прибыль распределяется пропорционально доле, в ПК — один пайщик = один голос. ПК не отвечает по долгам пайщиков, а пайщики — по долгам ПК только в пределах своего пая." },
+  { q: "Можно ли вести бизнес через ПК?", a: "ПК создается для удовлетворения потребностей пайщиков, а не для извлечения прибыли. Кооперативная цена = себестоимость. Если деятельность ведётся по закону 3085-1, налоговая база равна нулю. Однако нельзя подменять коммерческую деятельность кооперативной — это главное правило." },
+  { q: "Что такое паевой взнос?", a: "Паевой взнос — это имущественный взнос пайщика в кооператив. Он возвращается при выходе из ПК. Паевой взнос не облагается НДФЛ и не признаётся доходом. Размер пая определяется уставом кооператива." },
+  { q: "Могут ли приставы арестовать имущество ПК?", a: "Имущество кооператива принадлежит ПК как юридическому лицу. Приставы могут обратить взыскание только на долю должника-пайщика — паевой взнос. Личное имущество других пайщиков и кооператива в целом защищено." },
+  { q: "Какие документы нужны для регистрации ПК?", a: "Потребуются: устав кооператива, протокол учредительного собрания, целевая программа, заявление по форме Р11001, квитанция об оплате госпошлины (4000 ₽). Мы предоставляем все шаблоны и сопровождаем процесс." },
+  { q: "Какие проверки может проходить ПК?", a: "По ФЗ-3085 потребительские кооперативы освобождены от проверок пожарных, СЭС, Роспотребнадзора. Налоговые проверки возможны, но при правильном ведении деятельности рисков нет — мы учим именно этому." },
+  { q: "Сколько стоит обучение?", a: "Стоимость зависит от пакета: Базовый — от 15 000 ₽ (ознакомительный курс), Стандарт — от 30 000 ₽ (полный курс + документы), Премиум — от 50 000 ₽ (курс + консалтинг + 12 мес поддержки), VIP — от 80 000 ₽ (всё включено + регистрация ПК под ключ). Рассрочка available." },
 ];
 
 /* Tag cloud data */
@@ -94,7 +121,7 @@ function Hero() {
             НДС, налог на прибыль и соц.платежи — 0% по закону РФ № 3085-1. Обучим работе с некоммерческими организациями. Защитите имущество от взысканий, обнулите налоги и работайте легально.
           </p>
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "2.5rem" }}>
-            <a href="#how" className="btn-primary">Выбрать курс</a>
+            <a href="#services" className="btn-primary">Выбрать курс</a>
             <a href="#contacts" className="btn-secondary">Бесплатная консультация</a>
           </div>
         </div>
@@ -116,7 +143,7 @@ function Hero() {
             <img
               className="hero__logo-img"
               src="/images/hero-logo.webp"
-              alt="Школа Кооперации"
+              alt="Школа Кооперации — Древо"
               width={420}
               height={420}
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }}
@@ -210,10 +237,42 @@ function Stats() {
   );
 }
 
+/* ─── Services (Услуги) ─── */
+function Services() {
+  return (
+    <section id="services" style={{ padding: "var(--section-py) 0" }}>
+      <div className="container content-area">
+        <Reveal>
+          <span className="section-label" style={{ justifyContent: "center", display: "flex" }}>Услуги</span>
+          <h2 className="section-title heading-sweep" style={{ textAlign: "center" }}>Наши услуги</h2>
+          <p className="section-subtitle" style={{ textAlign: "center" }}>От обучения до полной регистрации кооператива под ключ. Выберите то, что нужно именно вам.</p>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem", marginTop: "2rem" }}>
+          {services.map((svc, i) => (
+            <Reveal key={i} delay={i + 1}>
+              <div className="glass-2" style={{ padding: "1.75rem", display: "flex", flexDirection: "column", height: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 12, background: `rgba(${colorRGB[svc.color]},0.12)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0 }}>{svc.icon}</div>
+                  <div style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--color-beige-200)" }}>{svc.title}</div>
+                </div>
+                <p style={{ fontSize: "0.88rem", color: "var(--color-text-muted)", lineHeight: 1.7, flex: 1 }}>{svc.desc}</p>
+                <div style={{ marginTop: "1rem", paddingTop: "0.75rem", borderTop: "1px solid var(--glass-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.85rem", fontWeight: 700, color: colorVar[svc.color] }}>{svc.price}</span>
+                  <a href="#contacts" style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textDecoration: "underline", textUnderlineOffset: 3 }}>Подробнее</a>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ─── How It Works ─── */
 function HowItWorks() {
   return (
-    <section id="how" style={{ padding: "var(--section-py) 0" }}>
+    <section id="how" className="section--light" style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area--wide">
         <Reveal>
           <span className="section-label" style={{ justifyContent: "center", display: "flex" }}>Как это работает</span>
@@ -239,26 +298,46 @@ function HowItWorks() {
   );
 }
 
-/* ─── About ─── */
+/* ─── About with Accordion ─── */
 function About() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
-    <section id="about" className="section--light" style={{ padding: "var(--section-py) 0" }}>
+    <section id="about" style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area">
         <Reveal>
           <span className="section-label">О Школе</span>
-          <h2 className="section-title heading-sweep">О Школе</h2>
+          <h2 className="section-title heading-sweep">О Школе ПК</h2>
           <p className="section-subtitle">Первая онлайн Школа потребительской кооперации — образовательный проект, запущенный в 2015 году Велеславом Старковым.</p>
         </Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.25rem", marginTop: "2.5rem" }}>
-          {aboutCards.map((card, i) => (
-            <Reveal key={i} delay={i + 1}>
-              <div className="value-card">
-                <div className={`value-card__icon value-card__icon--${card.color}`}>{card.icon}</div>
-                <div className="value-card__title">{card.title}</div>
-                <div className="value-card__desc">{card.desc}</div>
-              </div>
-            </Reveal>
-          ))}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", marginTop: "2rem" }}>
+          {/* Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+            {aboutCards.map((card, i) => (
+              <Reveal key={i} delay={i + 1}>
+                <div className="value-card">
+                  <div className={`value-card__icon value-card__icon--${card.color}`}>{card.icon}</div>
+                  <div className="value-card__title">{card.title}</div>
+                  <div className="value-card__desc">{card.desc}</div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          {/* Accordion */}
+          <div style={{ display: "grid", gap: "0.5rem" }}>
+            {aboutAccordion.map((item, i) => (
+              <Reveal key={i} delay={i + 1}>
+                <div className={`faq-item${openIndex === i ? " open" : ""}`}>
+                  <button className="faq-item__question" onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+                    <span>{item.title}</span>
+                    <span className="faq-item__icon">+</span>
+                  </button>
+                  <div className="faq-item__answer" style={{ maxHeight: openIndex === i ? 400 : 0 }}>
+                    <div className="faq-item__answer-inner">{item.content}</div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -269,7 +348,7 @@ function About() {
 function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   return (
-    <section style={{ padding: "var(--section-py) 0" }}>
+    <section id="faq" className="section--light" style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area">
         <Reveal>
           <span className="section-label">FAQ</span>
@@ -283,7 +362,7 @@ function FAQ() {
                   <span>{faq.q}</span>
                   <span className="faq-item__icon">+</span>
                 </button>
-                <div className="faq-item__answer" style={{ maxHeight: openIndex === i ? 300 : 0 }}>
+                <div className="faq-item__answer" style={{ maxHeight: openIndex === i ? 400 : 0 }}>
                   <div className="faq-item__answer-inner">{faq.a}</div>
                 </div>
               </div>
@@ -298,7 +377,7 @@ function FAQ() {
 /* ─── AI Consultant ─── */
 function AIConsultant() {
   const [messages, setMessages] = useState<{ text: string; type: "ai" | "user" | "error" }[]>([
-    { text: "Привет! 👋 Я AI-ассистент Школы Кооперативов. Помогу разобраться с потребительской кооперацией — просто и понятно. Спрашивай! 😊", type: "ai" },
+    { text: "Привет! Я AI-ассистент Школы Кооперативов. Помогу разобраться с потребительской кооперацией — просто и понятно. Спрашивайте!", type: "ai" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -314,7 +393,7 @@ function AIConsultant() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/ai/chat", {
+      const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMsg }),
@@ -339,7 +418,7 @@ function AIConsultant() {
   }, [messages]);
 
   return (
-    <section id="ai-consultant" className="ai-section section--light">
+    <section id="ai-consultant" className="ai-section">
       <div className="container content-area">
         <Reveal>
           <div className="ai-section__inner">
@@ -473,14 +552,14 @@ function Footer() {
           </div>
           <div>
             <div style={{ fontWeight: 600, marginBottom: "0.75rem", color: "var(--color-beige-200)", fontSize: "0.9rem" }}>Навигация</div>
-            {["О школе", "Программа", "FAQ", "Контакты"].map((t) => (
-              <div key={t} style={{ marginBottom: "0.4rem" }}><a href={`/#${t === "О школе" ? "about" : t === "Программа" ? "how" : t.toLowerCase()}`}>{t}</a></div>
+            {["О школе", "Программа", "Услуги", "FAQ", "Контакты"].map((t) => (
+              <div key={t} style={{ marginBottom: "0.4rem" }}><a href={`/#${t === "О школе" ? "about" : t === "Программа" ? "how" : t === "Услуги" ? "services" : t.toLowerCase()}`}>{t}</a></div>
             ))}
           </div>
           <div>
             <div style={{ fontWeight: 600, marginBottom: "0.75rem", color: "var(--color-beige-200)", fontSize: "0.9rem" }}>Услуги</div>
             {["Обучение", "Консалтинг", "Аудит устава", "Регистрация ПК"].map((t) => (
-              <div key={t} style={{ marginBottom: "0.4rem" }}><a href="#">{t}</a></div>
+              <div key={t} style={{ marginBottom: "0.4rem" }}><a href="#services">{t}</a></div>
             ))}
           </div>
           <div>
@@ -511,6 +590,7 @@ export default function Home() {
       <TagCloudSection />
       <Advantages />
       <Stats />
+      <Services />
       <HowItWorks />
       <About />
       <FAQ />

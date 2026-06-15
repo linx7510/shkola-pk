@@ -2,11 +2,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-/**
- * Header — BEIGE NEON
- * Прозрачный по умолчанию. При скролле: blur + тёмный фон.
- * CTA-кнопка в хедере с оранжевым акцентом.
- */
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -20,7 +15,7 @@ export default function Header() {
   const navLinks = [
     { label: "О школе", href: "/#about" },
     { label: "Программа", href: "/#how" },
-    { label: "Преимущества", href: "/#advantages" },
+    { label: "Услуги", href: "/#services" },
     { label: "FAQ", href: "/#faq" },
     { label: "Контакты", href: "/#contacts" },
   ];
@@ -55,7 +50,6 @@ export default function Header() {
           padding: "0 var(--container-px)",
         }}
       >
-        {/* Logo */}
         <Link
           href="/"
           style={{
@@ -81,7 +75,6 @@ export default function Header() {
           Школа ПК
         </Link>
 
-        {/* Desktop nav */}
         <nav
           className="nav-desktop"
           style={{
@@ -144,7 +137,6 @@ export default function Header() {
           </a>
         </nav>
 
-        {/* Mobile menu button */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="nav-mobile-btn"
@@ -163,7 +155,6 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile dropdown */}
       {mobileOpen && (
         <div
           style={{

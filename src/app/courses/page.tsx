@@ -1,9 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import CursorLight from "@/components/CursorLight";
-import Header from "@/components/Header";
-import Reveal from "@/components/Reveal";
+import { useRouter } from "next/navigation";
 
 interface Course {
   id: string;
@@ -11,144 +9,165 @@ interface Course {
   description: string;
   shortDesc: string | null;
   icon: string | null;
-  image: string | null;
+  order: number;
   isPublished: boolean;
-  modules: { id: string; title: string; lessons: { id: string; title: string; duration: number; isFree: boolean }[] }[];
-  _count: { enrollments: number };
+  modules: { id: string; title: string; order: number; lessons: { id: string }[] }[];
+}
+
+interface Enrollment {
+  courseId: string;
 }
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
+  const [enrollments, setEnrollments] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enrolling, setEnrolling] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    // Fetch courses
     fetch("/api/courses")
-      .then((res) => res.json())
+      .then((r) => r.json())
       .then((data) => {
-        setCourses(data.courses || []);
+        setCourses(data.courses || data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
 
-  const courseIcons = ["🏛️", "📋", "💰", "🛡️", "⚖️", "🎓"];
-  const badgeColors = ["orange", "green", "blue"] as const;
+    // Fetch enrollments if logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("/api/progress", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.enrollments) {
+            setEnrollments(data.enrollments.map((e: Enrollment) => e.courseId));
+          }
+        })
+        .catch(() => {});
+    }
+  }, [router]);
+
+  const handleEnroll = async (courseId: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+    setEnrolling(courseId);
+    try {
+      const res = await fetch("/api/enroll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ courseId }),
+      });
+      const data = await res.json();
+      if (data.enrollment) {
+        setEnrollments((prev) => [...prev, courseId]);
+      }
+    } catch (err) {
+      console.error("Enrollment error:", err);
+    } finally {
+      setEnrolling(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--color-bg-950)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: "var(--color-beige-300)" }}>Загрузка курсов...</div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ background: "var(--color-bg-950)", minHeight: "100vh" }}>
-      <CursorLight />
-      <Header />
+    <div style={{ minHeight: "100vh", background: "var(--color-bg-950)" }}>
+      {/* Header */}
+      <header style={{ borderBottom: "1px solid var(--glass-border)", padding: "1rem var(--container-px)", display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: "var(--container-max)", margin: "0 auto" }}>
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.65rem", textDecoration: "none" }}>
+          <img src="/images/header-logo-tiny.webp" alt="" style={{ width: 32, height: 32, filter: "brightness(1.2)" }} />
+          <span style={{ fontWeight: 700, color: "var(--color-beige-200)" }}>Школа ПК</span>
+        </Link>
+        <Link href="/dashboard" style={{ fontSize: "0.85rem", color: "var(--color-orange-400)", textDecoration: "none" }}>Мой кабинет</Link>
+      </header>
 
-      <div
-        style={{
-          paddingTop: "calc(var(--header-h) + 2rem)",
-          paddingBottom: "var(--section-py)",
-        }}
-      >
-        <div className="container content-area">
-          <Reveal>
-            <span className="section-label">Каталог</span>
-            <h1 style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", fontWeight: 800, marginBottom: "0.75rem" }}>
-              Курсы Школы ПК
-            </h1>
-            <p
-              style={{
-                color: "var(--color-text-muted)",
-                maxWidth: 600,
-                marginBottom: "2.5rem",
-                fontSize: "clamp(1rem, 1.6vw, 1.15rem)",
-                lineHeight: 1.7,
-              }}
-            >
-              Практическое обучение созданию и ведению потребительских
-              кооперативов. От регистрации до уверенной работы.
-            </p>
-          </Reveal>
+      <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "3rem var(--container-px)" }}>
+        <h1 className="heading-sweep" style={{ fontSize: "2rem", color: "var(--color-beige-200)", marginBottom: "0.5rem" }}>Каталог курсов</h1>
+        <p style={{ color: "var(--color-text-muted)", marginBottom: "2.5rem" }}>Выберите курс и начните обучение прямо сейчас</p>
 
-          {loading ? (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "4rem",
-                color: "var(--color-text-muted)",
-              }}
-            >
-              Загрузка курсов...
-            </div>
-          ) : courses.length === 0 ? (
-            <Reveal delay={1}>
-              <div
-                className="glass-2"
-                style={{
-                  textAlign: "center",
-                  padding: "4rem 2rem",
-                  borderRadius: 20,
-                }}
-              >
-                <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>
-                  🚧
-                </div>
-                <h2
-                  style={{
-                    fontSize: "1.4rem",
-                    fontWeight: 700,
-                    marginBottom: "0.5rem",
-                    color: "var(--color-text-primary)",
-                  }}
-                >
-                  Курсы скоро появятся
-                </h2>
-                <p style={{ color: "var(--color-text-muted)", marginBottom: "1.5rem" }}>
-                  Мы готовим обучающие программы. Оставьте заявку, и мы
-                  уведомим вас о старте.
-                </p>
-                <a href="/#contacts" className="btn-primary">
-                  Оставить заявку
-                </a>
-              </div>
-            </Reveal>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {courses.map((course, i) => (
-                <Reveal key={course.id} delay={Math.min(i + 1, 6)}>
-                  <Link href={`/courses/${course.id}`} style={{ textDecoration: "none" }}>
-                    <div className="course-card">
-                      <div className="course-card__image">
-                        {course.icon || courseIcons[i % courseIcons.length]}
-                      </div>
-                      <div className="course-card__body">
-                        <span className={`course-card__badge course-card__badge--${badgeColors[i % 3]}`}>
-                          {course.modules.length} модулей
-                        </span>
-                        <div className="course-card__title">{course.title}</div>
-                        <div className="course-card__desc">
-                          {course.shortDesc || course.description.slice(0, 120) + "..."}
-                        </div>
-                        <div className="course-card__meta">
-                          <span>{course._count.enrollments} студентов</span>
-                          <span
-                            style={{
-                              color: "var(--color-orange-400)",
-                              fontWeight: 600,
-                            }}
-                          >
-                            Подробнее →
-                          </span>
-                        </div>
+        {courses.length === 0 ? (
+          <div className="glass-2" style={{ padding: "3rem", textAlign: "center" }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📚</div>
+            <div style={{ color: "var(--color-beige-200)" }}>Курсы скоро появятся</div>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "1.5rem" }}>
+            {courses.map((course) => {
+              const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+              const isEnrolled = enrollments.includes(course.id);
+
+              return (
+                <div key={course.id} className="glass-2" style={{ padding: "2rem", display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+                    <div style={{ width: 56, height: 56, borderRadius: 14, background: "rgba(201,110,77,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem" }}>
+                      {course.icon || "📖"}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, color: "var(--color-beige-200)", fontSize: "1.1rem" }}>{course.title}</div>
+                      <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", marginTop: "0.25rem" }}>
+                        {course.modules.length} модулей · {totalLessons} уроков
                       </div>
                     </div>
-                  </Link>
-                </Reveal>
-              ))}
-            </div>
-          )}
-        </div>
+                  </div>
+
+                  <p style={{ color: "var(--color-text-muted)", fontSize: "0.88rem", lineHeight: 1.7, flex: 1 }}>
+                    {course.shortDesc || course.description.substring(0, 150) + "..."}
+                  </p>
+
+                  <div style={{ marginTop: "1.5rem", display: "flex", gap: "0.75rem" }}>
+                    {isEnrolled ? (
+                      <>
+                        <Link
+                          href="/dashboard"
+                          className="btn-primary"
+                          style={{ fontSize: "0.85rem", padding: "0.6rem 1.5rem", textDecoration: "none" }}
+                        >
+                          Продолжить обучение
+                        </Link>
+                        <Link
+                          href={`/courses/${course.id}`}
+                          style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", textDecoration: "underline", display: "flex", alignItems: "center" }}
+                        >
+                          Подробнее
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleEnroll(course.id)}
+                          disabled={enrolling === course.id}
+                          className="btn-primary"
+                          style={{ fontSize: "0.85rem", padding: "0.6rem 1.5rem" }}
+                        >
+                          {enrolling === course.id ? "Запись..." : "Записаться"}
+                        </button>
+                        <Link
+                          href={`/courses/${course.id}`}
+                          style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", textDecoration: "underline", display: "flex", alignItems: "center" }}
+                        >
+                          Программа курса
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
