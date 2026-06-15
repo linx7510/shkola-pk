@@ -1,5 +1,13 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import Link from "next/link";
+import CursorLight from "@/components/CursorLight";
+import Header from "@/components/Header";
+import Reveal from "@/components/Reveal";
+
+/* ═══════════════════════════════════════════════════════════
+   BEIGE NEON — Главная страница Школа ПК
+   ═══════════════════════════════════════════════════════════ */
 
 /* ─── Data ─── */
 const advantages = [
@@ -39,108 +47,252 @@ const faqItems = [
   { q: "Онлайн-касса нужна для ПК?", a: "Нет. Поскольку ПК не осуществляет реализацию товаров, а производит возврат паевых взносов, применение ККТ не требуется (ст. 1.1 ФЗ-54)." },
 ];
 
-/* ─── Reveal on Scroll ─── */
-function useReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { el.classList.add("visible"); obs.disconnect(); } },
-      { threshold: 0.12 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return ref;
-}
+/* ─── Color maps ─── */
+const colorRGB: Record<string, string> = {
+  orange: "201,110,77",
+  green: "76,154,122",
+  blue: "58,109,140",
+};
 
-function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useReveal();
-  const delayClass = delay ? ` reveal-delay-${delay}` : "";
-  return <div ref={ref} className={`reveal${delayClass} ${className}`}>{children}</div>;
-}
-
-/* ─── Header ─── */
-function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", h, { passive: true });
-    return () => window.removeEventListener("scroll", h);
-  }, []);
-
-  return (
-    <header style={{
-      position: "fixed", top: 0, width: "100%", zIndex: 10000,
-      height: "var(--header-h)", display: "flex", alignItems: "center",
-      background: scrolled ? "rgba(13,12,10,.95)" : "rgba(13,12,10,1)",
-      backdropFilter: scrolled ? "blur(12px)" : "none",
-      borderBottom: scrolled ? "1px solid rgba(214,198,178,.06)" : "none",
-      transition: "all .3s"
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem", width: "100%", maxWidth: "var(--container-max)", margin: "0 auto", padding: "0 var(--container-px)" }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: ".65rem", fontWeight: 700, fontSize: "1.05rem", color: "#D6C6B2", textDecoration: "none", letterSpacing: ".03em" }}>
-          <span style={{ width: 38, height: 38, borderRadius: 10, background: "linear-gradient(135deg, var(--color-orange-400), var(--color-beige-200))", display: "flex", alignItems: "center", justifyContent: "center", color: "#0D0C0A", fontWeight: 900, fontSize: "1.1rem" }}>Ш</span>
-          Школа ПК
-        </a>
-        <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem", flex: 1 }}>
-          {["О школе", "Программа", "Преимущества", "FAQ", "Контакты"].map((t) => (
-            <a key={t} href={`#${t === "О школе" ? "about" : t === "Программа" ? "how" : t === "Преимущества" ? "advantages" : t.toLowerCase()}`}
-              style={{ fontSize: ".875rem", fontWeight: 500, color: "rgba(214,198,178,.6)", textDecoration: "none", transition: "color .15s", whiteSpace: "nowrap" }}
-              onMouseEnter={e => (e.target as HTMLElement).style.color = "#C9B19A"}
-              onMouseLeave={e => (e.target as HTMLElement).style.color = "rgba(214,198,178,.6)"}>
-              {t}
-            </a>
-          ))}
-          <a href="#contacts" className="btn-primary" style={{ marginLeft: "auto", fontSize: ".85rem", padding: ".6rem 1.5rem" }}>Записаться</a>
-        </nav>
-        <button onClick={() => setMobileOpen(!mobileOpen)} style={{ display: "none", background: "rgba(214,198,178,.12)", border: "1px solid rgba(214,198,178,.3)", borderRadius: 8, padding: "10px 8px", cursor: "pointer", color: "#D6C6B2" }}>
-          ☰
-        </button>
-      </div>
-    </header>
-  );
-}
+const colorVar: Record<string, string> = {
+  orange: "var(--color-orange-400)",
+  green: "var(--color-green-400)",
+  blue: "var(--color-blue-400)",
+};
 
 /* ─── Hero ─── */
 function Hero() {
   return (
-    <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", paddingTop: "calc(var(--header-h) + 2rem)", overflow: "hidden", isolation: "isolate" }}>
-      {/* Ambient glow */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none", opacity: .6 }}>
-        <div style={{ position: "absolute", top: "-20%", left: "-10%", width: "60%", height: "60%", background: "radial-gradient(ellipse, rgba(201,110,77,.06) 0%, transparent 70%)", animation: "ambientDrift 20s ease-in-out infinite" }} />
-        <div style={{ position: "absolute", bottom: "-20%", right: "-10%", width: "60%", height: "60%", background: "radial-gradient(ellipse, rgba(76,154,122,.05) 0%, transparent 70%)", animation: "ambientDrift 25s ease-in-out infinite reverse" }} />
+    <section
+      style={{
+        position: "relative",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        paddingTop: "calc(var(--header-h) + 2rem)",
+        overflow: "hidden",
+        isolation: "isolate",
+      }}
+    >
+      {/* Ambient glow — colour spots drifting */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: "none",
+          opacity: 0.6,
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "-20%",
+            left: "-10%",
+            width: "60%",
+            height: "60%",
+            background:
+              "radial-gradient(ellipse, rgba(201,110,77,0.06) 0%, transparent 70%)",
+            animation: "ambientDrift 20s ease-in-out infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "-20%",
+            right: "-10%",
+            width: "60%",
+            height: "60%",
+            background:
+              "radial-gradient(ellipse, rgba(76,154,122,0.05) 0%, transparent 70%)",
+            animation: "ambientDrift 25s ease-in-out infinite reverse",
+          }}
+        />
       </div>
 
-      <div className="container" style={{ position: "relative", zIndex: 10, display: "grid", gridTemplateColumns: "1.1fr .9fr", gap: "3rem", alignItems: "center" }}>
+      <div
+        className="container"
+        style={{
+          position: "relative",
+          zIndex: 10,
+          display: "grid",
+          gridTemplateColumns: "1.1fr 0.9fr",
+          gap: "3rem",
+          alignItems: "center",
+        }}
+      >
         <div style={{ maxWidth: 680 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: ".5rem", padding: ".4rem 1rem", borderRadius: 100, background: "rgba(255,255,255,.04)", border: "1px solid var(--glass-border)", fontSize: ".75rem", fontWeight: 600, color: "var(--color-text-secondary)", marginBottom: "1.5rem", fontFamily: "ui-monospace, monospace" }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-green-400)", animation: "pulse 2s ease-in-out infinite" }} />
+          {/* Badge */}
+          <div
+            className="mono"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.4rem 1rem",
+              borderRadius: 100,
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid var(--glass-border)",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              color: "var(--color-text-muted)",
+              marginBottom: "1.5rem",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "var(--color-green-400)",
+                animation: "pulse 2s ease-in-out infinite",
+              }}
+            />
             Потребительский кооператив — защита активов и ставка 0%
           </div>
-          <h1 style={{ fontSize: "clamp(2.4rem, 5.5vw, 4.2rem)", fontWeight: 800, lineHeight: 1.08, letterSpacing: ".02em", marginBottom: "1.5rem" }}>
-            <span className="text-gradient">Первая Онлайн Школа</span><br />
+
+          {/* Heading */}
+          <h1 style={{ marginBottom: "1.5rem" }}>
+            <span className="text-gradient">Первая Онлайн Школа</span>
+            <br />
             <span>Потребительских Кооперативов</span>
           </h1>
-          <p style={{ fontSize: "clamp(1rem, 1.8vw, 1.2rem)", color: "var(--color-text-secondary)", lineHeight: 1.7, maxWidth: 540, marginBottom: "2rem" }}>
-            НДС, налог на прибыль и соц.платежи — 0% по закону РФ № 3085-1. Обучим работе с некоммерческими организациями. Защитите имущество от взысканий, обнулите налоги и работайте легально.
+
+          {/* Subtitle */}
+          <p
+            style={{
+              color: "var(--color-text-muted)",
+              maxWidth: 540,
+              marginBottom: "2rem",
+            }}
+          >
+            НДС, налог на прибыль и соц.платежи — 0% по закону РФ № 3085-1.
+            Обучим работе с некоммерческими организациями. Защитите имущество от
+            взысканий, обнулите налоги и работайте легально.
           </p>
-          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginBottom: "2.5rem" }}>
-            <a href="#how" className="btn-primary">Выбрать курс</a>
-            <a href="#contacts" className="btn-secondary">Бесплатная консультация</a>
+
+          {/* CTA */}
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              flexWrap: "wrap",
+              marginBottom: "2.5rem",
+            }}
+          >
+            <a href="#how" className="btn-primary">
+              Выбрать курс
+            </a>
+            <a href="#contacts" className="btn-secondary">
+              Бесплатная консультация
+            </a>
           </div>
         </div>
-        <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
-          <div style={{ position: "relative", width: "100%", maxWidth: 420, aspectRatio: "1/1" }}>
-            {/* Logo glow rings */}
-            <div style={{ position: "absolute", inset: "-20%", borderRadius: "50%", border: "1px solid rgba(214,198,178,.06)", animation: "logoFloat 8s ease-in-out infinite" }} />
-            <div style={{ position: "absolute", inset: "-10%", borderRadius: "50%", border: "1px solid rgba(214,198,178,.04)", animation: "logoFloat 10s ease-in-out infinite reverse" }} />
+
+        {/* Right: Logo with glow rings + particles */}
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: 400,
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: 420,
+              aspectRatio: "1/1",
+            }}
+          >
+            {/* Orbital rings */}
+            <div
+              style={{
+                position: "absolute",
+                inset: "-25%",
+                borderRadius: "50%",
+                border: "1px solid rgba(214,198,178,0.05)",
+                animation: "logoRing 16s linear infinite",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: "-15%",
+                borderRadius: "50%",
+                border: "1px solid rgba(214,198,178,0.04)",
+                animation: "logoRing 12s linear infinite reverse",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: "-5%",
+                borderRadius: "50%",
+                border: "1px solid rgba(214,198,178,0.06)",
+                animation: "logoRing 8s linear infinite",
+              }}
+            />
+
+            {/* Floating particles */}
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  width: 3 + i,
+                  height: 3 + i,
+                  borderRadius: "50%",
+                  background: "rgba(214,198,178,0.3)",
+                  animation: `logoGlow ${5 + i}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.8}s`,
+                  top: `${20 + (i * 12) % 60}%`,
+                  left: `${15 + (i * 17) % 70}%`,
+                }}
+              />
+            ))}
+
             {/* Center emblem */}
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", animation: "logoFloat 6s ease-in-out infinite" }}>
-              <div style={{ width: "60%", height: "60%", borderRadius: "50%", background: "radial-gradient(circle, rgba(201,110,77,.12) 0%, rgba(214,198,178,.04) 40%, transparent 70%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 60px rgba(255,230,200,.15), 0 0 120px rgba(214,198,178,.08)" }}>
-                <span style={{ fontSize: "4rem", filter: "drop-shadow(0 0 20px rgba(255,230,200,.3))" }}>🏛️</span>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                animation: "logoFloat 6s ease-in-out infinite",
+              }}
+            >
+              <div
+                style={{
+                  width: "60%",
+                  height: "60%",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(201,110,77,0.12) 0%, rgba(214,198,178,0.04) 40%, transparent 70%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow:
+                    "0 0 40px rgba(255,230,200,0.4), 0 0 80px rgba(214,198,178,0.2)",
+                  animation: "logoGlow 4s ease-in-out infinite",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "4rem",
+                    filter:
+                      "drop-shadow(0 0 40px rgba(255,230,200,0.4)) drop-shadow(0 0 80px rgba(214,198,178,0.2))",
+                  }}
+                >
+                  🏛️
+                </span>
               </div>
             </div>
           </div>
@@ -150,15 +302,14 @@ function Hero() {
   );
 }
 
-/* ─── Quote (Pause) ─── */
+/* ─── Quote (Pause-section) ─── */
 function Quote({ text, author }: { text: string; author: string }) {
   return (
     <Reveal>
-      <section style={{ textAlign: "center", padding: "4rem 1rem" }}>
-        <blockquote style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)", fontWeight: 300, fontStyle: "italic", color: "var(--color-beige-200)", maxWidth: 700, margin: "0 auto .75rem", lineHeight: 1.6 }}>
-          &laquo;{text}&raquo;
-        </blockquote>
-        <cite style={{ fontSize: ".9rem", color: "var(--color-text-muted)", fontStyle: "normal" }}>{author}</cite>
+      <section className="quote-section">
+        <blockquote className="quote-text">&laquo;{text}&raquo;</blockquote>
+        <div className="quote-divider" />
+        <cite className="quote-author">{author}</cite>
       </section>
     </Reveal>
   );
@@ -167,16 +318,24 @@ function Quote({ text, author }: { text: string; author: string }) {
 /* ─── Advantages ─── */
 function Advantages() {
   return (
-    <section id="advantages" style={{ padding: "5rem 0" }}>
+    <section id="advantages" style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area">
         <Reveal>
           <span className="section-label">Преимущества</span>
-          <h2 className="section-title heading-sweep">Преимущества</h2>
+          <h2 className="section-title">Преимущества</h2>
           <p className="section-subtitle" style={{ marginBottom: "2rem" }}>
-            Предприниматели теряют миллионы на налогах и рискуют имуществом. ООО и ИП платят НДС, налог на прибыль, НДФЛ и страховые взносы. Но есть другой путь — потребительский кооператив по закону РФ № 3085-1.
+            Предприниматели теряют миллионы на налогах и рискуют имуществом. ООО
+            и ИП платят НДС, налог на прибыль, НДФЛ и страховые взносы. Но есть
+            другой путь — потребительский кооператив по закону РФ № 3085-1.
           </p>
         </Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem" }} className="advantages__grid">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: "1.25rem",
+          }}
+        >
           {advantages.map((card, i) => (
             <Reveal key={i} delay={i + 1}>
               <div className={`advantage-card advantage-card--${card.color}`}>
@@ -201,7 +360,9 @@ function Stats() {
           <div className="stats-bar__inner">
             {stats.map((s, i) => (
               <div key={i}>
-                <div className={`stats-bar__number stats-bar__number--${s.color}`}>{s.number}</div>
+                <div className={`stats-bar__number stats-bar__number--${s.color}`}>
+                  {s.number}
+                </div>
                 <div className="stats-bar__label">{s.label}</div>
               </div>
             ))}
@@ -214,25 +375,81 @@ function Stats() {
 
 /* ─── How It Works ─── */
 function HowItWorks() {
-  const colorMap: Record<string, string> = { orange: "201,110,77", green: "76,154,122", blue: "58,109,140" };
-  const textColor: Record<string, string> = { orange: "var(--color-orange-400)", green: "var(--color-green-400)", blue: "var(--color-blue-400)" };
   return (
-    <section id="how" style={{ padding: "5rem 0" }}>
+    <section id="how" style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area--wide">
         <Reveal>
-          <span className="section-label" style={{ justifyContent: "center", display: "flex" }}>Как это работает</span>
-          <h2 className="section-title heading-sweep" style={{ textAlign: "center" }}>
-            Устал выживать один? <span style={{ color: "var(--color-orange-400)" }}>Пора кооперироваться!</span>
+          <span
+            className="section-label"
+            style={{
+              justifyContent: "center",
+              display: "flex",
+            }}
+          >
+            Как это работает
+          </span>
+          <h2 className="section-title" style={{ textAlign: "center" }}>
+            Устал выживать один?{" "}
+            <span style={{ color: "var(--color-orange-400)" }}>
+              Пора кооперироваться!
+            </span>
           </h2>
         </Reveal>
-        <div style={{ maxWidth: 800, margin: "2rem auto 0", display: "grid", gap: "1.5rem" }}>
+        <div
+          style={{
+            maxWidth: 800,
+            margin: "2rem auto 0",
+            display: "grid",
+            gap: "1.5rem",
+          }}
+        >
           {howSteps.map((step, i) => (
             <Reveal key={i} delay={i + 1}>
-              <div className="glass-2" style={{ padding: "1.5rem 2rem", display: "flex", alignItems: "flex-start", gap: "1.25rem" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 10, background: `rgba(${colorMap[step.color]},.12)`, color: textColor[step.color], display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "1.1rem", flexShrink: 0 }}>{step.num}</div>
+              <div
+                className="glass-2"
+                style={{
+                  padding: "1.5rem 2rem",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "1.25rem",
+                }}
+              >
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    background: `rgba(${colorRGB[step.color]},0.12)`,
+                    color: colorVar[step.color],
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 800,
+                    fontSize: "1.1rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  {step.num}
+                </div>
                 <div>
-                  <div style={{ fontWeight: 600, marginBottom: ".35rem", color: "var(--color-beige-200)" }}>{step.title}</div>
-                  <div style={{ fontSize: ".88rem", color: "var(--color-text-secondary)", lineHeight: 1.7 }}>{step.desc}</div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      marginBottom: "0.35rem",
+                      color: "var(--color-beige-200)",
+                    }}
+                  >
+                    {step.title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.88rem",
+                      color: "var(--color-text-muted)",
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {step.desc}
+                  </div>
                 </div>
               </div>
             </Reveal>
@@ -246,18 +463,34 @@ function HowItWorks() {
 /* ─── About ─── */
 function About() {
   return (
-    <section id="about" className="section--light" style={{ padding: "5rem 0" }}>
+    <section
+      id="about"
+      className="section--light"
+      style={{ padding: "var(--section-py) 0" }}
+    >
       <div className="container content-area">
         <Reveal>
           <span className="section-label">О Школе</span>
-          <h2 className="section-title heading-sweep">О Школе</h2>
-          <p className="section-subtitle">Первая онлайн Школа потребительской кооперации — образовательный проект, запущенный в 2015 году Велеславом Старковым.</p>
+          <h2 className="section-title">О Школе</h2>
+          <p className="section-subtitle">
+            Первая онлайн Школа потребительской кооперации — образовательный
+            проект, запущенный в 2015 году Велеславом Старковым.
+          </p>
         </Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.25rem", marginTop: "2.5rem" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "1.25rem",
+            marginTop: "2.5rem",
+          }}
+        >
           {aboutCards.map((card, i) => (
             <Reveal key={i} delay={i + 1}>
               <div className="value-card">
-                <div className={`value-card__icon value-card__icon--${card.color}`}>{card.icon}</div>
+                <div className={`value-card__icon value-card__icon--${card.color}`}>
+                  {card.icon}
+                </div>
                 <div className="value-card__title">{card.title}</div>
                 <div className="value-card__desc">{card.desc}</div>
               </div>
@@ -273,21 +506,29 @@ function About() {
 function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   return (
-    <section id="faq" className="section--light" style={{ padding: "5rem 0" }}>
+    <section style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area">
         <Reveal>
           <span className="section-label">FAQ</span>
-          <h2 className="section-title heading-sweep">Частые вопросы</h2>
+          <h2 className="section-title">Частые вопросы</h2>
         </Reveal>
-        <div style={{ display: "grid", gap: ".75rem", marginTop: "1.5rem" }}>
+        <div
+          style={{ display: "grid", gap: "0.75rem", marginTop: "1.5rem" }}
+        >
           {faqItems.map((faq, i) => (
-            <Reveal key={i} delay={i + 1}>
+            <Reveal key={i} delay={Math.min(i + 1, 6)}>
               <div className={`faq-item${openIndex === i ? " open" : ""}`}>
-                <button className="faq-item__question" onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+                <button
+                  className="faq-item__question"
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                >
                   <span>{faq.q}</span>
                   <span className="faq-item__icon">+</span>
                 </button>
-                <div className="faq-item__answer" style={{ maxHeight: openIndex === i ? 300 : 0 }}>
+                <div
+                  className="faq-item__answer"
+                  style={{ maxHeight: openIndex === i ? 300 : 0 }}
+                >
                   <div className="faq-item__answer-inner">{faq.a}</div>
                 </div>
               </div>
@@ -302,13 +543,25 @@ function FAQ() {
 /* ─── CTA ─── */
 function CTA() {
   return (
-    <section style={{ padding: "5rem 0" }}>
+    <section
+      className="section--light"
+      style={{ padding: "var(--section-py) 0" }}
+    >
       <div className="container content-area">
         <Reveal>
           <div className="cta__inner">
             <h2 className="cta__title">Готовы начать?</h2>
-            <p className="cta__desc">Запишитесь на бесплатную консультацию и узнайте, как потребительский кооператив поможет вашему бизнесу</p>
-            <a href="#contacts" className="btn-primary" style={{ fontSize: "1.05rem", padding: "1rem 2.5rem" }}>Оставить заявку</a>
+            <p className="cta__desc">
+              Запишитесь на бесплатную консультацию и узнайте, как
+              потребительский кооператив поможет вашему бизнесу
+            </p>
+            <a
+              href="#contacts"
+              className="btn-primary"
+              style={{ fontSize: "1.05rem", padding: "1rem 2.5rem" }}
+            >
+              Оставить заявку
+            </a>
           </div>
         </Reveal>
       </div>
@@ -319,37 +572,89 @@ function CTA() {
 /* ─── Contacts ─── */
 function Contacts() {
   return (
-    <section id="contacts" style={{ padding: "5rem 0" }}>
+    <section id="contacts" style={{ padding: "var(--section-py) 0" }}>
       <div className="container content-area">
         <Reveal>
           <span className="section-label">Контакты</span>
-          <h2 className="section-title heading-sweep">Свяжитесь с нами</h2>
+          <h2 className="section-title">Свяжитесь с нами</h2>
         </Reveal>
         <div className="contacts__grid">
           <div>
             {[
-              { label: "Телефон", value: "+7 (902) 472-07-38", href: "tel:+79024720738" },
-              { label: "Email", value: "boss@2980738.ru", href: "mailto:boss@2980738.ru" },
-              { label: "Telegram", value: "@Veles_ST (личный)", href: "https://t.me/Veles_ST" },
-              { label: "Адрес", value: "г. Пермь, ул. Фонтанная, д. 1а/1", href: undefined },
+              {
+                label: "Телефон",
+                value: "+7 (902) 472-07-38",
+                href: "tel:+79024720738",
+              },
+              {
+                label: "Email",
+                value: "boss@2980738.ru",
+                href: "mailto:boss@2980738.ru",
+              },
+              {
+                label: "Telegram",
+                value: "@Veles_ST (личный)",
+                href: "https://t.me/Veles_ST",
+              },
+              {
+                label: "Адрес",
+                value: "г. Пермь, ул. Фонтанная, д. 1а/1",
+                href: undefined,
+              },
             ].map((c, i) => (
               <Reveal key={i} delay={i + 1}>
                 <div className="contact-block">
                   <div className="contact-block__label">{c.label}</div>
                   <div className="contact-block__value">
-                    {c.href ? <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener">{c.value}</a> : c.value}
+                    {c.href ? (
+                      <a
+                        href={c.href}
+                        target={
+                          c.href.startsWith("http") ? "_blank" : undefined
+                        }
+                        rel="noopener"
+                      >
+                        {c.value}
+                      </a>
+                    ) : (
+                      c.value
+                    )}
                   </div>
                 </div>
               </Reveal>
             ))}
           </div>
           <Reveal delay={3}>
-            <form onSubmit={e => e.preventDefault()} style={{ display: "grid", gap: ".75rem" }}>
-              <input type="text" className="form-field" placeholder="Ваше имя" />
-              <input type="email" className="form-field" placeholder="Email" />
-              <input type="tel" className="form-field" placeholder="Телефон (необязательно)" />
-              <textarea className="form-field form-textarea" placeholder="Сообщение" />
-              <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Отправить →</button>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              style={{ display: "grid", gap: "0.75rem" }}
+            >
+              <input
+                type="text"
+                className="form-field"
+                placeholder="Ваше имя"
+              />
+              <input
+                type="email"
+                className="form-field"
+                placeholder="Email"
+              />
+              <input
+                type="tel"
+                className="form-field"
+                placeholder="Телефон (необязательно)"
+              />
+              <textarea
+                className="form-field form-textarea"
+                placeholder="Сообщение"
+              />
+              <button
+                type="submit"
+                className="btn-primary"
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                Отправить
+              </button>
             </form>
           </Reveal>
         </div>
@@ -361,38 +666,132 @@ function Contacts() {
 /* ─── Footer ─── */
 function Footer() {
   return (
-    <footer className="footer" style={{ borderTop: "1px solid rgba(214,198,178,.06)" }}>
+    <footer className="footer">
       <div className="container">
         <div className="footer-grid">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: ".65rem", fontWeight: 700, fontSize: "1.05rem", color: "#D6C6B2", marginBottom: "1rem" }}>
-              <span style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, var(--color-orange-400), var(--color-beige-200))", display: "flex", alignItems: "center", justifyContent: "center", color: "#0D0C0A", fontWeight: 900, fontSize: ".9rem" }}>Ш</span>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.65rem",
+                fontWeight: 700,
+                fontSize: "1.05rem",
+                color: "#D6C6B2",
+                marginBottom: "1rem",
+              }}
+            >
+              <span
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background:
+                    "linear-gradient(135deg, var(--color-orange-500), var(--color-beige-300))",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#0D0C0A",
+                  fontWeight: 900,
+                  fontSize: "0.9rem",
+                }}
+              >
+                Ш
+              </span>
               Школа ПК
             </div>
-            <p style={{ fontSize: ".85rem", color: "var(--color-text-muted)", lineHeight: 1.6, maxWidth: 280 }}>Первая Онлайн Школа Потребительских Кооперативов</p>
+            <p
+              style={{
+                fontSize: "0.85rem",
+                color: "var(--color-text-muted)",
+                lineHeight: 1.6,
+                maxWidth: 280,
+              }}
+            >
+              Первая Онлайн Школа Потребительских Кооперативов
+            </p>
           </div>
           <div>
-            <div style={{ fontWeight: 600, marginBottom: ".75rem", color: "var(--color-beige-200)", fontSize: ".9rem" }}>Навигация</div>
-            {["О школе", "Программа", "FAQ", "Контакты"].map(t => (
-              <div key={t} style={{ marginBottom: ".4rem" }}><a href={`#${t === "О школе" ? "about" : t === "Программа" ? "how" : t.toLowerCase()}`}>{t}</a></div>
+            <div
+              style={{
+                fontWeight: 600,
+                marginBottom: "0.75rem",
+                color: "var(--color-beige-200)",
+                fontSize: "0.9rem",
+              }}
+            >
+              Навигация
+            </div>
+            {["О школе", "Программа", "FAQ", "Контакты"].map((t) => (
+              <div key={t} style={{ marginBottom: "0.4rem" }}>
+                <a
+                  href={`/#${t === "О школе" ? "about" : t === "Программа" ? "how" : t.toLowerCase()}`}
+                >
+                  {t}
+                </a>
+              </div>
             ))}
           </div>
           <div>
-            <div style={{ fontWeight: 600, marginBottom: ".75rem", color: "var(--color-beige-200)", fontSize: ".9rem" }}>Услуги</div>
-            {["Обучение", "Консалтинг", "Аудит устава", "Регистрация ПК"].map(t => (
-              <div key={t} style={{ marginBottom: ".4rem" }}><a href="#">{t}</a></div>
-            ))}
+            <div
+              style={{
+                fontWeight: 600,
+                marginBottom: "0.75rem",
+                color: "var(--color-beige-200)",
+                fontSize: "0.9rem",
+              }}
+            >
+              Услуги
+            </div>
+            {["Обучение", "Консалтинг", "Аудит устава", "Регистрация ПК"].map(
+              (t) => (
+                <div key={t} style={{ marginBottom: "0.4rem" }}>
+                  <a href="#">{t}</a>
+                </div>
+              )
+            )}
           </div>
           <div>
-            <div style={{ fontWeight: 600, marginBottom: ".75rem", color: "var(--color-beige-200)", fontSize: ".9rem" }}>Контакты</div>
-            <div style={{ fontSize: ".85rem", color: "var(--color-text-secondary)", lineHeight: 1.8 }}>
-              <a href="tel:+79024720738">+7 (902) 472-07-38</a><br />
-              <a href="mailto:boss@2980738.ru">boss@2980738.ru</a><br />
-              <a href="https://t.me/Veles_ST" target="_blank" rel="noopener">@Veles_ST</a>
+            <div
+              style={{
+                fontWeight: 600,
+                marginBottom: "0.75rem",
+                color: "var(--color-beige-200)",
+                fontSize: "0.9rem",
+              }}
+            >
+              Контакты
+            </div>
+            <div
+              style={{
+                fontSize: "0.85rem",
+                color: "var(--color-text-muted)",
+                lineHeight: 1.8,
+              }}
+            >
+              <a href="tel:+79024720738">+7 (902) 472-07-38</a>
+              <br />
+              <a href="mailto:boss@2980738.ru">boss@2980738.ru</a>
+              <br />
+              <a
+                href="https://t.me/Veles_ST"
+                target="_blank"
+                rel="noopener"
+              >
+                @Veles_ST
+              </a>
             </div>
           </div>
         </div>
-        <div style={{ padding: "1.5rem 0", borderTop: "1px solid rgba(214,198,178,.04)", textAlign: "center", fontSize: ".8rem", color: "var(--color-text-muted)" }}>
+        <div
+          style={{
+            padding: "1.5rem 0",
+            borderTop: "1px solid rgba(214,198,178,0.04)",
+            textAlign: "center",
+            fontSize: "0.8rem",
+            color: "var(--color-text-disabled)",
+          }}
+        >
           &copy; 2026 Школа ПК. Все права защищены.
         </div>
       </div>
@@ -404,19 +803,25 @@ function Footer() {
 export default function Home() {
   return (
     <div style={{ minHeight: "100vh" }}>
+      <CursorLight />
       <Header />
       <Hero />
-      <Quote text="Кооперация — это не бизнес-модель. Это архитектура доверия." author="— Велеслав Старков" />
+      <Quote
+        text="Кооперация — это не бизнес-модель. Это архитектура доверия."
+        author="— Велеслав Старков"
+      />
       <Advantages />
       <Stats />
       <HowItWorks />
       <About />
       <FAQ />
       <CTA />
-      <Quote text="Один в поле не воин. Но вместе мы — сила, меняющая правила игры." author="— Кооперативная мудрость" />
+      <Quote
+        text="Один в поле не воин. Но вместе мы — сила, меняющая правила игры."
+        author="— Кооперативная мудрость"
+      />
       <Contacts />
       <Footer />
     </div>
   );
 }
-
