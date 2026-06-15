@@ -69,23 +69,15 @@ export default function Header() {
             letterSpacing: "0.03em",
           }}
         >
-          <span
+          <img
+            src="/images/header-logo-tiny.webp"
+            alt=""
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: 10,
-              background:
-                "linear-gradient(135deg, var(--color-orange-500), var(--color-beige-300))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#0D0C0A",
-              fontWeight: 900,
-              fontSize: "1.1rem",
+              width: 40,
+              height: 40,
+              filter: "brightness(1.2) contrast(1.05) drop-shadow(0 0 10px rgba(255,230,200,0.4))",
             }}
-          >
-            Ш
-          </span>
+          />
           Школа ПК
         </Link>
 
