@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from '@/lib/prisma';
+import { sendEmail, enrollmentEmail } from '@/lib/email';
 
-const prisma = new PrismaClient();
-
-// POST /api/enroll — enroll in a course
 export async function POST(request: NextRequest) {
   try {
     const authHeader = request.headers.get("authorization");
@@ -25,13 +23,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Укажите courseId" }, { status: 400 });
     }
 
-    // Check if course exists
     const course = await prisma.course.findUnique({ where: { id: courseId } });
     if (!course) {
       return NextResponse.json({ error: "Курс не найден" }, { status: 404 });
     }
 
-    // Check if already enrolled
     const existing = await prisma.enrollment.findUnique({
       where: { userId_courseId: { userId, courseId } },
     });
@@ -40,10 +36,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ enrollment: existing, message: "Вы уже записаны" });
     }
 
-    // Create enrollment
     const enrollment = await prisma.enrollment.create({
       data: { userId, courseId, progress: 0 },
     });
+
+    // Send enrollment email
+    const enrollUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (enrollUser) {
+      sendEmail({ to: enrollUser.email, ...enrollmentEmail(enrollUser.name, course.title) }).catch(console.error);
+    }
 
     return NextResponse.json({ enrollment }, { status: 201 });
   } catch (error) {

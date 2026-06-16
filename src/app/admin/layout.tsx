@@ -39,6 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: "Обзор", href: "/admin", icon: "📊" },
     { label: "Курсы", href: "/admin/courses", icon: "📚" },
     { label: "Пользователи", href: "/admin/users", icon: "👥" },
+    { label: "Заказы", href: "/admin/orders", icon: "💳" },
     { label: "Записи", href: "/admin/enrollments", icon: "📋" },
   ];
 

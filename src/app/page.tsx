@@ -523,13 +523,7 @@ function Contacts() {
             ))}
           </div>
           <Reveal delay={3}>
-            <form onSubmit={(e) => e.preventDefault()} style={{ display: "grid", gap: "0.75rem" }}>
-              <input type="text" className="form-field" placeholder="Ваше имя" />
-              <input type="email" className="form-field" placeholder="Email" />
-              <input type="tel" className="form-field" placeholder="Телефон (необязательно)" />
-              <textarea className="form-field form-textarea" placeholder="Сообщение" />
-              <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Отправить</button>
-            </form>
+            <ContactForm />
           </Reveal>
         </div>
       </div>
@@ -576,6 +570,64 @@ function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+
+/* ─── Contact Form (functional) ─── */
+function ContactForm() {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.message) return;
+    setSending(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setSent(true);
+        setForm({ name: "", email: "", phone: "", message: "" });
+        setTimeout(() => setSent(false), 5000);
+      }
+    } catch {
+      setError("Ошибка отправки. Попробуйте позже.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>✅</div>
+        <div style={{ color: "var(--color-green-400)", fontWeight: 600 }}>Заявка отправлена!</div>
+        <div style={{ color: "var(--color-text-muted)", fontSize: "0.85rem", marginTop: "0.25rem" }}>Мы свяжемся с вами в ближайшее время</div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: "grid", gap: "0.75rem" }}>
+      <input type="text" className="form-field" placeholder="Ваше имя *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+      <input type="email" className="form-field" placeholder="Email *" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+      <input type="tel" className="form-field" placeholder="Телефон (необязательно)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+      <textarea className="form-field form-textarea" placeholder="Сообщение *" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required />
+      {error && <div style={{ fontSize: "0.85rem", color: "var(--color-orange-400)" }}>{error}</div>}
+      <button type="submit" className="btn-primary" style={{ width: "100%", justifyContent: "center" }} disabled={sending}>
+        {sending ? "Отправка..." : "Отправить"}
+      </button>
+    </form>
   );
 }
 

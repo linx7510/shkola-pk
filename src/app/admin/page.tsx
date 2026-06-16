@@ -7,6 +7,7 @@ interface Stats {
   enrollments: number;
   lessons: number;
   modules: number;
+  orders: number;
 }
 
 interface RecentUser {
@@ -65,6 +66,7 @@ export default function AdminOverview() {
     { label: "Записей на курсы", value: stats?.enrollments || 0, color: "var(--color-blue-400)", icon: "📋" },
     { label: "Уроков", value: stats?.lessons || 0, color: "var(--color-beige-300)", icon: "📖" },
     { label: "Модулей", value: stats?.modules || 0, color: "var(--color-orange-400)", icon: "📦" },
+    { label: "Заказов", value: stats?.orders || 0, color: "var(--color-green-400)", icon: "💳" },
   ];
 
   return (
@@ -73,7 +75,7 @@ export default function AdminOverview() {
       <p style={{ color: "var(--color-text-muted)", marginBottom: "2rem", fontSize: "0.9rem" }}>Обзор платформы Школа ПК</p>
 
       {/* Stats grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
         {statCards.map((s) => (
           <div key={s.label} className="glass-2" style={{ padding: "1.25rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>

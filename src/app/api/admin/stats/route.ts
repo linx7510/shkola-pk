@@ -7,12 +7,13 @@ export async function GET(request: NextRequest) {
   if (!admin) return admin === null ? unauthorized() : forbidden();
 
   try {
-    const [users, courses, enrollments, lessons, modules] = await Promise.all([
+    const [users, courses, enrollments, lessons, modules, orders] = await Promise.all([
       prisma.user.count(),
       prisma.course.count({ where: { isPublished: true } }),
       prisma.enrollment.count(),
       prisma.lesson.count(),
       prisma.module.count(),
+      prisma.order.count({ where: { status: 'COMPLETED' } }),
     ]);
 
     const recentUsers = await prisma.user.findMany({
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      stats: { users, courses, enrollments, lessons, modules },
+      stats: { users, courses, enrollments, lessons, modules, orders },
       recentUsers,
       recentEnrollments,
       courseStats,
