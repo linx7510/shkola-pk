@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { requireAdmin, unauthorized, forbidden } from '@/lib/api-middleware';
+import { requireAdmin } from '@/lib/api-middleware';
 
 // GET /api/admin/orders — list all orders
 export async function GET(request: NextRequest) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const url = request.nextUrl;

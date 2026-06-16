@@ -14,9 +14,10 @@ export default function Header() {
 
   const navLinks = [
     { label: "О школе", href: "/#about" },
-    { label: "Программа", href: "/#how" },
-    { label: "Услуги", href: "/#services" },
-    { label: "FAQ", href: "/#faq" },
+    { label: "Курсы", href: "/courses" },
+    { label: "Блог", href: "/blog" },
+    { label: "Глоссарий", href: "/glossary" },
+    { label: "FAQ", href: "/faq" },
     { label: "Контакты", href: "/#contacts" },
   ];
 

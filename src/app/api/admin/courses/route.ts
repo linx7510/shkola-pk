@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { requireAdmin, unauthorized, forbidden } from '@/lib/api-middleware';
+import { requireAdmin } from '@/lib/api-middleware';
 
 // GET /api/admin/courses — all courses (including unpublished)
 export async function GET(request: NextRequest) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const courses = await prisma.course.findMany({
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/courses — create course
 export async function POST(request: NextRequest) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();

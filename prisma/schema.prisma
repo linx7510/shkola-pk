@@ -25,6 +25,8 @@ model User {
   progress    LessonProgress[]
   comments    Comment[]
   orders      Order[]
+  leads       Lead[]
+  auditLogs   AuditLog[]
 
   @@map("users")
 }
@@ -36,8 +38,12 @@ model Course {
   shortDesc   String?
   icon        String?
   image       String?
+  price       Float?
   order       Int      @default(0)
   isPublished Boolean  @default(false)
+  slug        String?   @unique
+  metaTitle       String?
+  metaDescription  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -143,6 +149,97 @@ model Order {
   @@map("orders")
 }
 
+model BlogPost {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  excerpt         String?
+  content         String
+  coverImage      String?
+  category        String?
+  tags            String?
+  isPublished     Boolean  @default(false)
+  authorId        String?
+  metaTitle       String?
+  metaDescription String?
+  publishedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("blog_posts")
+}
+
+model GlossaryTerm {
+  id              String   @id @default(cuid())
+  term            String   @unique
+  slug            String   @unique
+  definition      String
+  extendedContent String?
+  category        String?
+  order           Int      @default(0)
+  isPublished     Boolean  @default(true)
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("glossary_terms")
+}
+
+model FaqItem {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String
+  category    String?
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("faq_items")
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  message     String?
+  source      String?
+  courseSlug  String?
+  status      LeadStatus @default(NEW)
+  userId      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("leads")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+model SiteSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@map("site_settings")
+}
+
 enum Role {
   STUDENT
   TEACHER
@@ -156,3 +253,10 @@ enum OrderStatus {
   REFUNDED
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  LOST
+  CONVERTED
+}

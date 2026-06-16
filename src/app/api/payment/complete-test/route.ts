@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getUserFromRequest, unauthorized } from '@/lib/api-middleware';
+import { getUserFromRequest } from '@/lib/api-middleware';
 import { sendEmail, enrollmentEmail, paymentSuccessEmail } from '@/lib/email';
 
 // POST /api/payment/complete-test — complete test payment
 export async function POST(request: NextRequest) {
   const user = getUserFromRequest(request);
-  if (!user) return unauthorized();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();

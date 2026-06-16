@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getUserFromRequest, unauthorized } from '@/lib/api-middleware';
+import { getUserFromRequest } from '@/lib/api-middleware';
 import { createPayment } from '@/lib/payment';
 import { sendEmail, enrollmentEmail } from '@/lib/email';
 
@@ -8,7 +8,7 @@ import { sendEmail, enrollmentEmail } from '@/lib/email';
 export async function POST(request: NextRequest) {
   try {
     const user = getUserFromRequest(request);
-    if (!user) return unauthorized();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await request.json();
     const { courseId, amount, description } = body;

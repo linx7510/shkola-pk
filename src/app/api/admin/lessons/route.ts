@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { requireAdmin, unauthorized, forbidden } from '@/lib/api-middleware';
+import { requireAdmin } from '@/lib/api-middleware';
 
 // POST /api/admin/lessons — create lesson in a module
 export async function POST(request: NextRequest) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/admin/lessons — update lesson
 export async function PUT(request: NextRequest) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();
@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
 // DELETE /api/admin/lessons — delete lesson
 export async function DELETE(request: NextRequest) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const body = await request.json();

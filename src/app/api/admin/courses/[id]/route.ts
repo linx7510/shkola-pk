@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { requireAdmin, unauthorized, forbidden } from '@/lib/api-middleware';
+import { requireAdmin } from '@/lib/api-middleware';
 
 // GET /api/admin/courses/[id]
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { id } = await params;
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 // PUT /api/admin/courses/[id] — update course
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { id } = await params;
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 // DELETE /api/admin/courses/[id]
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = requireAdmin(request);
-  if (!admin) return admin === null ? unauthorized() : forbidden();
+  if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { id } = await params;
