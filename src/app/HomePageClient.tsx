@@ -881,6 +881,31 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 
 
+
+      {/* ===== LEAD FORM ===== */}
+      <section id="lead-form" style={{...S, background:"rgba(214,198,178,0.02)"}}>
+        <div style={{...I, maxWidth:600}}>
+          <Reveal>
+            <div style={{padding: "2rem", background: "rgba(214,198,178,0.04)", border: "1px solid rgba(214,198,178,0.12)", borderRadius: 16, margin: "0 auto"}}>
+              <h3 style={{fontSize: "1.3rem", fontWeight: 600, color: "#E7DCCF", marginBottom: "0.5rem", textAlign: "center"}}>Оставьте заявку</h3>
+              <p style={{fontSize: "0.88rem", color: "rgba(214,198,178,0.85)", textAlign: "center", marginBottom: "1.5rem"}}>Заполните форму — перезвоним в течение рабочего дня</p>
+              <form onSubmit={submitLead} style={{display: "flex", flexDirection: "column", gap: "0.85rem"}}>
+                <input type="text" placeholder="Ваше имя *" value={leadForm.name} onChange={e => setLeadForm({...leadForm, name: e.target.value})} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "0.95rem", outline: "none"}} required />
+                <input type="tel" placeholder="Телефон *" value={leadForm.phone} onChange={e => setLeadForm({...leadForm, phone: e.target.value})} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "0.95rem", outline: "none"}} required />
+                <textarea placeholder="Сообщение (необязательно)" value={leadForm.message} onChange={e => setLeadForm({...leadForm, message: e.target.value})} rows={3} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "0.95rem", outline: "none", resize: "vertical"}} />
+                <label style={{display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.82rem", color: "rgba(214,198,178,0.85)", cursor: "pointer", lineHeight: 1.5}}>
+                  <input type="checkbox" checked={leadForm.consentAccepted} onChange={e => setLeadForm({...leadForm, consentAccepted: e.target.checked})} style={{marginTop: "0.2rem", accentColor: "#E68863"}} required />
+                  <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности (152-ФЗ)</span>
+                </label>
+                {leadFormStatus.type === 'error' && (<div style={{padding: "0.75rem 1rem", background: "rgba(201,77,77,0.1)", border: "1px solid rgba(201,77,77,0.3)", borderRadius: 8, color: "#E68888", fontSize: "0.88rem"}}>⚠ {leadFormStatus.message}</div>)}
+                {leadFormStatus.type === 'success' && (<div style={{padding: "0.75rem 1rem", background: "rgba(90,154,110,0.1)", border: "1px solid rgba(90,154,110,0.3)", borderRadius: 8, color: "#6DB89A", fontSize: "0.88rem"}}>✓ {leadFormStatus.message}</div>)}
+                <button type="submit" disabled={leadFormStatus.type === 'loading'} style={{padding: "1rem 1.5rem", background: leadFormStatus.type === 'loading' ? "rgba(230,136,99,0.5)" : "#E68863", color: "#fff", border: "none", borderRadius: 10, fontSize: "1rem", fontWeight: 600, cursor: leadFormStatus.type === 'loading' ? 'not-allowed' : 'pointer', transition: "all 0.25s"}}>{leadFormStatus.type === 'loading' ? 'Отправка...' : 'Отправить заявку'}</button>
+              </form>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ===== FOOTER ===== */}
       <footer className="site-footer">
         <div style={I}>
