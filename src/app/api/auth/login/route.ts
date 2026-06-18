@@ -1,64 +1,49 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { verifyPassword, signToken } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server'
+
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const body = await request.json()
+    const { email, password } = body
 
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email и пароль обязательны' },
         { status: 400 }
-      );
+      )
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    // Call Payload CMS login API
+    const res = await fetch(`${PAYLOAD_API_URL}/api/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
       return NextResponse.json(
-        { error: 'Неверный email или пароль' },
+        { error: data.errors?.[0]?.message || 'Неверный email или пароль' },
         { status: 401 }
-      );
+      )
     }
 
-    if (!user.isActive) {
-      return NextResponse.json(
-        { error: 'Аккаунт заблокирован' },
-        { status: 403 }
-      );
-    }
+    const data = await res.json()
 
-    const valid = await verifyPassword(password, user.password);
-    if (!valid) {
-      return NextResponse.json(
-        { error: 'Неверный email или пароль' },
-        { status: 401 }
-      );
-    }
-
-    const token = signToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
+    // Transform Payload response to match our frontend format
     return NextResponse.json({
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        avatar: user.avatar,
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        role: data.user.role,
+        avatar: data.user.avatar,
       },
-      token,
-    });
+      token: data.token,
+    })
   } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json(
-      { error: 'Ошибка при входе' },
-      { status: 500 }
-    );
+    console.error('Login error:', error)
+    return NextResponse.json({ error: 'Ошибка при входе' }, { status: 500 })
   }
 }
-

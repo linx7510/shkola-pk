@@ -1,26 +1,110 @@
 import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { Metadata } from "next";
 import Header from "@/components/Header";
 import Link from "next/link";
+
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
+
+async function payloadApi(path: string) {
+  try {
+    const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, { cache: 'no-store' })
+    if (!res.ok) return null
+    return res.json()
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Convert Payload Lexical JSON to HTML string
+ */
+function lexicalToHtml(content: any): string {
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  
+  const root = content.root;
+  if (!root?.children) return '';
+
+  function nodeToHtml(node: any): string {
+    if (node.type === 'text') {
+      let text = node.text || '';
+      if (node.bold) text = `<strong>${text}</strong>`;
+      if (node.italic) text = `<em>${text}</em>`;
+      if (node.underline) text = `<u>${text}</u>`;
+      if (node.code) text = `<code>${text}</code>`;
+      return text;
+    }
+
+    if (node.type === 'paragraph') {
+      const children = (node.children || []).map(nodeToHtml).join('');
+      return `<p>${children}</p>`;
+    }
+
+    if (node.type === 'heading') {
+      const tag = node.tag || 'h2';
+      const children = (node.children || []).map(nodeToHtml).join('');
+      return `<${tag}>${children}</${tag}>`;
+    }
+
+    if (node.type === 'list') {
+      const tag = node.listType === 'number' ? 'ol' : 'ul';
+      const children = (node.children || []).map(nodeToHtml).join('');
+      return `<${tag}>${children}</${tag}>`;
+    }
+
+    if (node.type === 'listitem') {
+      const children = (node.children || []).map(nodeToHtml).join('');
+      return `<li>${children}</li>`;
+    }
+
+    if (node.type === 'link') {
+      const href = node.fields?.url || '#';
+      const children = (node.children || []).map(nodeToHtml).join('');
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${children}</a>`;
+    }
+
+    if (node.type === 'quote') {
+      const children = (node.children || []).map(nodeToHtml).join('');
+      return `<blockquote>${children}</blockquote>`;
+    }
+
+    if (node.type === 'linebreak') {
+      return '<br/>';
+    }
+
+    // Fallback: render children if present
+    if (node.children) {
+      return (node.children as any[]).map(nodeToHtml).join('');
+    }
+
+    return '';
+  }
+
+  return root.children.map(nodeToHtml).join('');
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.blogPost.findUnique({ where: { slug } });
+  const data = await payloadApi(`/blog-posts?where[slug][equals]=${slug}&limit=1`)
+  const post = data?.docs?.[0]
   if (!post) return { title: "Статья не найдена" };
   return {
-    title: post.metaTitle || `${post.title} | Школа ПК`,
-    description: post.metaDescription || post.excerpt || "",
+    title: post.meta?.title || post.title ? `${post.title} | Школа ПК` : "Статья | Школа ПК",
+    description: post.meta?.description || post.excerpt || "",
   };
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = await prisma.blogPost.findUnique({ where: { slug } });
+  const data = await payloadApi(`/blog-posts?where[slug][equals]=${slug}&limit=1`)
+  const post = data?.docs?.[0]
   if (!post || !post.isPublished) notFound();
+
+  const contentHtml = lexicalToHtml(post.content);
 
   return (
     <>
@@ -58,18 +142,20 @@ export default async function BlogPostPage({ params }: Props) {
 
           {post.coverImage && (
             <div style={{ width: "100%", borderRadius: 12, overflow: "hidden", marginBottom: "2rem" }}>
-              <img src={post.coverImage} alt="" style={{ width: "100%", display: "block" }} />
+              <img src={typeof post.coverImage === "object" ? post.coverImage.url : post.coverImage} alt="" style={{ width: "100%", display: "block" }} />
             </div>
           )}
 
-          <div
-            style={{ color: "rgba(214,198,178,0.75)", fontSize: "1.05rem", lineHeight: 1.8 }}
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          {contentHtml && (
+            <div
+              style={{ color: "rgba(214,198,178,0.75)", fontSize: "1.05rem", lineHeight: 1.8 }}
+              dangerouslySetInnerHTML={{ __html: contentHtml }}
+            />
+          )}
 
           {post.tags && (
             <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "2rem" }}>
-              {post.tags.split(",").map((tag, i) => (
+              {post.tags.split(",").map((tag: string, i: number) => (
                 <span
                   key={i}
                   style={{

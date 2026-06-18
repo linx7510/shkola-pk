@@ -1,5 +1,16 @@
 import { MetadataRoute } from "next";
-import prisma from "@/lib/prisma";
+
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
+
+async function payloadApi(path: string) {
+  try {
+    const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, { cache: 'no-store' })
+    if (!res.ok) return { docs: [] }
+    return res.json()
+  } catch {
+    return { docs: [] }
+  }
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
@@ -12,29 +23,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
   ];
 
-  const [courses, posts, terms] = await Promise.all([
-    prisma.course.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
-    prisma.blogPost.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
-    prisma.glossaryTerm.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
+  const [coursesData, postsData, termsData] = await Promise.all([
+    payloadApi("/courses?where[isPublished][equals]=true&limit=100&select=slug,updatedAt"),
+    payloadApi("/blog-posts?where[isPublished][equals]=true&limit=100&select=slug,updatedAt"),
+    payloadApi("/glossary-terms?where[isPublished][equals]=true&limit=100&select=slug,updatedAt"),
   ]);
 
-  const coursePages = courses.map(c => ({
+  const coursePages = (coursesData.docs || []).map((c: any) => ({
     url: `${baseUrl}/courses/${c.slug}`,
-    lastModified: c.updatedAt,
+    lastModified: c.updatedAt ? new Date(c.updatedAt) : new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,
   }));
 
-  const blogPages = posts.map(p => ({
+  const blogPages = (postsData.docs || []).map((p: any) => ({
     url: `${baseUrl}/blog/${p.slug}`,
-    lastModified: p.updatedAt,
+    lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
-  const glossaryPages = terms.map(t => ({
+  const glossaryPages = (termsData.docs || []).map((t: any) => ({
     url: `${baseUrl}/glossary/${t.slug}`,
-    lastModified: t.updatedAt,
+    lastModified: t.updatedAt ? new Date(t.updatedAt) : new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.5,
   }));

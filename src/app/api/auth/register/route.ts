@@ -1,65 +1,83 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { sendEmail, welcomeEmail } from '@/lib/email';
-import { hashPassword, signToken } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server'
+
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, password, name, phone } = body;
+    const body = await request.json()
+    const { email, password, name, phone } = body
 
     if (!email || !password || !name) {
       return NextResponse.json(
         { error: 'Email, пароль и имя обязательны' },
         { status: 400 }
-      );
+      )
     }
 
     if (password.length < 6) {
       return NextResponse.json(
         { error: 'Пароль минимум 6 символов' },
         { status: 400 }
-      );
+      )
     }
 
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Пользователь с таким email уже существует' },
-        { status: 409 }
-      );
-    }
-
-    const hashedPassword = await hashPassword(password);
-
-    const user = await prisma.user.create({
-      data: {
+    // Create user via Payload CMS API
+    const res = await fetch(`${PAYLOAD_API_URL}/api/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         email,
-        password: hashedPassword,
+        password,
         name,
-        phone: phone || null,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-      },
-    });
+        phone: phone || undefined,
+        role: 'student',
+        isActive: true,
+      }),
+    })
 
-    const token = signToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    if (!res.ok) {
+      const data = await res.json()
+      if (data.errors?.[0]?.message?.includes('unique') || data.errors?.[0]?.message?.includes('email')) {
+        return NextResponse.json(
+          { error: 'Пользователь с таким email уже существует' },
+          { status: 409 }
+        )
+      }
+      return NextResponse.json(
+        { error: data.errors?.[0]?.message || 'Ошибка при регистрации' },
+        { status: 400 }
+      )
+    }
 
-    return NextResponse.json({ user, token }, { status: 201 });
+    const data = await res.json()
+
+    // Auto-login: call Payload login to get token
+    const loginRes = await fetch(`${PAYLOAD_API_URL}/api/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+
+    if (!loginRes.ok) {
+      // User created but auto-login failed — return user without token
+      return NextResponse.json({
+        user: { id: data.doc.id, email: data.doc.email, name: data.doc.name, role: data.doc.role },
+      }, { status: 201 })
+    }
+
+    const loginData = await loginRes.json()
+
+    return NextResponse.json({
+      user: {
+        id: data.doc.id,
+        email: data.doc.email,
+        name: data.doc.name,
+        role: data.doc.role,
+      },
+      token: loginData.token,
+    }, { status: 201 })
   } catch (error) {
-    console.error('Register error:', error);
-    return NextResponse.json(
-      { error: 'Ошибка при регистрации' },
-      { status: 500 }
-    );
+    console.error('Register error:', error)
+    return NextResponse.json({ error: 'Ошибка при регистрации' }, { status: 500 })
   }
 }
-

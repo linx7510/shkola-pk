@@ -1,43 +1,46 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { getUserFromRequest } from '@/lib/api-middleware';
+import { NextRequest, NextResponse } from 'next/server'
+import { getUserFromRequest } from '@/lib/api-middleware'
+
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
 export async function GET(request: NextRequest) {
   try {
-    const payload = getUserFromRequest(request);
-    if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const authUser = getUserFromRequest(request)
+    if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        avatar: true,
-        bio: true,
-        isActive: true,
-        emailVerified: true,
-        createdAt: true,
-        enrollments: {
-          include: {
-            course: {
-              select: { id: true, title: true, icon: true },
-            },
-          },
-        },
-      },
-    });
+    // Fetch user details from Payload API
+    const authHeader = request.headers.get('authorization') || ''
+    let token = ''
+    if (authHeader.startsWith('JWT ')) token = authHeader.substring(4)
+    else if (authHeader.startsWith('Bearer ')) token = authHeader.substring(7)
 
-    if (!user) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 });
+    const res = await fetch(`${PAYLOAD_API_URL}/api/users/${authUser.userId}?depth=1`, {
+      headers: { 'Authorization': `JWT ${token}` },
+      cache: 'no-store',
+    })
+
+    if (!res.ok) {
+      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 })
     }
 
-    return NextResponse.json({ user });
+    const user = await res.json()
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        role: user.role,
+        avatar: user.avatar,
+        bio: user.bio,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        enrollments: user.enrollments || [],
+      },
+    })
   } catch (error) {
-    console.error('Me error:', error);
-    return NextResponse.json({ error: 'Ошибка сервера' }, { status: 500 });
+    console.error('Me error:', error)
+    return NextResponse.json({ error: 'Ошибка сервера' }, { status: 500 })
   }
 }
-
