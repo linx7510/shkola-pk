@@ -172,6 +172,7 @@ function AIChatWidget() {
           </div>
         </div>
       )}
+      <AIChatWidget />
     </>
   );
 }
@@ -420,7 +421,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 
       {/* ===== QUOTE ===== */}
-      <section className="pause pause--after-hero reveal">
+      <section style={{padding:"2rem 0", background:"rgba(214,198,178,0.02)"}}>
         <div style={I}>
           <blockquote className="quote-block">
             <p className="quote-text">{quoteData?.text || "«Кооперация — это не бизнес-модель. Это архитектура доверия.»"}</p>
@@ -648,7 +649,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                 Авторская методика Велеслава Старкова — пять этапов от анализа бизнес-модели до запуска деятельности.
                 Ни один ПК, созданный по модели С500, не был ликвидирован по решению ФНС.
               </p>
-              <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:"1.5rem", marginTop:"2rem", marginBottom:"2rem"}}>
+              <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"1.5rem", marginTop:"2rem", marginBottom:"2rem"}}>
                 {/* Консультации */}
                 <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.05)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:14, textAlign:"center"}}>
                   <div style={{fontSize:"2.5rem", marginBottom:"0.5rem"}}>💬</div>
@@ -746,28 +747,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
         </div>
       </section>
 
-      {/* ===== FAQ ===== */}
-      <section id="faq" style={S}>
-        <div style={I}>
-          <Reveal>
-            <div className="section-label">FAQ</div>
-            <h2 className="section-title heading-sweep" data-text="Частые вопросы">Частые вопросы</h2>
-          </Reveal>
-          <div className="faq-list">
-            {faqData.map((item,i) => (
-              <div key={i} className="faq-item">
-                <button className={`faq-btn ${faqOpen===i?"open":""}`} onClick={() => setFaqOpen(faqOpen===i?null:i)}>
-                  <span>{item.q}</span>
-                  <span className={`faq-chevron ${faqOpen===i?"open":""}`}>+</span>
-                </button>
-                <div className={`faq-panel ${faqOpen===i?"open":""}`}>
-                  <div className="faq-inner">{item.a}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* ===== AI CONSULTANT ===== */}
       <section id="ai-consultant" style={{...S,background:"rgba(214,198,178,0.02)"}}>
@@ -993,8 +973,9 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </footer>
 
       {/* ===== AI CHAT WIDGET (внизу справа) ===== */}
-      <AIChatWidget />
+      
 
+      <AIChatWidget />
     </>
   );
 }

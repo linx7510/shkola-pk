@@ -1890,9 +1890,13 @@ a:hover { color: var(--color-orange-400); }
 /* === QUOTE BLOCK === */
 .quote-block {
   text-align: center;
-  padding: 3rem 1.5rem;
+  padding: 4rem 2rem;
   max-width: 900px;
-  margin: 0 auto;
+  margin: 2rem auto;
+  background: linear-gradient(135deg, rgba(230,136,99,0.05), rgba(214,198,178,0.02));
+  border-left: 3px solid rgba(230,136,99,0.3);
+  border-right: 3px solid rgba(230,136,99,0.3);
+  border-radius: 12px;
 }
 .quote-text {
   font-size: clamp(1.3rem, 3vw, 2rem);
