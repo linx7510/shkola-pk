@@ -385,7 +385,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       <Header />
 
       {/* ===== HERO ===== */}
-      <section id="hero" style={{minHeight:"100vh",display:"flex",alignItems:"center",background:"var(--color-bg,#0D0C0A)",paddingTop:"calc(var(--header-h,72px) + 3rem)",position:"relative",overflow:"hidden"}}>
+      <section id="hero" style={{minHeight:"100vh",display:"flex",alignItems:"center",background:"var(--color-bg,#0D0C0A)",paddingTop:"var(--header-h,72px)",position:"relative",overflow:"hidden"}}>
         <div className="hero__ambient" />
         <div style={{...I,width:"100%",position:"relative",zIndex:2}}>
           <Reveal>
@@ -423,8 +423,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       <section className="pause pause--after-hero reveal">
         <div style={I}>
           <blockquote className="quote-block">
-            <p className="quote-text">{quoteData?.text || "«Кооперация — это не бизнес-модель. Это архитектура доверия.»"}</p>
-            <cite className="quote-author">— {quoteData?.author || "Велеслав Старков"}</cite>
+            <p className="quote-text">«Кооперация — это не бизнес-модель. Это архитектура доверия.»</p>
+            <cite className="quote-author">— Велеслав Старков</cite>
           </blockquote>
         </div>
       </section>
@@ -504,9 +504,6 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
           <Reveal>
             <div className="section-label">О Школе</div>
             <h2 className="section-title heading-sweep" data-text="О Школе">О Школе</h2>
-            <p style={{fontSize:"1.05rem", color:"rgba(214,198,178,0.97)", lineHeight:1.8, maxWidth:800, margin:"1.5rem auto 2rem", textAlign:"center"}}>
-              Первая онлайн Школа потребительской кооперации — образовательный проект, запущенный в 2015 году Велеславом Старковым. За десять лет работы Школа стала крупнейшим в России центром подготовки предпринимателей к ведению деятельности через паевую модель. Более 120 учеников открыли собственные Кооперативы и успешно ведут бизнес по всей стране.
-            </p>
           </Reveal>
           <div className="about-accordion">
             {aboutCardsData.map((card,i) => (
@@ -624,7 +621,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 
       {/* ===== LATEST BLOG POSTS ===== */}
-      <section id="latest-materials" style={{...S, display:"flex", justifyContent:"center"}}>
+      <section id="latest-materials" style={S}>
         <div style={I}>
           <Reveal>
             <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
@@ -647,30 +644,11 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
               <p style={{color:"rgba(214,198,178,0.97)", fontSize:"1.1rem", lineHeight:1.8, marginTop:"1.5rem", marginBottom:"2rem"}}>
                 Авторская методика Велеслава Старкова — пять этапов от анализа бизнес-модели до запуска деятельности.
                 Ни один ПК, созданный по модели С500, не был ликвидирован по решению ФНС.
+                Полный курс: 4 пакета обучения, 64 часа практики, 12 месяцев поддержки.
               </p>
-              <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px, 1fr))", gap:"1.5rem", marginTop:"2rem", marginBottom:"2rem"}}>
-                {/* Консультации */}
-                <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.05)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:14, textAlign:"center"}}>
-                  <div style={{fontSize:"2.5rem", marginBottom:"0.5rem"}}>💬</div>
-                  <h3 style={{fontSize:"1.1rem", color:"#E7DCCF", marginBottom:"0.5rem"}}>Консультации</h3>
-                  <p style={{fontSize:"0.88rem", color:"rgba(214,198,178,0.85)", marginBottom:"0.75rem"}}>Индивидуально или группой. Онлайн. 1 час — 6 000 ₽</p>
-                  <Link href="/konsultacii" style={{display:"inline-block", padding:"0.5rem 1.25rem", background:"#E68863", color:"#fff", borderRadius:8, fontSize:"0.88rem", textDecoration:"none", fontWeight:600}}>Записаться</Link>
-                </div>
-                {/* Бесплатные видео-уроки */}
-                <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.05)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:14, textAlign:"center"}}>
-                  <div style={{fontSize:"2.5rem", marginBottom:"0.5rem"}}>🎬</div>
-                  <h3 style={{fontSize:"1.1rem", color:"#E7DCCF", marginBottom:"0.5rem"}}>Бесплатные видео-уроки</h3>
-                  <p style={{fontSize:"0.88rem", color:"rgba(214,198,178,0.85)", marginBottom:"0.75rem"}}>13 базовых уроков. Понимание основ. Доступ сразу после регистрации</p>
-                  <Link href="/besplatno" style={{display:"inline-block", padding:"0.5rem 1.25rem", background:"rgba(214,198,178,0.15)", color:"#E7DCCF", borderRadius:8, fontSize:"0.88rem", textDecoration:"none", fontWeight:600, border:"1px solid rgba(214,198,178,0.2)"}}>Смотреть</Link>
-                </div>
-                {/* Обучающий курс */}
-                <div style={{padding:"1.5rem", background:"rgba(230,136,99,0.08)", border:"2px solid rgba(230,136,99,0.3)", borderRadius:14, textAlign:"center", position:"relative"}}>
-                  <div style={{position:"absolute", top:-10, left:"50%", transform:"translateX(-50%)", background:"#E68863", color:"#fff", padding:"0.2rem 0.75rem", borderRadius:10, fontSize:"0.72rem", fontWeight:600}}>ПОПУЛЯРНОЕ</div>
-                  <div style={{fontSize:"2.5rem", marginBottom:"0.5rem"}}>🎓</div>
-                  <h3 style={{fontSize:"1.1rem", color:"#E7DCCF", marginBottom:"0.5rem"}}>Обучающий курс С500</h3>
-                  <p style={{fontSize:"0.88rem", color:"rgba(214,198,178,0.85)", marginBottom:"0.75rem"}}>Полное открытие ПК под ключ. Документы и скрипты. Консалтинг 12 месяцев. Защита имущества. Оптимизация налогов</p>
-                  <Link href="/kursy" style={{display:"inline-block", padding:"0.5rem 1.25rem", background:"#E68863", color:"#fff", borderRadius:8, fontSize:"0.88rem", textDecoration:"none", fontWeight:600}}>Подробнее</Link>
-                </div>
+              <div style={{display:"flex", gap:"1rem", justifyContent:"center", flexWrap:"wrap"}}>
+                <Link href="/kursy" className="btn-primary" style={{padding:"0.85rem 2rem", fontSize:"1rem", textDecoration:"none"}}>Выбрать курс</Link>
+                <Link href="/konsultacii" className="btn-secondary" style={{padding:"0.85rem 2rem", fontSize:"1rem", textDecoration:"none"}}>Бесплатная консультация</Link>
               </div>
             </div>
           </Reveal>
@@ -836,8 +814,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
           <div style={{display:"flex", flexDirection:"column", gap:"1.25rem"}}>
             
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Что такое потребительский кооператив и чем он отличается от ООО?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>Что такое потребительский кооператив и чем он отличается от ООО?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   Потребительский кооператив (ПК) — это некоммерческая организация, созданная путём объединения граждан и юридических лиц для удовлетворения материальных и иных потребностей участников. Главное отличие от ООО заключается в правовой природе: общество с ограниченной ответственностью — коммерческая организация, целью которой является извлечение прибыли, тогда как потребительское общество функционирует для удовлетворения потребностей пайщиков. Практически это означает, что ПК освобождён от НДС, налога на прибыль, НДФЛ и страховых взносов с паевых взносов в соответствии с Законом РФ № 3085-1. Кроме того, ПК не отвечает по долгам пайщиков, а пайщики несут ограниченную ответственность в размере внесённых паёв. В отличие от ООО, ПК не подлежит проверкам Роспотребнадзора, пожарной инспекции и большинства других контролирующих органов.
                 </p>
@@ -845,8 +823,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </Reveal>
 
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Сколько времени занимает создание ПК под ключ?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>Сколько времени занимает создание ПК под ключ?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   Полный цикл создания потребительского общества «под ключ» занимает от трёх до семи рабочих дней при условии, что все необходимые данные от заказчика получены в полном объёме. Процесс включает разработку индивидуального устава с учётом конкретного ОКВЭД и бизнес-модели, подготовку протокола учредительного собрания, составление заявления о государственной регистрации, а также разработку целевой потребительской программы. После подачи документов в ФНС регистрация занимает ещё 3–5 рабочих дней. Таким образом, с момента обращения до получения готового ЕГРЮЛ-записи проходит в среднем 10–14 дней. Школа Потребительской кооперации берёт на себя все этапы — заказчику не нужно лично посещать налоговую или другие ведомства.
                 </p>
@@ -854,8 +832,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </Reveal>
 
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Какие налоги платит потребительский кооператив?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>Какие налоги платит потребительский кооператив?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   ПК, зарегистрированный в соответствии с Законом РФ № 3085-1 и ведущий деятельность по утверждённой целевой потребительской программе, освобождён от большинства налогов. К числу освобождений относятся: НДС (статья 149 НК РФ), налог на прибыль организаций, НДФЛ с доходов от паевых взносов, страховые взносы на обязательное пенсионное и медицинское страхование в части паевых операций. ПК обязан уплачивать лишь государственную пошлину при регистрации, налог на имущество (при наличии недвижимости), а также земельный налог и транспортный налог в общем порядке. Важно отметить, что возврат паевого взноса при выходе пайщика не признаётся доходом и не облагается налогом. Однако для сохранения налоговых льгот необходимо документально подтверждать целевой характер деятельности — именно для этого Школа разрабатывает индивидуальные потребительские программы.
                 </p>
@@ -863,8 +841,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </Reveal>
 
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Кто может стать пайщиком потребительского кооператива?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>Кто может стать пайщиком потребительского кооператива?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   Закон РФ № 3085-1 устанавливает, что пайщиком потребительского общества может стать любое физическое лицо, достигшее 16-летнего возраста, а также любое юридическое лицо. Количество пайщиков не ограничено — минимальное число составляет пять человек (физических или юридических лиц в любом сочетании). Иностранные граждане и иностранные юридические лица также вправе вступить в Кооператив на территории Российской Федерации. Каждый пайщик вносит паевой взнос, размер которого определяется уставом, и получает один голос при голосовании на общих собраниях независимо от размера внесённого пая. Это принципиальное отличие от ООО, где количество голосов пропорционально доле в уставном капитале. Для вступления в ПК необходимо подать заявление в Правление кооператива и оплатить паевой взнос в установленные уставом сроки.
                 </p>
@@ -872,8 +850,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </Reveal>
 
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Как защитить имущество через паевую модель?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>Как защитить имущество через паевую модель?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   Защита активов через Кооператив основана на нескольких ключевых механизмах. Во-первых, ПК является самостоятельным юридическим лицом и не отвечает по обязательствам своих пайщиков. Это означает, что долги, судебные иски или исполнительные производства, направленные против пайщика, не распространяются на имущество объединения. Во-вторых, паевые взносы пайщиков не признаются доходом и не подлежат взысканию по личным обязательствам пайщика — они находятся в собственности потребительского общества. В-третьих, закон предусматривает, что взыскание может быть обращено лишь на сам паевой взнос, а не на имущество, приобретённое за его счёт. На практике это означает, что недвижимость, транспортные средства и другие активы, оформленные на ПК, недоступны для взыскания со стороны кредиторов пайщика — банков, судебных приставов или иных третьих лиц. Школа Потребительской кооперации уделяет особое внимание правильному оформлению передачи активов в ПК, чтобы исключить любые юридические риски.
                 </p>
@@ -881,8 +859,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </Reveal>
 
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>В чём заключается модель С500 и почему она эффективна?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>В чём заключается модель С500 и почему она эффективна?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   Модель С500 — это авторская методика Велеслава Старкова, структурирующая процесс создания и ведения потребительского общества в пять последовательных этапов. Этап первый — анализ бизнес-модели предпринимателя и оценка применимости паевой формы. Этап второй — разработка устава и учредительных документов с учётом конкретных целей. Этап третий — создание целевой потребительской программы, определяющей направление расходов. Этап четвёртый — регистрация, внесение в ЕГРЮЛ и запуск деятельности. Этап пятый — сопровождение и поддержка в первые двенадцать месяцев работы. Модель проверена на более чем 120 реализованных проектах и учитывает все изменения законодательства за 2015–2026 годы. Её эффективность подтверждается тем, что ни один Кооператив, созданный по модели С500, не был ликвидирован по решению налоговых органов. Все документы, скрипты и инструкции входят в стоимость курса обучения — ученик получает полностью готовый инструментарий.
                 </p>
@@ -890,8 +868,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </Reveal>
 
             <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Как проходит обучение в Школе и что получает ученик по итогу?</h3>
+              <div style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}}>
+                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.75rem"}}>Как проходит обучение в Школе и что получает ученик по итогу?</h3>
                 <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.85)", lineHeight:1.8}}>
                   Обучение в Школе Потребительской кооперации состоит из трёх форматов. Первый — тринадцать бесплатных видео-уроков, доступных после регистрации: они покрывают базовые темы и позволяют оценить подход проекта. Второй — полный курс «Потребительский кооператив по модели С500», включающий восемь модулей живых онлайн-занятий, документальный конструктор с готовыми шаблонами и двенадцать месяцев поддержки. Третий — индивидуальные и групповые консультации для решения конкретных задач. По итогам полного обучения ученик получает: индивидуальный устав, разработанный под его бизнес-модель; протокол учредительного собрания; целевую потребительскую программу; полный пакет документов для регистрации; скрипты для общения с банками и налоговой; доступ к закрытому сообществу единомышленников; и двенадцатимесячную поддержку по всем вопросам ведения деятельности. Все материалы обновляются в соответствии с текущим законодательством, поэтому ученик всегда располагает актуальными документами.
                 </p>
