@@ -3,7 +3,7 @@ import { Pool } from 'pg'
 
 // shkola_pk БД (где audit_logs)
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://shkola_pk:Shk0laPK2026!Db@localhost:5432/shkola_pk'
+  connectionString: process.env.DATABASE_URL || process.env.AUDIT_DATABASE_URL
 })
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
