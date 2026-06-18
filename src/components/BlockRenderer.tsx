@@ -15,6 +15,7 @@ import { CardsBlock, CardsBlockData } from "./blocks/CardsBlock"
 import { ContactBlock, ContactBlockData } from "./blocks/ContactBlock"
 import { DividerBlock, DividerBlockData } from "./blocks/DividerBlock"
 import { QuoteBlock, QuoteBlockData } from "./blocks/QuoteBlock"
+import { TableBlock, TableBlockData } from "./blocks/TableBlock"
 
 export interface Block {
   blockType: string
@@ -56,6 +57,8 @@ export function BlockRenderer({ blocks }: { blocks: Block[] }) {
             return <ContactBlock key={i} data={block as unknown as ContactBlockData} />
           case "divider":
             return <DividerBlock key={i} data={block as unknown as DividerBlockData} />
+          case "table":
+            return <TableBlock key={i} data={block as unknown as TableBlockData} />
           case "quote":
             return <QuoteBlock key={i} data={block as unknown as QuoteBlockData} />
           case "content":
