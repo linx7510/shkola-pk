@@ -3,7 +3,9 @@ import { useEffect, useRef } from "react";
 
 /**
  * Reveal — scroll reveal animation
- * IntersectionObserver (threshold 0.1), opacity 0→1, translateY +40px→0
+ * IntersectionObserver with rootMargin for reliable detection.
+ * Fallback: show after 500ms if observer doesn't fire.
+ * Supports prefers-reduced-motion.
  */
 export default function Reveal({
   children,
@@ -20,6 +22,12 @@ export default function Reveal({
     const el = ref.current;
     if (!el) return;
 
+    // Check prefers-reduced-motion — skip animation entirely
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.classList.add("visible");
+      return;
+    }
+
     const obs = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
@@ -27,10 +35,17 @@ export default function Reveal({
           obs.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { rootMargin: "0px 0px -50px 0px", threshold: 0.05 }
     );
     obs.observe(el);
-    return () => obs.disconnect();
+
+    // Fallback: show after 500ms in any case (was missing — caused invisible content)
+    const timer = setTimeout(() => {
+      el.classList.add("visible");
+      obs.disconnect();
+    }, 500);
+
+    return () => { obs.disconnect(); clearTimeout(timer); };
   }, []);
 
   const delayClass = delay ? ` reveal-delay-${delay}` : "";
