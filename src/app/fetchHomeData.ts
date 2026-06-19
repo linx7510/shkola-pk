@@ -5,8 +5,7 @@ export async function fetchHomeData(): Promise<any | null> {
     const res = await fetch(
       `${PAYLOAD_API_URL}/api/pages?where[slug][equals]=home&depth=2&draft=false`,
       { 
-        cache: 'no-store',
-        next: { revalidate: 0 }
+        next: { revalidate: 60 }
       }
     );
     if (!res.ok) return null;

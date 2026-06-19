@@ -39,7 +39,7 @@ function LatestBlogPosts() {
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
-    const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
+    const PAYLOAD_API_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || "https://2980738.ru";
     fetch(`${PAYLOAD_API_URL}/api/blog-posts?where[isPublished][equals]=true&sort=-publishedAt&depth=1&limit=3`)
       .then(r => r.json())
       .then(data => setPosts(data.docs || []))
@@ -381,8 +381,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
   return (
     <>
-      {/* <CursorLight /> — отключено для производительности */}
-      {/* <BlogParticles /> — отключено для производительности */}
+      <CursorLight />
+      <BlogParticles />
       <Header />
 
       {/* ===== HERO ===== */}

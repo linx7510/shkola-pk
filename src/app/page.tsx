@@ -1,9 +1,7 @@
 import { fetchHomeData } from "./fetchHomeData";
 import HomePageClient from "./HomePageClient";
 
-// Force dynamic rendering — данные из Payload обновляются мгновенно
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page() {
   const homeData = await fetchHomeData();
