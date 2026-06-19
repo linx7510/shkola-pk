@@ -381,8 +381,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
   return (
     <>
-      {/* <CursorLight /> disabled */}
-      {/* <BlogParticles /> disabled */}
+      {/* CursorLight disabled */}
+      {/* BlogParticles disabled */}
       <Header />
 
       {/* ===== HERO ===== */}
@@ -679,109 +679,11 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 
 
-      {/* ===== TAG CLOUD ===== */}
-      <section id="tags" style={{...S, background:"rgba(214,198,178,0.02)"}}>
-        <div style={I}>
-          <Reveal>
-            <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
-              <div className="section-label">ТЕМЫ</div>
-              <h3 className="section-title heading-sweep" data-text="Облако тегов">Облако тегов</h3>
-            </div>
-          </Reveal>
-          <Reveal delay={2}>
-            <div style={{display:"flex", flexWrap:"wrap", gap:"0.6rem", justifyContent:"center", maxWidth:800, margin:"0 auto"}}>
-              {[
-                {label:"Потребительский кооператив", size:1.3, color:"orange"},
-                {label:"Обнуление НДС", size:1.2, color:"orange"},
-                {label:"Защита активов", size:1.25, color:"green"},
-                {label:"Паевой взнос", size:1.1, color:"beige"},
-                {label:"Закон 3085-1", size:1.2, color:"orange"},
-                {label:"Налоги 0%", size:1.3, color:"orange"},
-                {label:"Устав ПК", size:1.05, color:"beige"},
-                {label:"Регистрация кооператива", size:1.15, color:"green"},
-                {label:"Пайщик", size:1.1, color:"beige"},
-                {label:"Субсидиарная ответственность", size:1.0, color:"muted"},
-                {label:"ФНС", size:1.0, color:"muted"},
-                {label:"Некоммерческая организация", size:1.05, color:"beige"},
-                {label:"НДФЛ", size:1.0, color:"muted"},
-                {label:"Кооперативные выплаты", size:1.0, color:"green"},
-                {label:"Модель С500", size:1.1, color:"orange"},
-                {label:"Аудит устава", size:1.0, color:"muted"},
-                {label:"ЕГРЮЛ", size:0.9, color:"muted"},
-                {label:"Целевая программа", size:1.0, color:"beige"},
-                {label:"Кооперация", size:1.15, color:"orange"},
-                {label:"Налоговая оптимизация", size:1.1, color:"green"},
-                {label:"Онлайн-касса не нужна", size:1.0, color:"beige"},
-                {label:"Потребительское общество", size:1.05, color:"beige"},
-                {label:"Ставка 0%", size:1.2, color:"orange"},
-                {label:"Возврат пая", size:1.0, color:"muted"},
-                {label:"Паевой фонд", size:0.95, color:"muted"},
-                {label:"Общее собрание", size:0.95, color:"muted"},
-                {label:"Правление ПК", size:0.9, color:"muted"},
-                {label:"Ревизионная комиссия", size:0.9, color:"muted"},
-                {label:"Резервный фонд", size:0.9, color:"muted"},
-                {label:"Кооперативный возврат", size:0.95, color:"green"},
-              ].map((tag, i) => {
-                const colors:Record<string,string> = {orange:"#E68863", green:"#6DB89A", beige:"#BCA891", muted:"#8A7F74"};
-                const c = colors[tag.color] || colors.muted;
-                return (
-                  <span key={i} style={{
-                    fontSize: `${tag.size}rem`,
-                    padding: "0.4rem 0.9rem",
-                    borderRadius: 999,
-                    border: `1px solid ${c}33`,
-                    background: `${c}0D`,
-                    color: c,
-                    cursor: "default",
-                    transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
-                  }}
-                  onMouseEnter={e => {e.currentTarget.style.borderColor=c+"99"; e.currentTarget.style.background=c+"1A"; e.currentTarget.style.transform="translateY(-2px)"}}
-                  onMouseLeave={e => {e.currentTarget.style.borderColor=c+"33"; e.currentTarget.style.background=c+"0D"; e.currentTarget.style.transform="translateY(0)"}}
-                  >
-                    {tag.label}
-                  </span>
-                );
-              })}
-            </div>
-          </Reveal>
-        </div>
-      </section>
+
 
       
 
-      {/* ===== AI CONSULTANT ===== */}
-      <section id="ai-consultant" style={{...S,background:"rgba(214,198,178,0.02)"}}>
-        <div style={I}>
-          <Reveal>
-            <h3 className="section-title heading-sweep" data-text="Задайте вопрос AI-ассистенту">🤖 Задайте вопрос AI-ассистенту</h3>
-            <p className="section-subtitle">Наш AI-помощник специально натренирован на потребительскую кооперацию и законодательство РФ</p>
-          </Reveal>
-          <div className="ai-chat-box glass-2">
-            <div className="ai-chat-header">
-              <img src="/images/veleslav-avatar.png" alt="Ассистент Школы Кооперативов — Велеслав Старков" className="ai-avatar" />
-              <div>
-                <div className="ai-name">Ассистент Школы Кооперативов</div>
-                <div className="ai-status">Онлайн</div>
-              </div>
-            </div>
-            <div className="ai-chat-messages">
-              {aiMessages.map((m,i) => (
-                <div key={i} className={`ai-msg ${m.role}`}>{m.text}</div>
-              ))}
-              {aiLoading && <div className="ai-msg bot">Печатаю...</div>}
-            </div>
-            <div className="ai-quick-btns">
-              {["Как обнулить НДС? 💰","Что такое ПК? 🤔","Сколько стоит? 💬","Как зарегистрировать ПК? 📝"].map((q,i) => (
-                <button key={i} className="ai-quick-btn" onClick={() => {setAiInput(q.replace(/[💰🤔💬📝]/g,"").trim());}}>{q}</button>
-              ))}
-            </div>
-            <form className="ai-input-row" onSubmit={e => {e.preventDefault();sendAi();}}>
-              <input value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder="Спросите о кооперации..." className="ai-input" />
-              <button type="submit" className="ai-send-btn">→</button>
-            </form>
-          </div>
-        </div>
-      </section>
+
 
       {/* ===== CTA ===== */}
       <section className="cta reveal">
