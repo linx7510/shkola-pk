@@ -650,10 +650,23 @@ a:hover { color: var(--color-orange-400); }
 }
 
 /* ─── 17. Reveal Animation ─── */
+/* Reveal: VISIBLE by default (progressive enhancement).
+   Only hide if JavaScript is available (.js class on <html>). */
 .reveal {
+  opacity: 1;
+  transform: none;
+  transition: opacity 800ms var(--ease-premium), transform 800ms var(--ease-premium);
+}
+
+/* Only hide if JS is active */
+.js .reveal {
   opacity: 0;
   transform: translateY(40px);
-  transition: opacity 800ms var(--ease-premium), transform 800ms var(--ease-premium);
+}
+
+.js .reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .reveal.visible {

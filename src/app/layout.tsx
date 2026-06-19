@@ -50,7 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="twitter:label2" content="Telegram" />
         <meta name="twitter:data2" content="@Veles_ST" />
       </head>
-      <body className="antialiased">
+      <body className="antialiased"><script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "EducationalOrganization",
