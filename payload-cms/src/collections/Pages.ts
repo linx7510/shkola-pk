@@ -1,6 +1,26 @@
 import type { CollectionConfig } from 'payload'
 import { createAuditHooks } from '../lib/audit'
 
+// === ИМПОРТ ВСЕХ 18 БЛОКОВ для layout.blocks[] ===
+import { HeroBlock } from '../blocks/HeroBlock'
+import { FeaturesBlock } from '../blocks/FeaturesBlock'
+import { CtaBlock } from '../blocks/CtaBlock'
+import { ContentBlock } from '../blocks/ContentBlock'
+import { FaqBlock } from '../blocks/FaqBlock'
+import { GalleryBlock } from '../blocks/GalleryBlock'
+import { PricingBlock } from '../blocks/PricingBlock'
+import { TestimonialsBlock } from '../blocks/TestimonialsBlock'
+import { StatsBlock } from '../blocks/StatsBlock'
+import { TextBlock } from '../blocks/TextBlock'
+import { ImageBlock } from '../blocks/ImageBlock'
+import { VideoBlock } from '../blocks/VideoBlock'
+import { StepsBlock } from '../blocks/StepsBlock'
+import { CardsBlock } from '../blocks/CardsBlock'
+import { ContactBlock } from '../blocks/ContactBlock'
+import { DividerBlock } from '../blocks/DividerBlock'
+import { QuoteBlock } from '../blocks/QuoteBlock'
+import { TableBlock } from '../blocks/TableBlock'
+
 export const Pages: CollectionConfig = {
   slug: 'pages',
   labels: { singular: 'Страница', plural: 'Страницы' },
@@ -192,6 +212,45 @@ export const Pages: CollectionConfig = {
 
     // === SEO ===
     { name: 'content', type: 'richText', label: 'Содержание (SEO)' },
+
+    // === LAYOUT: BLOCKS[] — гибкая компоновка страницы из 18 блоков ===
+    // Редактор может добавлять блоки в любом порядке и количестве.
+    // Каждый блок имеет свой blockType (hero, features, cta, faq, pricing,
+    // testimonials, gallery, stats, content, text, image, video, steps,
+    // cards, contact, divider, quote, table) и свои поля.
+    // Frontend рендерит через BlockRenderer.tsx.
+    // Используется для второстепенных страниц (курсы, услуги, faq, и т.д.),
+    // где стандартная модель с фиксированными полями не подходит.
+    {
+      name: 'blocks',
+      type: 'blocks',
+      label: 'Блоки страницы (гибкая компоновка)',
+      admin: {
+        description: 'Добавляйте блоки в любом порядке. Каждый блок — отдельная секция страницы. Используются для второстепенных страниц (курсы, услуги, faq, и т.д.). Доступно 18 типов блоков.',
+      },
+      blocks: [
+        // Стандартные (9)
+        HeroBlock,
+        FeaturesBlock,
+        CtaBlock,
+        ContentBlock,
+        FaqBlock,
+        GalleryBlock,
+        PricingBlock,
+        TestimonialsBlock,
+        StatsBlock,
+        // Дополнительные (9)
+        TextBlock,
+        ImageBlock,
+        VideoBlock,
+        StepsBlock,
+        CardsBlock,
+        ContactBlock,
+        DividerBlock,
+        QuoteBlock,
+        TableBlock,
+      ],
+    },
   ],
     hooks: createAuditHooks('page'),
   timestamps: true,

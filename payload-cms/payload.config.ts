@@ -22,6 +22,8 @@ import { Services } from './src/collections/Services'
 import { Enrollments } from './src/collections/Enrollments'
 import { LessonProgress } from './src/collections/LessonProgress'
 import { Settings } from './src/collections/Settings'
+
+// === Стандартные 9 блоков (из v5.4) ===
 import { HeroBlock } from './src/blocks/HeroBlock'
 import { FeaturesBlock } from './src/blocks/FeaturesBlock'
 import { CtaBlock } from './src/blocks/CtaBlock'
@@ -31,6 +33,17 @@ import { GalleryBlock } from './src/blocks/GalleryBlock'
 import { PricingBlock } from './src/blocks/PricingBlock'
 import { TestimonialsBlock } from './src/blocks/TestimonialsBlock'
 import { StatsBlock } from './src/blocks/StatsBlock'
+
+// === Дополнительные 9 блоков (новые в v5.5) ===
+import { TextBlock } from './src/blocks/TextBlock'
+import { ImageBlock } from './src/blocks/ImageBlock'
+import { VideoBlock } from './src/blocks/VideoBlock'
+import { StepsBlock } from './src/blocks/StepsBlock'
+import { CardsBlock } from './src/blocks/CardsBlock'
+import { ContactBlock } from './src/blocks/ContactBlock'
+import { DividerBlock } from './src/blocks/DividerBlock'
+import { QuoteBlock } from './src/blocks/QuoteBlock'
+import { TableBlock } from './src/blocks/TableBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -57,9 +70,31 @@ export default buildConfig({
   editor: lexicalEditor(),
   collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress],
   globals: [Settings],
-  blocks: [HeroBlock, FeaturesBlock, CtaBlock, ContentBlock, FaqBlock, GalleryBlock, PricingBlock, TestimonialsBlock, StatsBlock],
+  // === ВСЕ 18 BLOCKS — доступны в админке для выбора в layout.blocks[] ===
+  blocks: [
+    // Стандартные (9)
+    HeroBlock,
+    FeaturesBlock,
+    CtaBlock,
+    ContentBlock,
+    FaqBlock,
+    GalleryBlock,
+    PricingBlock,
+    TestimonialsBlock,
+    StatsBlock,
+    // Дополнительные (9) — добавлены в v5.5
+    TextBlock,
+    ImageBlock,
+    VideoBlock,
+    StepsBlock,
+    CardsBlock,
+    ContactBlock,
+    DividerBlock,
+    QuoteBlock,
+    TableBlock,
+  ],
   plugins,
-  db: postgresAdapter({ 
+  db: postgresAdapter({
     push: true,
     pool: { connectionString: process.env.DATABASE_URL },
   }),
