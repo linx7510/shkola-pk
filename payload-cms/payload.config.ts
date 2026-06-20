@@ -2,7 +2,6 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { seoPlugin } from '@payloadcms/plugin-seo'
-// S3 temporarily disabled - import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -23,7 +22,7 @@ import { Enrollments } from './src/collections/Enrollments'
 import { LessonProgress } from './src/collections/LessonProgress'
 import { Settings } from './src/collections/Settings'
 
-// === Стандартные 9 блоков (из v5.4) ===
+// === Стандартные 9 блоков ===
 import { HeroBlock } from './src/blocks/HeroBlock'
 import { FeaturesBlock } from './src/blocks/FeaturesBlock'
 import { CtaBlock } from './src/blocks/CtaBlock'
@@ -34,7 +33,7 @@ import { PricingBlock } from './src/blocks/PricingBlock'
 import { TestimonialsBlock } from './src/blocks/TestimonialsBlock'
 import { StatsBlock } from './src/blocks/StatsBlock'
 
-// === Дополнительные 9 блоков (новые в v5.5) ===
+// === Дополнительные 9 блоков ===
 import { TextBlock } from './src/blocks/TextBlock'
 import { ImageBlock } from './src/blocks/ImageBlock'
 import { VideoBlock } from './src/blocks/VideoBlock'
@@ -45,9 +44,9 @@ import { DividerBlock } from './src/blocks/DividerBlock'
 import { QuoteBlock } from './src/blocks/QuoteBlock'
 import { TableBlock } from './src/blocks/TableBlock'
 
-// === Специфичные блоки для страниц (v5.5.1) ===
+// === Специфичные блоки ===
 import { InstructorBlock } from './src/blocks/InstructorBlock'
-import { PacmanAnimationBlock } from './src/blocks/PacmanAnimationBlock'
+import { SnakeAnimationBlock } from './src/blocks/SnakeAnimationBlock'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -68,31 +67,14 @@ export default buildConfig({
   editor: lexicalEditor(),
   collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress],
   globals: [Settings],
-  // === ВСЕ 20 BLOCKS — доступны в админке для выбора в layout.blocks[] ===
+  // === 20 BLOCKS ===
   blocks: [
-    // Стандартные (9)
-    HeroBlock,
-    FeaturesBlock,
-    CtaBlock,
-    ContentBlock,
-    FaqBlock,
-    GalleryBlock,
-    PricingBlock,
-    TestimonialsBlock,
-    StatsBlock,
-    // Дополнительные (9)
-    TextBlock,
-    ImageBlock,
-    VideoBlock,
-    StepsBlock,
-    CardsBlock,
-    ContactBlock,
-    DividerBlock,
-    QuoteBlock,
-    TableBlock,
-    // Специфичные (2) — v5.5.1
+    HeroBlock, FeaturesBlock, CtaBlock, ContentBlock, FaqBlock,
+    GalleryBlock, PricingBlock, TestimonialsBlock, StatsBlock,
+    TextBlock, ImageBlock, VideoBlock, StepsBlock, CardsBlock,
+    ContactBlock, DividerBlock, QuoteBlock, TableBlock,
     InstructorBlock,
-    PacmanAnimationBlock,
+    SnakeAnimationBlock,
   ],
   plugins,
   db: postgresAdapter({

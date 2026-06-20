@@ -1,8 +1,6 @@
-
 import type { CollectionConfig } from 'payload'
 import { createAuditHooks } from '../lib/audit'
 
-// === ИМПОРТ ВСЕХ 20 БЛОКОВ для layout.blocks[] ===
 import { HeroBlock } from '../blocks/HeroBlock'
 import { FeaturesBlock } from '../blocks/FeaturesBlock'
 import { CtaBlock } from '../blocks/CtaBlock'
@@ -22,7 +20,7 @@ import { DividerBlock } from '../blocks/DividerBlock'
 import { QuoteBlock } from '../blocks/QuoteBlock'
 import { TableBlock } from '../blocks/TableBlock'
 import { InstructorBlock } from '../blocks/InstructorBlock'
-import { PacmanAnimationBlock } from '../blocks/PacmanAnimationBlock'
+import { SnakeAnimationBlock } from '../blocks/SnakeAnimationBlock'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -38,12 +36,10 @@ export const Pages: CollectionConfig = {
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг', admin: { position: 'sidebar' } },
     { name: 'isPublished', type: 'checkbox', defaultValue: false, label: 'Опубликована', admin: { position: 'sidebar' } },
-
-    // === HERO (для home страницы) ===
     {
       name: 'hero',
       type: 'group',
-      label: 'Hero — главный экран (только для главной)',
+      label: 'Hero (только для главной)',
       admin: { condition: (_, sibling) => sibling?.slug === 'home' },
       fields: [
         { name: 'titleLine1', type: 'text', label: 'Заголовок (первая строка)' },
@@ -55,39 +51,17 @@ export const Pages: CollectionConfig = {
         { name: 'ctaSecondaryLink', type: 'text', label: 'Ссылка второй кнопки' },
       ],
     },
-
-    // === SEO ===
     { name: 'content', type: 'richText', label: 'Содержание (SEO)' },
-
-    // === LAYOUT: BLOCKS[] — гибкая компоновка страницы из 20 блоков ===
     {
       name: 'blocks',
       type: 'blocks',
       label: 'Блоки страницы (гибкая компоновка)',
-      admin: {
-        description: 'Добавляйте блоки в любом порядке. Доступно 20 типов блоков.',
-      },
       blocks: [
-        HeroBlock,
-        FeaturesBlock,
-        CtaBlock,
-        ContentBlock,
-        FaqBlock,
-        GalleryBlock,
-        PricingBlock,
-        TestimonialsBlock,
-        StatsBlock,
-        TextBlock,
-        ImageBlock,
-        VideoBlock,
-        StepsBlock,
-        CardsBlock,
-        ContactBlock,
-        DividerBlock,
-        QuoteBlock,
-        TableBlock,
-        InstructorBlock,
-        PacmanAnimationBlock,
+        HeroBlock, FeaturesBlock, CtaBlock, ContentBlock, FaqBlock,
+        GalleryBlock, PricingBlock, TestimonialsBlock, StatsBlock,
+        TextBlock, ImageBlock, VideoBlock, StepsBlock, CardsBlock,
+        ContactBlock, DividerBlock, QuoteBlock, TableBlock,
+        InstructorBlock, SnakeAnimationBlock,
       ],
     },
   ],
