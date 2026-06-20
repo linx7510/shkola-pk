@@ -78,7 +78,8 @@ export default buildConfig({
   ],
   plugins,
   db: postgresAdapter({
-    push: true,
+    push: false,
+    migrationDir: path.resolve(dirname, 'src/migrations'),
     pool: { connectionString: process.env.DATABASE_URL },
   }),
   secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',

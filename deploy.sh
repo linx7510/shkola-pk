@@ -16,6 +16,9 @@ for db in shkola_pk shkola_pk_payload shkola_pk_audit; do
 done
 log "   Backup: $BACKUP_DIR"
 
+log "1.5. Run migrations (BEFORE build)..."
+bash "$PROJECT_DIR/scripts/migrate.sh" || { log "❌ Migration check failed! Aborting deploy."; exit 1; }
+
 log "2. Git pull..."
 cd "$PROJECT_DIR"
 git pull --rebase origin main 2>&1 || log "   (no changes or rebase needed)"
