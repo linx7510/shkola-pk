@@ -5,9 +5,10 @@ export const CtaBlock: Block = {
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'description', type: 'textarea', label: 'Описание' },
-    { name: 'buttonText', type: 'text', label: 'Текст кнопки' },
-    { name: 'buttonLink', type: 'text', label: 'Ссылка кнопки' },
+    { name: 'buttonText', type: 'text', label: 'Текст основной кнопки' },
+    { name: 'buttonLink', type: 'text', label: 'Ссылка основной кнопки' },
+    { name: 'buttonText2', type: 'text', label: 'Текст второй кнопки' },
+    { name: 'buttonLink2', type: 'text', label: 'Ссылка второй кнопки' },
     { name: 'backgroundImage', type: 'upload', relationTo: 'media', label: 'Фоновое изображение' },
   ],
 }
-

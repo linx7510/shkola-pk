@@ -45,6 +45,10 @@ import { DividerBlock } from './src/blocks/DividerBlock'
 import { QuoteBlock } from './src/blocks/QuoteBlock'
 import { TableBlock } from './src/blocks/TableBlock'
 
+// === Специфичные блоки для страниц (v5.5.1) ===
+import { InstructorBlock } from './src/blocks/InstructorBlock'
+import { PacmanAnimationBlock } from './src/blocks/PacmanAnimationBlock'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -55,12 +59,6 @@ const plugins: any[] = [
   }),
 ]
 
-/* S3 temporarily disabled to fix admin white page
-   if (process.env.S3_ENDPOINT) { ... }
-   S3 storage was causing importMap errors in Payload admin
-   Media is stored locally in /var/www/shkola-pk/payload-cms/media/
-   Re-enable when Payload fixes S3 client importMap issue */
-
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -70,7 +68,7 @@ export default buildConfig({
   editor: lexicalEditor(),
   collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress],
   globals: [Settings],
-  // === ВСЕ 18 BLOCKS — доступны в админке для выбора в layout.blocks[] ===
+  // === ВСЕ 20 BLOCKS — доступны в админке для выбора в layout.blocks[] ===
   blocks: [
     // Стандартные (9)
     HeroBlock,
@@ -82,7 +80,7 @@ export default buildConfig({
     PricingBlock,
     TestimonialsBlock,
     StatsBlock,
-    // Дополнительные (9) — добавлены в v5.5
+    // Дополнительные (9)
     TextBlock,
     ImageBlock,
     VideoBlock,
@@ -92,6 +90,9 @@ export default buildConfig({
     DividerBlock,
     QuoteBlock,
     TableBlock,
+    // Специфичные (2) — v5.5.1
+    InstructorBlock,
+    PacmanAnimationBlock,
   ],
   plugins,
   db: postgresAdapter({
