@@ -1,0 +1,90 @@
+# docker-compose.dev.yml — Локальная разработка
+# Использование:
+#   docker compose -f docker-compose.dev.yml up -d postgres
+#   cd payload-cms && npm run dev
+#   cd app-payload && npm run dev
+#
+# Или полный старт (всех сервисов):
+#   docker compose -f docker-compose.dev.yml up
+#
+# Остановка:
+#   docker compose -f docker-compose.dev.yml down
+
+services:
+  # === PostgreSQL 16 ===
+  postgres-dev:
+    image: postgres:16-alpine
+    container_name: shkola-pk-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shkola_pk
+      POSTGRES_PASSWORD: Shk0laPK2026Dev
+      POSTGRES_DB: shkola_pk_payload
+      POSTGRES_MULTIPLE_DATABASES: shkola_pk,shkola_pk_payload,shkola_pk_audit
+    ports:
+      - "5433:5432"  # порт 5433 — чтобы не конфликтовать с продовым PG
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shkola_pk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shkola-dev
+
+  # === Payload CMS (dev mode — hot reload) ===
+  payload-dev:
+    build:
+      context: ./payload-cms
+      dockerfile: Dockerfile
+    container_name: shkola-pk-cms-dev
+    restart: unless-stopped
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://shkola_pk:Shk0laPK2026Dev@postgres-dev:5432/shkola_pk_payload"
+      AUDIT_DATABASE_URL: "postgresql://shkola_pk:Shk0laPK2026Dev@postgres-dev:5432/shkola_pk"
+      PAYLOAD_SECRET: "dev-secret-not-for-production"
+      NODE_ENV: development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./payload-cms:/app
+      - /app/node_modules  # исключить node_modules из монтирования
+      - /app/.next
+    command: npm run dev
+    networks:
+      - shkola-dev
+
+  # === Frontend (dev mode — hot reload) ===
+  frontend-dev:
+    build:
+      context: ./app-payload
+      dockerfile: Dockerfile
+    container_name: shkola-pk-frontend-dev
+    restart: unless-stopped
+    depends_on:
+      - payload-dev
+    environment:
+      PAYLOAD_API_URL: "http://payload-dev:3001"
+      NEXT_PUBLIC_PAYLOAD_URL: "http://localhost:3001"
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app-payload:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    networks:
+      - shkola-dev
+
+volumes:
+  postgres_dev_data:
+
+networks:
+  shkola-dev:
+    driver: bridge
