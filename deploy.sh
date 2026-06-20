@@ -28,6 +28,9 @@ log "1.5. Run migrations (BEFORE build)..."
 bash "$PROJECT_DIR/scripts/migrate.sh" || { log "❌ Migration check failed! Aborting deploy."; exit 1; }
 
 # === 2. Git pull ===
+log "1.6. Check block sync (schema ↔ frontend)..."
+bash "$PROJECT_DIR/scripts/check-block-sync.sh" || { log "❌ Block sync check failed! Fix frontend components."; exit 1; }
+
 log "2. Git pull..."
 cd "$PROJECT_DIR"
 git pull --rebase origin main 2>&1 || log "   (no changes or rebase needed)"
