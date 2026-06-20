@@ -1,0 +1,123 @@
+version: '3.8'
+
+# Школа ПК — Docker Compose для платформы v5.4
+# Использование:
+#   development: docker-compose up
+#   production:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# ВНИМАНИЕ: На текущем продакшн-сервере используется PM2 (не Docker).
+# Этот файл предоставляет reproducibility для staging/development окружений.
+
+services:
+  # === PostgreSQL ===
+  postgres:
+    image: postgres:16-alpine
+    container_name: shkola-pk-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shkola_pk
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-Shk0laPK2026}
+      POSTGRES_DB: shkola_pk_payload
+      POSTGRES_MULTIPLE_DATABASES: shkola_pk,shkola_pk_payload,shkola_pk_audit
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shkola_pk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shkola-network
+
+  # === Payload CMS (admin + API) ===
+  payload-cms:
+    build:
+      context: ./payload-cms
+      dockerfile: Dockerfile
+    container_name: shkola-pk-cms
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://shkola_pk:${DB_PASSWORD:-Shk0laPK2026}@postgres:5432/shkola_pk_payload
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:-sk-pk-2026-payload-secret-key-secure}
+      NODE_ENV: production
+      PORT: 3001
+      # S3 Storage (REG.RU)
+      S3_ENDPOINT: ${S3_ENDPOINT:-https://s3.regru.cloud}
+      S3_BUCKET: ${S3_BUCKET:-shkola-pk-prom}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      S3_REGION: ${S3_REGION:-ru-1}
+    ports:
+      - "3001:3001"
+    volumes:
+      - cms_media:/var/www/shkola-pk/payload-cms/media
+      - ./payload-cms:/app
+      - /app/node_modules
+    networks:
+      - shkola-network
+
+  # === Next.js Frontend ===
+  frontend:
+    build:
+      context: ./app-payload
+      dockerfile: Dockerfile
+    container_name: shkola-pk-frontend
+    restart: unless-stopped
+    depends_on:
+      - payload-cms
+    environment:
+      PAYLOAD_API_URL: http://payload-cms:3001
+      NEXT_PUBLIC_PAYLOAD_URL: ${PUBLIC_URL:-https://2980738.ru}
+      NODE_ENV: production
+      PORT: 3000
+      # AI Provider
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
+      DEEPSEEK_API_URL: https://api.deepseek.com/v1
+      # Auth
+      JWT_SECRET: ${JWT_SECRET:-sk-pk-2026-jwt-key-secure}
+      # Audit logs (отдельная БД)
+      DATABASE_URL: postgresql://shkola_pk:${DB_PASSWORD:-Shk0laPK2026}@postgres:5432/shkola_pk
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app-payload:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - shkola-network
+
+  # === nginx (reverse proxy + SSL) ===
+  nginx:
+    image: nginx:1.24-alpine
+    container_name: shkola-pk-nginx
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - payload-cms
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - shkola-network
+
+volumes:
+  postgres_data:
+    driver: local
+  cms_media:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  shkola-network:
+    driver: bridge
