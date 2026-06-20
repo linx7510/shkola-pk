@@ -389,8 +389,8 @@ export function SnakeAnimationBlock({ data }: { data: SnakeAnimationBlockData })
         width: "100vw",
         height: "100vh",
         pointerEvents: "none",
-        zIndex: 0,
-        opacity: 0.85,
+        zIndex: 9999,
+        opacity: 0.55,
         imageRendering: "pixelated",
       }}
       aria-hidden="true"

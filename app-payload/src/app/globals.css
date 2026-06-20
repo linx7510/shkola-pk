@@ -1364,8 +1364,8 @@ a:hover { color: var(--color-orange-400); }
 .hero__logo-img {
   position: relative;
   z-index: 20;
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 80%;
   object-fit: contain;
   animation: logoFloat 6s ease-in-out infinite;
   filter: brightness(1.25) contrast(1.1) drop-shadow(0 0 40px rgba(255,230,200,0.4)) drop-shadow(0 0 80px rgba(214,198,178,0.2));

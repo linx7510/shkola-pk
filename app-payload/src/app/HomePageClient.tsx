@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import CursorLight from "@/components/CursorLight";
 import BlogParticles from "@/components/BlogParticles";
 import Reveal from "@/components/Reveal";
+import { BlockRenderer } from "@/components/BlockRenderer";
 
 // Тип данных главной страницы из Payload CMS
 interface HomePageData {
@@ -18,6 +19,7 @@ interface HomePageData {
   services?: Array<{ icon: string; title: string; price: string; desc: string; href: string; }>;
   faqItems?: Array<{ q: string; a: string; }>;
   cta?: { title?: string; subtitle?: string; buttonText?: string; buttonLink?: string; };
+  blocks?: Array<{ blockType: string; [key: string]: any; }>;
   contacts?: { phone?: string; phoneHref?: string; email?: string; telegram?: string; telegramLink?: string; address?: string; legal?: string; };
 }
 
@@ -1012,6 +1014,11 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
           </div>
         </div>
       </footer>
+
+      {/* ===== DYNAMIC BLOCKS FROM PAYLOAD ADMIN ===== */}
+      {homeData?.blocks && Array.isArray(homeData.blocks) && homeData.blocks.length > 0 && (
+        <BlockRenderer blocks={homeData.blocks} />
+      )}
 
       {/* ===== AI CHAT WIDGET (внизу справа) ===== */}
       
