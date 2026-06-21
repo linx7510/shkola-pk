@@ -4,6 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import CursorLight from "@/components/CursorLight";
 import BlogParticles from "@/components/BlogParticles";
+import HeroCanvas from "@/components/HeroCanvas";
 import Reveal from "@/components/Reveal";
 import { BlockRenderer } from "@/components/BlockRenderer";
 
@@ -389,6 +390,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
       {/* ===== HERO ===== */}
       <section id="hero" style={{minHeight:"100vh",display:"flex",alignItems:"center",background:"var(--color-bg,#0D0C0A)",paddingTop:"calc(var(--header-h,72px) + 3rem)",position:"relative",overflow:"hidden"}}>
+        <HeroCanvas />
         <div className="hero__ambient" />
         <div style={{...I,width:"100%",position:"relative",zIndex:2}}>
           <Reveal>

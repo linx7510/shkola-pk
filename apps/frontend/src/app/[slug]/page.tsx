@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import { BlockRenderer } from '@/components/BlockRenderer'
 import Header from '@/components/Header'
 import CursorLight from '@/components/CursorLight'
+import AIConsultant from '@/components/AIConsultant'
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL
                || process.env.NEXT_PUBLIC_PAYLOAD_URL
@@ -107,6 +108,8 @@ export default async function SlugPage({ params }: Props) {
             </p>
           </section>
         )}
+        {/* AI-консультант — точная копия блока с главной страницы */}
+        <AIConsultant />
       </main>
     </>
   )

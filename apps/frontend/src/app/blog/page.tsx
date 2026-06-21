@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import BlogListClient from "./BlogListClient";
+import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -37,6 +38,7 @@ export default async function BlogPage() {
     <>
       <Header />
       <BlogListClient posts={posts} />
+      <AIConsultant />
     </>
   );
 }

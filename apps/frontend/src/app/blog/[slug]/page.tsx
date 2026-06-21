@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import Link from "next/link";
+import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -189,6 +190,9 @@ export default async function BlogPostPage({ params }: Props) {
             </Link>
           </div>
         </article>
+
+        {/* AI-консультант — точная копия блока с главной страницы */}
+        <AIConsultant />
       </main>
     </>
   );
