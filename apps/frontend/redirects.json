@@ -129,7 +129,7 @@
     },
     {
       "source": "/uslugi/audit-ustava",
-      "destination": "/uslugi/audit-ustava-potrebitelskogo-kooperativa",
+      "destination": "/uslugi/audit-ustava-pk",
       "permanent": true
     }
   ]
