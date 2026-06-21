@@ -75,18 +75,23 @@
 /* ─── 25. Heading Sweep — ЕДИНОЕ ОПРЕДЕЛЕНИЕ для главной и второстепенных страниц ───
    Эффект: всегда работающая бесконечная подсветка (4s) + при hover — усиление свечения,
    цвет в бежевый, лёгкий подъём вверх, и подчёркивание снизу раскрывается на всю ширину.
-   Это ТОТ ЖЕ эффект, что применяется на главной странице 2980738.ru. */
+   Это ТОТ ЖЕ эффект, что применяется на главной странице 2980738.ru.
+   ВАЖНО: overflow: visible — чтобы «пробегающий свет» ВЫЛЕТАЛ за правый край заголовка
+   (как было на исходнике velaslav.rus до правок). */
 .heading-sweep {
   position: relative;
   display: inline-block;
-  overflow: hidden;
+  overflow: visible;
   cursor: default;
   transition: color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               text-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Бесконечная «бегущая подсветка» — всегда работает, даже без hover */
+/* Бесконечная «бегущая подсветка» — всегда работает, даже без hover.
+   Свет стартует слева за пределами заголовка (left:-100%), доезжает до правого края
+   и ВЫЛЕТАЕТ за него (left:100% — при width:100% правый край ::before уходит
+   за правый край заголовка). */
 .heading-sweep::before {
   content: '';
   position: absolute;
@@ -94,10 +99,11 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(214,198,178,.18) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(214,198,178,.28) 45%, rgba(245,240,232,.35) 50%, rgba(214,198,178,.28) 55%, transparent 100%);
   animation: headingSweep 4s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
+  will-change: left;
 }
 
 /* Подчёркивание снизу — раскрывается на всю ширину при hover или появлении */
@@ -142,19 +148,20 @@
   background-position: 100% 50%;
 }
 
-/* Гарантируем, что на второстепенных страницах h1/h2 с heading-sweep тоже работают */
+/* Гарантируем, что на второстепенных страницах h1/h2 с heading-sweep тоже работают
+   и свет тоже вылетает за правый край (overflow: visible) */
 main h1.heading-sweep,
 main h2.heading-sweep,
 main h3.heading-sweep {
   position: relative;
   display: inline-block;
-  overflow: hidden;
+  overflow: visible;
 }
 
 @keyframes headingSweep {
-  0%   { left: -100%; }
-  50%  { left: 100%; }
-  100% { left: 100%; }
+  0%   { left: -100%; }   /* старт за левым краем */
+  40%  { left: 100%; }    /* выехал за правый край */
+  100% { left: 100%; }    /* пауза перед следующим циклом */
 }
 
 @keyframes headingHoverSweep {
