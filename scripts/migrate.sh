@@ -7,7 +7,7 @@
 set -euo pipefail
 
 PROJECT_DIR="/var/www/shkola-pk"
-PAYLOAD_DIR="$PROJECT_DIR/payload-cms"
+PAYLOAD_DIR="$PROJECT_DIR/apps/payload"
 
 log() { echo "[$(date '+%H:%M:%S')] $*"; }
 

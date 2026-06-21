@@ -7,9 +7,9 @@
 set -euo pipefail
 
 PROJECT_DIR="/var/www/shkola-pk"
-SCHEMA_DIR="$PROJECT_DIR/payload-cms/src/blocks"
-FRONTEND_DIR="$PROJECT_DIR/app-payload/src/components/blocks"
-TYPES_FILE="$PROJECT_DIR/payload-cms/src/payload-types.ts"
+SCHEMA_DIR="$PROJECT_DIR/apps/payload/src/blocks"
+FRONTEND_DIR="$PROJECT_DIR/apps/frontend/src/components/blocks"
+TYPES_FILE="$PROJECT_DIR/apps/payload/src/payload-types.ts"
 
 PASS=0
 FAIL=0
@@ -86,7 +86,7 @@ done
 # ═══ 3. Проверить что все frontend блоки зарегистрированы в BlockRenderer ═══
 echo ""
 echo "3. All blocks registered in BlockRenderer"
-RENDERER="$PROJECT_DIR/app-payload/src/components/BlockRenderer.tsx"
+RENDERER="$PROJECT_DIR/apps/frontend/src/components/BlockRenderer.tsx"
 if [ -f "$RENDERER" ]; then
     RENDERER_CASES=$(grep -c 'case "' "$RENDERER" 2>/dev/null || echo "0")
     echo "  BlockRenderer handles $RENDERER_CASES block types"
@@ -116,7 +116,7 @@ fi
 # ═══ 4. Проверить что все блоки зарегистрированы в payload.config.ts ═══
 echo ""
 echo "4. All blocks registered in payload.config.ts"
-CONFIG="$PROJECT_DIR/payload-cms/payload.config.ts"
+CONFIG="$PROJECT_DIR/apps/payload/payload.config.ts"
 if [ -f "$CONFIG" ]; then
     CONFIG_BLOCKS=$(grep -c "Block," "$CONFIG" 2>/dev/null || echo "0")
     echo "  payload.config.ts registers $CONFIG_BLOCKS blocks"
