@@ -37,28 +37,28 @@ git pull --rebase origin main 2>&1 || log "   (no changes or rebase needed)"
 
 # === 3. Install dependencies ===
 log "3. Install dependencies..."
-if [ -f "payload-cms/package.json" ]; then
-    cd "$PROJECT_DIR/payload-cms"
+if [ -f "apps/payload/package.json" ]; then
+    cd "$PROJECT_DIR/apps/payload"
     npm install --no-audit --no-fund 2>&1 | tail -3
 fi
-if [ -f "app-payload/package.json" ]; then
-    cd "$PROJECT_DIR/app-payload"
+if [ -f "apps/frontend/package.json" ]; then
+    cd "$PROJECT_DIR/apps/frontend"
     npm install --no-audit --no-fund 2>&1 | tail -3
 fi
 
 # === 4. Generate Payload importmap ===
 log "4. Generate Payload importmap..."
-cd "$PROJECT_DIR/payload-cms"
+cd "$PROJECT_DIR/apps/payload"
 npx payload generate:importmap 2>&1 | tail -3
 
 # === 5. Build Payload CMS ===
 log "5. Build Payload CMS..."
-cd "$PROJECT_DIR/payload-cms"
+cd "$PROJECT_DIR/apps/payload"
 NODE_OPTIONS='--max-old-space-size=2048' npm run build 2>&1 | tail -5
 
 # === 6. Build Frontend ===
 log "6. Build Frontend..."
-cd "$PROJECT_DIR/app-payload"
+cd "$PROJECT_DIR/apps/frontend"
 NODE_OPTIONS='--max-old-space-size=2048' npm run build 2>&1 | tail -5
 
 # === 7. PM2 restart ===
@@ -85,9 +85,9 @@ else
     fi
     
     log "ROLLBACK 2. Rebuilding..."
-    cd "$PROJECT_DIR/payload-cms"
+    cd "$PROJECT_DIR/apps/payload"
     NODE_OPTIONS='--max-old-space-size=2048' npm run build 2>&1 | tail -3
-    cd "$PROJECT_DIR/app-payload"
+    cd "$PROJECT_DIR/apps/frontend"
     NODE_OPTIONS='--max-old-space-size=2048' npm run build 2>&1 | tail -3
     
     log "ROLLBACK 3. PM2 restart..."

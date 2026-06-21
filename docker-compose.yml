@@ -35,7 +35,7 @@ services:
   # === Payload CMS (admin + API) ===
   payload-cms:
     build:
-      context: ./payload-cms
+      context: ./apps/payload
       dockerfile: Dockerfile
     container_name: shkola-pk-cms
     restart: unless-stopped
@@ -57,7 +57,7 @@ services:
       - "3001:3001"
     volumes:
       - cms_media:/var/www/shkola-pk/payload-cms/media
-      - ./payload-cms:/app
+      - ./apps/payload:/app
       - /app/node_modules
     networks:
       - shkola-network
@@ -65,7 +65,7 @@ services:
   # === Next.js Frontend ===
   frontend:
     build:
-      context: ./app-payload
+      context: ./apps/frontend
       dockerfile: Dockerfile
     container_name: shkola-pk-frontend
     restart: unless-stopped
@@ -86,7 +86,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./app-payload:/app
+      - ./apps/frontend:/app
       - /app/node_modules
       - /app/.next
     networks:

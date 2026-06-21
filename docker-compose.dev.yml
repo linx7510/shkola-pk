@@ -37,7 +37,7 @@ services:
   # === Payload CMS (dev mode — hot reload) ===
   payload-dev:
     build:
-      context: ./payload-cms
+      context: ./apps/payload
       dockerfile: Dockerfile
     container_name: shkola-pk-cms-dev
     restart: unless-stopped
@@ -52,7 +52,7 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./payload-cms:/app
+      - ./apps/payload:/app
       - /app/node_modules  # исключить node_modules из монтирования
       - /app/.next
     command: npm run dev
@@ -62,7 +62,7 @@ services:
   # === Frontend (dev mode — hot reload) ===
   frontend-dev:
     build:
-      context: ./app-payload
+      context: ./apps/frontend
       dockerfile: Dockerfile
     container_name: shkola-pk-frontend-dev
     restart: unless-stopped
@@ -75,7 +75,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./app-payload:/app
+      - ./apps/frontend:/app
       - /app/node_modules
       - /app/.next
     command: npm run dev
