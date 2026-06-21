@@ -9,14 +9,50 @@ export function StepsBlock({ data }: { data: StepsBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        {data.title && <Reveal><h2 className="heading-sweep" style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "2rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
+        {data.title && (
+          <Reveal>
+            <h2
+              className="section-title heading-sweep"
+              data-text={data.title}
+              style={{
+                fontSize: "1.8rem",
+                color: "#E7DCCF",
+                marginBottom: "2rem",
+                fontWeight: 700,
+                textAlign: "center",
+              }}
+            >
+              {data.title}
+            </h2>
+          </Reveal>
+        )}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {data.steps.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>
-              <div style={{ minWidth: 48, height: 48, borderRadius: "50%", background: "#E68863", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", fontWeight: 700 }}>{i + 1}</div>
+              <div
+                style={{
+                  minWidth: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #C96E4D, #E68863)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1.3rem",
+                  fontWeight: 700,
+                  boxShadow: "0 4px 12px rgba(201,110,77,0.25)",
+                }}
+              >
+                {i + 1}
+              </div>
               <div>
-                <Reveal><h3 style={{ color: "#E7DCCF", fontSize: "1.1rem", marginBottom: "0.4rem" }}>{s.title}</h3></Reveal>
-                <p style={{ color: "rgba(214,198,178,0.8)", fontSize: "0.92rem", lineHeight: 1.6 }}>{s.description}</p>
+                <Reveal>
+                  <h3 style={{ color: "#E7DCCF", fontSize: "1.1rem", marginBottom: "0.4rem" }}>{s.title}</h3>
+                </Reveal>
+                <p style={{ color: "rgba(214,198,178,0.8)", fontSize: "0.92rem", lineHeight: 1.6 }}>
+                  {s.description}
+                </p>
               </div>
             </div>
           ))}

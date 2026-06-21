@@ -442,3 +442,152 @@
 .seo-faq-item.open > h3::after {
   content: '−';
 }
+
+
+/* === SERVICE CARDS (второстепенные страницы — Унифицированы с главной) ===
+   На главной странице услуги отображаются в виде карточек со следующей структурой:
+   иконка + цена-плашка в одной строке, название, описание, ссылка «Подробнее →».
+   Здесь — та же визуальная модель для всех карточек на второстепенных страницах. */
+.service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem;
+  background: rgba(214,198,178,0.03);
+  border: 1px solid rgba(214,198,178,0.08);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-orange-500), var(--color-orange-600));
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-card:hover {
+  border-color: rgba(230,136,99,0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 25px rgba(230,136,99,0.08);
+}
+
+.service-card:hover::before {
+  opacity: 1;
+}
+
+.service-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.service-card__icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.service-card__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #E7DCCF;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+.service-card__desc {
+  font-size: 0.88rem;
+  color: rgba(214,198,178,0.95);
+  line-height: 1.6;
+}
+
+.service-card__more {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #E68863;
+  font-weight: 500;
+}
+
+.service-card__more:hover {
+  color: #F5F0E8;
+}
+
+/* === ЦЕНОВАЯ ПЛАШКА — отдельный блок, как на главной ===
+   Большая, яркая, с background-gradient и text-shadow.
+   Эта плашка УНИФИЦИРОВАНА с главной страницей (раздел «Услуги»). */
+.service-card-price {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0.4rem 0.85rem;
+  background: linear-gradient(135deg, rgba(230,136,99,0.18), rgba(201,110,77,0.08));
+  border: 1px solid rgba(230,136,99,0.3);
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(201,110,77,0.12);
+}
+
+.service-card-price__value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #FFD4B8;
+  text-shadow: 0 0 10px rgba(230,136,99,0.4);
+  line-height: 1.1;
+}
+
+.service-card-price__note {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(245,240,232,0.7);
+  margin-top: 0.15rem;
+  letter-spacing: 0.03em;
+}
+
+/* Большая ценовая плашка — для PricingBlock и выделенных предложений */
+.price-plaque {
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(214,198,178,0.08), rgba(214,198,178,0.03));
+  border-top: 1px solid rgba(230,136,99,0.2);
+  border-bottom: 1px solid rgba(230,136,99,0.2);
+  text-align: center;
+}
+
+.price-plaque--featured {
+  background: linear-gradient(135deg, rgba(201,110,77,0.25), rgba(230,136,99,0.15));
+  border-top-color: rgba(230,136,99,0.4);
+  border-bottom-color: rgba(230,136,99,0.4);
+}
+
+.price-plaque__value {
+  color: #E68863;
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-shadow: 0 0 15px rgba(230,136,99,0.3);
+}
+
+.price-plaque--featured .price-plaque__value {
+  color: #FFD4B8;
+  text-shadow: 0 0 30px rgba(230,136,99,0.5);
+}
+
+.price-plaque__note {
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.65);
+  margin-top: 0.3rem;
+}

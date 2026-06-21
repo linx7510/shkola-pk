@@ -13,11 +13,7 @@
   transform: translateY(20px);
 }
 
-.js .reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
+.js .reveal.visible,
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
@@ -76,140 +72,21 @@
 }
 
 
-/* ─── 25. Heading Sweep (hover effect — color sweep through text) ─── */
+/* ─── 25. Heading Sweep — ЕДИНОЕ ОПРЕДЕЛЕНИЕ для главной и второстепенных страниц ───
+   Эффект: всегда работающая бесконечная подсветка (4s) + при hover — усиление свечения,
+   цвет в бежевый, лёгкий подъём вверх, и подчёркивание снизу раскрывается на всю ширину.
+   Это ТОТ ЖЕ эффект, что применяется на главной странице 2980738.ru. */
 .heading-sweep {
   position: relative;
   display: inline-block;
   overflow: hidden;
   cursor: default;
-  background: linear-gradient(90deg, var(--color-beige-200), var(--color-beige-200));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  transition: all 0.3s ease;
+  transition: color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              text-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.heading-sweep::before {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-orange-400), var(--color-beige-100), var(--color-green-400), var(--color-orange-400));
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  opacity: 0;
-  transform: translateX(-100%);
-  transition: opacity 0.1s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: none;
-}
-
-.heading-sweep:hover::before {
-  opacity: 1;
-  transform: translateX(0);
-  animation: headingColorSweep 1.5s ease forwards;
-}
-
-@keyframes headingColorSweep {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
-
-/* Fallback: underline sweep for browsers that dont support background-clip */
-@supports not (-webkit-background-clip: text) {
-  .heading-sweep::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, var(--color-orange-500), var(--color-beige-200), var(--color-orange-500));
-    background-size: 200% 100%;
-    transform: translateX(-110%);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .heading-sweep:hover::after {
-    transform: translateX(0);
-  }
-}
-
-
-/* === Усиленный hover для ВСЕХ heading-sweep заголовков === */
-.heading-sweep:hover {
-  color: #F5F0E8 !important;
-  text-shadow: 0 0 24px rgba(230, 136, 99, 0.45), 0 0 8px rgba(245, 240, 232, 0.25);
-  transform: translateY(-1px);
-}
-
-/* Подчёркивание снизу для всех heading-sweep (поверх ::before) */
-.heading-sweep::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #E68863 20%, #F5F0E8 50%, #E68863 80%, transparent);
-  box-shadow: 0 0 12px rgba(230, 136, 99, 0.6);
-  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), left 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.heading-sweep:hover::after {
-  width: 100%;
-  left: 0;
-}
-
-
-.heading-sweep {
-  position: relative;
-  display: inline-block;
-  overflow: visible;
-  cursor: default;
-  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-
-/* === Усиленный hover для ВСЕХ heading-sweep заголовков === */
-.heading-sweep:hover {
-  color: #F5F0E8 !important;
-  text-shadow: 0 0 24px rgba(230, 136, 99, 0.45), 0 0 8px rgba(245, 240, 232, 0.25);
-  transform: translateY(-1px);
-}
-
-/* Подчёркивание снизу для всех heading-sweep (поверх ::before) */
-.heading-sweep::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #E68863 20%, #F5F0E8 50%, #E68863 80%, transparent);
-  box-shadow: 0 0 12px rgba(230, 136, 99, 0.6);
-  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), left 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.heading-sweep:hover::after {
-  width: 100%;
-  left: 0;
-}
-
-
-/* === HEADING-SWEEP — анимация заголовков как на velaslav.rus === */
-.heading-sweep {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-}
-
+/* Бесконечная «бегущая подсветка» — всегда работает, даже без hover */
 .heading-sweep::before {
   content: '';
   position: absolute;
@@ -219,47 +96,83 @@
   height: 100%;
   background: linear-gradient(90deg, transparent 0%, rgba(214,198,178,.18) 50%, transparent 100%);
   animation: headingSweep 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
 }
 
+/* Подчёркивание снизу — раскрывается на всю ширину при hover или появлении */
 .heading-sweep::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -4px;
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #C96E4D, #E68863, transparent);
+  background: linear-gradient(90deg, #C96E4D, #E68863, #F5F0E8, #E68863, #C96E4D);
+  background-size: 200% 100%;
   transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: left center;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              background-position 0.8s ease;
+  box-shadow: 0 0 12px rgba(230, 136, 99, 0.55);
+  pointer-events: none;
+  z-index: 2;
 }
 
+/* На главной странице после scroll-reveal добавляется .visible — подчёркивание видно */
 .heading-sweep.visible::after,
-.heading-sweep.reveal.visible::after {
+.heading-sweep.reveal.visible::after,
+.js .reveal.visible .heading-sweep::after {
   transform: scaleX(1);
 }
 
-.heading-sweep.heading-hover::before {
-  animation-name: headingHoverSweep !important;
-  animation-duration: 0.7s !important;
-  animation-fill-mode: forwards !important;
+/* HOVER — усиливаем свечение, меняем цвет, лёгкий подъём */
+.heading-sweep:hover {
+  color: #F5F0E8 !important;
+  text-shadow: 0 0 24px rgba(230, 136, 99, 0.45), 0 0 8px rgba(245, 240, 232, 0.25);
+  transform: translateY(-1px);
+}
+
+.heading-sweep:hover::before {
+  animation: headingHoverSweep 0.8s ease forwards;
+}
+
+.heading-sweep:hover::after {
+  transform: scaleX(1);
+  background-position: 100% 50%;
+}
+
+/* Гарантируем, что на второстепенных страницах h1/h2 с heading-sweep тоже работают */
+main h1.heading-sweep,
+main h2.heading-sweep,
+main h3.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
 }
 
 @keyframes headingSweep {
-  0% { left: -100%; }
-  50% { left: 100%; }
+  0%   { left: -100%; }
+  50%  { left: 100%; }
   100% { left: 100%; }
 }
 
 @keyframes headingHoverSweep {
-  0% { left: -100%; }
+  0%   { left: -100%; }
   100% { left: 100%; }
 }
 
-/* Также применить к h1 и h2 на второстепенных страницах */
-main h1.heading-sweep,
-main h2.heading-sweep {
+
+/* ─── Hero block hover (второстепенные страницы) ───
+   Лёгкий border-glow при наведении мышью на hero-секцию — то же самое, что
+   неявно происходит на главной за счёт ambient glow + ctaGlow. */
+.hero-block {
   position: relative;
-  display: inline-block;
-  overflow: hidden;
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-block:hover {
+  box-shadow: 0 0 60px rgba(201,110,77,0.18), inset 0 0 0 1px rgba(230,136,99,0.25);
 }
