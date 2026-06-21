@@ -2,7 +2,7 @@ import { Pool } from 'pg'
 
 // Подключение к shkola_pk БД (где audit_logs)
 const pool = new Pool({
-  connectionString: process.env.AUDIT_DATABASE_URL || process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL  // Теперь одна БД — shkola_pk_payload
 })
 
 export interface AuditLogInput {
@@ -24,7 +24,7 @@ export async function logAudit(input: AuditLogInput): Promise<void> {
     const id = randomBytes(12).toString('hex')
     
     await pool.query(
-      `INSERT INTO audit_logs ("id", "userId", "action", "entity", "entityId", "details", "ip", "userAgent")
+      `INSERT INTO audit.audit_logs ("id", "userId", "action", "entity", "entityId", "details", "ip", "userAgent")
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
         id,

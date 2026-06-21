@@ -9,7 +9,7 @@ DATE=$(date "+%Y%m%d_%H%M%S")
 mkdir -p "$BACKUP_DIR"
 
 # Бэкап всех 3 БД
-for db in shkola_pk shkola_pk_payload shkola_pk_audit; do
+for db in shkola_pk_payload; do  # Единая БД (audit — в схеме audit)
     sudo -u postgres pg_dump "$db" | gzip > "$BACKUP_DIR/${db}_${DATE}.sql.gz"
 done
 

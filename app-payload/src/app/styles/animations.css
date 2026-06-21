@@ -1,0 +1,204 @@
+/* ─── 17. Reveal Animation ─── */
+/* Reveal: VISIBLE by default (progressive enhancement).
+   Only hide if JavaScript is available (.js class on <html>). */
+.reveal {
+  opacity: 1;
+  transform: none;
+  transition: opacity 800ms var(--ease-premium), transform 800ms var(--ease-premium);
+}
+
+/* Only hide if JS is active */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.js .reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 100ms; }
+.reveal-delay-2 { transition-delay: 200ms; }
+.reveal-delay-3 { transition-delay: 300ms; }
+.reveal-delay-4 { transition-delay: 400ms; }
+.reveal-delay-5 { transition-delay: 500ms; }
+.reveal-delay-6 { transition-delay: 600ms; }
+
+
+/* ─── 18. Keyframe Animations ─── */
+@keyframes ambientDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -15px) scale(1.05); }
+  50% { transform: translate(-10px, 20px) scale(0.95); }
+  75% { transform: translate(15px, 10px) scale(1.02); }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes logoGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes logoRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 0 40px rgba(201,110,77,0.08); }
+  50% { box-shadow: 0 0 60px rgba(201,110,77,0.15); }
+}
+
+@keyframes tagAppear {
+  from { opacity: 0; transform: translateY(10px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes textGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* ─── 25. Heading Sweep (hover effect — color sweep through text) ─── */
+.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  cursor: default;
+  background: linear-gradient(90deg, var(--color-beige-200), var(--color-beige-200));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.heading-sweep::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-orange-400), var(--color-beige-100), var(--color-green-400), var(--color-orange-400));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 0.1s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: none;
+}
+
+.heading-sweep:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+  animation: headingColorSweep 1.5s ease forwards;
+}
+
+@keyframes headingColorSweep {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* Fallback: underline sweep for browsers that dont support background-clip */
+@supports not (-webkit-background-clip: text) {
+  .heading-sweep::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-orange-500), var(--color-beige-200), var(--color-orange-500));
+    background-size: 200% 100%;
+    transform: translateX(-110%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .heading-sweep:hover::after {
+    transform: translateX(0);
+  }
+}
+
+
+/* === Усиленный hover для ВСЕХ heading-sweep заголовков === */
+.heading-sweep:hover {
+  color: #F5F0E8 !important;
+  text-shadow: 0 0 24px rgba(230, 136, 99, 0.45), 0 0 8px rgba(245, 240, 232, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Подчёркивание снизу для всех heading-sweep (поверх ::before) */
+.heading-sweep::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #E68863 20%, #F5F0E8 50%, #E68863 80%, transparent);
+  box-shadow: 0 0 12px rgba(230, 136, 99, 0.6);
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), left 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.heading-sweep:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+
+.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+  cursor: default;
+  transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+/* === Усиленный hover для ВСЕХ heading-sweep заголовков === */
+.heading-sweep:hover {
+  color: #F5F0E8 !important;
+  text-shadow: 0 0 24px rgba(230, 136, 99, 0.45), 0 0 8px rgba(245, 240, 232, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Подчёркивание снизу для всех heading-sweep (поверх ::before) */
+.heading-sweep::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #E68863 20%, #F5F0E8 50%, #E68863 80%, transparent);
+  box-shadow: 0 0 12px rgba(230, 136, 99, 0.6);
+  transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1), left 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.heading-sweep:hover::after {
+  width: 100%;
+  left: 0;
+}
+
