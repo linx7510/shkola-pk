@@ -10,7 +10,7 @@ export function CardsBlock({ data }: { data: CardsBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        {data.title && <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "2rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
+        {data.title && <Reveal><h2 className="heading-sweep" style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "2rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.5rem" }}>
           {data.cards.map((c, i) => (
             <div key={i} style={{ padding: "1.5rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.12)", borderRadius: 14 }}>

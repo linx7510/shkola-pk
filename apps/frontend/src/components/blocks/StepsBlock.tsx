@@ -9,7 +9,7 @@ export function StepsBlock({ data }: { data: StepsBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        {data.title && <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "2rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
+        {data.title && <Reveal><h2 className="heading-sweep" style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "2rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           {data.steps.map((s, i) => (
             <div key={i} style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>

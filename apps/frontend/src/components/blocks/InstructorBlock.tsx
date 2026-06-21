@@ -14,7 +14,7 @@ export function InstructorBlock({ data }: { data: InstructorBlockData }) {
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
         {data.title && (
-          <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
+          <Reveal><h2 className="heading-sweep" style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
             {data.title}
           </h2></Reveal>
         )}

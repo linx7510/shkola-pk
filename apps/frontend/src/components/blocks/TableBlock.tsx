@@ -10,7 +10,7 @@ export function TableBlock({ data }: { data: TableBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-        {data.title && <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "1.5rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
+        {data.title && <Reveal><h2 className="heading-sweep" style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "1.5rem", fontWeight: 700, textAlign: "center" }}>{data.title}</h2></Reveal>}
         <div style={{ overflowX: "auto", borderRadius: 14, border: "1px solid rgba(214,198,178,0.12)", background: "rgba(214,198,178,0.02)" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
             <thead>

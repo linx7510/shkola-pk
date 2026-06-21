@@ -17,7 +17,7 @@ export function FeaturesBlock({ data }: { data: FeaturesBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       {data.title && (
-        <Reveal><h2 style={{ fontSize: "2rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
+        <Reveal><h2 className="heading-sweep" style={{ fontSize: "2rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
           {data.title}
         </h2></Reveal>
       )}

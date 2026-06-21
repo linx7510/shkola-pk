@@ -15,7 +15,7 @@ export function StatsBlock({ data }: { data: StatsBlockData }) {
   return (
     <section style={{ padding: "2.5rem 1.5rem" }}>
       {data.title && (
-        <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "1.5rem", fontWeight: 700 }}>
+        <Reveal><h2 className="heading-sweep" style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "1.5rem", fontWeight: 700 }}>
           {data.title}
         </h2></Reveal>
       )}

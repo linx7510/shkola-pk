@@ -88,11 +88,6 @@
       "permanent": true
     },
     {
-      "source": "/about",
-      "destination": "/#about",
-      "permanent": true
-    },
-    {
       "source": "/konsultacii",
       "destination": "/#contacts",
       "permanent": true
