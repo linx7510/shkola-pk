@@ -117,7 +117,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
                 {featuredPost.category && (
                   <span style={{ fontSize: "0.75rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{featuredPost.category}</span>
                 )}
-                <h2 className="blog-featured__title">{featuredPost.title}</h2>
+                <h2 className="blog-featured__title heading-sweep" data-text={featuredPost.title}>{featuredPost.title}</h2>
                 {featuredPost.excerpt && <p className="blog-featured__excerpt">{featuredPost.excerpt}</p>}
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                   <span className="blog-featured__link">Читать статью →</span>
@@ -188,7 +188,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
 
         {/* SEO текст — внизу страницы */}
         <div className="blog-seo-block">
-          <h2 className="blog-seo-block__title">О потребительской кооперации</h2>
+          <h2 className="blog-seo-block__title heading-sweep" data-text="О потребительской кооперации">О потребительской кооперации</h2>
           <div className="blog-seo-block__text">
             <p>
               <strong>Потребительский кооператив</strong> — это добровольное объединение граждан и юридических лиц

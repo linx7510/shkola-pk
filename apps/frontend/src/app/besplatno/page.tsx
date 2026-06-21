@@ -32,7 +32,7 @@ export default async function BesplatnoPage() {
           <BlockRenderer blocks={blocks} />
         ) : (
           <section style={{ padding: "4rem 1.5rem", maxWidth: 800, margin: "0 auto" }}>
-            <h1 style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
+            <h1 className="heading-sweep" data-text={(page as any).title || ''} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
           </section>
         )}
       </main>

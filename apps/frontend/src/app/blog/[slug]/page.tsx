@@ -132,7 +132,7 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           )}
 
-          <h1 style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800, color: "#D6C6B2", lineHeight: 1.3, marginBottom: "1rem" }}>
+          <h1 className="heading-sweep" data-text={post.title || ''} style={{ fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800, color: "#D6C6B2", lineHeight: 1.3, marginBottom: "1rem" }}>
             {post.title}
           </h1>
 
@@ -174,7 +174,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           {/* Lead capture */}
           <div style={{ marginTop: "3rem", padding: "2rem", background: "rgba(214,198,178,0.03)", border: "1px solid rgba(214,198,178,0.08)", borderRadius: 12 }}>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 600, color: "#D6C6B2", marginBottom: "0.5rem" }}>
+            <h3 className="heading-sweep" data-text="Хотите узнать больше?" style={{ fontSize: "1.2rem", fontWeight: 600, color: "#D6C6B2", marginBottom: "0.5rem" }}>
               Хотите узнать больше?
             </h3>
             <p style={{ color: "rgba(214,198,178,0.5)", fontSize: "0.9rem", marginBottom: "1rem" }}>

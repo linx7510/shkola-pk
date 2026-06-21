@@ -19,7 +19,7 @@ export default function FaqListClient({ items }: { items: FaqItem[] }) {
     <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
       <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "0 var(--container-px)" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-          <h1 className="heading-sweep" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, color: "#D6C6B2", marginBottom: "1rem" }}>
+          <h1 className="heading-sweep" data-text="Часто задаваемые вопросы" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, color: "#D6C6B2", marginBottom: "1rem" }}>
             Часто задаваемые вопросы
           </h1>
           <p style={{ color: "rgba(214,198,178,0.6)", fontSize: "1.1rem", maxWidth: 600, margin: "0 auto" }}>

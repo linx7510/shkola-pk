@@ -99,7 +99,7 @@ export default async function SlugPage({ params }: Props) {
           <BlockRenderer blocks={blocks} />
         ) : (
           <section style={{ padding: '4rem 1.5rem', maxWidth: 800, margin: '0 auto' }}>
-            <h1 style={{ color: '#D6C6B2', marginBottom: '1rem' }}>
+            <h1 className="heading-sweep" data-text={(page as any).title || ''} style={{ color: '#D6C6B2', marginBottom: '1rem' }}>
               {(page as any).title}
             </h1>
             <p style={{ color: 'rgba(214,198,178,0.3)', marginTop: '2rem', fontSize: '0.9rem' }}>
