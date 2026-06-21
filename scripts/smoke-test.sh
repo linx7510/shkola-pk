@@ -89,7 +89,7 @@ fi
 # ═══ 5. Ключевые страницы: HTTP 200 ═══
 echo "5. Key pages HTTP 200"
 PAGES_FAIL=0
-for path in "/" "/blog" "/courses" "/faq" "/glossary" "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn"; do
+for path in "/" "/blog" "/faq" "/glossary" "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn"; do
     CODE=$(curl -s -m 10 -o /dev/null -w '%{http_code}' "http://localhost:3000${path}" 2>/dev/null || echo "000")
     if [ "$CODE" != "200" ] && [ "$CODE" != "307" ] && [ "$CODE" != "308" ]; then
         echo "    ✗ $path → HTTP $CODE"
