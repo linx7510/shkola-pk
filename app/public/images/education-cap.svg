@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-  <defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-  <path d="M60 30L15 50l45 20 45-20z" fill="none" stroke="#D6C6B2" stroke-width="1.5" filter="url(#glow)"/>
-  <path d="M30 58v22c0 10 14 18 30 18s30-8 30-18V58" fill="none" stroke="rgba(214,198,178,.3)" stroke-width="1.5" filter="url(#glow)"/>
-  <line x1="90" y1="50" x2="90" y2="85" stroke="#C96E4D" stroke-width="1.5" filter="url(#glow)"/>
-  <rect x="86" y="85" width="8" height="4" rx="1" fill="#C96E4D" filter="url(#glow)"/>
-  <circle cx="60" cy="50" r="3" fill="rgba(214,198,178,.3)"/>
-</svg>
