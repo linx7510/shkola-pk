@@ -20,9 +20,9 @@ const navItems = [
   { label: "Курсы", href: "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" },
   { label: "Услуги для ПК", href: "/uslugi", dropdown: serviceLinks },
   { label: "Бесплатно", href: "/besplatno" },
-  { label: "Консультации", href: "/konsultacii" },
+  { label: "Консультации", href: "/potrebitelskiy-kooperativ-konsultatsii" },
   { label: "Блог", href: "/blog" },
-  { label: "О нас", href: "/about" },
+  { label: "О нас", href: "/about-us" },
 ];
 
 export default function Header() {

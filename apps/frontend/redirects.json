@@ -88,11 +88,6 @@
       "permanent": true
     },
     {
-      "source": "/konsultacii",
-      "destination": "/#contacts",
-      "permanent": true
-    },
-    {
       "source": "/blog/yuridicheskaya-baza",
       "destination": "/blog",
       "permanent": true
@@ -125,6 +120,11 @@
     {
       "source": "/uslugi/audit-ustava",
       "destination": "/uslugi/audit-ustava-pk",
+      "permanent": true
+    },
+    {
+      "source": "/konsultacii",
+      "destination": "/potrebitelskiy-kooperativ-konsultatsii",
       "permanent": true
     }
   ]
