@@ -2,9 +2,10 @@
 import { useEffect, useRef } from "react";
 
 /**
- * BlogParticles — световые частицы из 033
- * Летают по странице, при наведении курсора — разлетаются от него.
+ * BlogParticles — оптимизированные световые частицы
  * Desktop only (mobile — выключено для экономии GPU).
+ * 
+ * v2: 25 particles max, visibility API pause, reduced math per frame
  */
 export default function BlogParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,10 +20,12 @@ export default function BlogParticles() {
     if (!ctx) return;
 
     let raf = 0;
+    let paused = false;
     let mouseX = -1000;
     let mouseY = -1000;
-    const REPEL_RADIUS = 120;
-    const REPEL_FORCE = 0.6;
+    const REPEL_RADIUS = 100;
+    const REPEL_FORCE = 0.5;
+    const MAX_PARTICLES = 25;
 
     interface Particle {
       x: number;
@@ -42,26 +45,25 @@ export default function BlogParticles() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Количество частиц — зависит от площади экрана
-      const count = Math.min(60, Math.floor((canvas.width * canvas.height) / 25000));
+      const count = Math.min(MAX_PARTICLES, Math.floor((canvas.width * canvas.height) / 50000));
       particles = [];
       
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
           r: Math.random() * 2 + 0.5,
-          baseAlpha: Math.random() * 0.4 + 0.15,
+          baseAlpha: Math.random() * 0.35 + 0.12,
           alpha: 0,
-          hue: Math.random() > 0.5 ? 25 : 35, // оранжевый/бежевый
+          hue: Math.random() > 0.5 ? 25 : 35,
         });
       }
     }
 
     function draw() {
-      if (!canvas || !ctx) return;
+      if (!canvas || !ctx || paused) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (const p of particles) {
@@ -75,104 +77,75 @@ export default function BlogParticles() {
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
-        // Отталкивание от курсора
+        // Отталкивание от курсора (упрощённая математика)
         const dx = p.x - mouseX;
         const dy = p.y - mouseY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        if (dist < REPEL_RADIUS && dist > 0) {
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq < REPEL_RADIUS * REPEL_RADIUS && distSq > 0) {
+          const dist = Math.sqrt(distSq);
           const force = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
           p.vx += (dx / dist) * force;
           p.vy += (dy / dist) * force;
-          p.alpha = Math.min(1, p.baseAlpha + (1 - dist / REPEL_RADIUS) * 0.6);
-        } else {
-          // Возврат к базовому
-          p.alpha += (p.baseAlpha - p.alpha) * 0.05;
-          // Замедление
-          p.vx *= 0.98;
-          p.vy *= 0.98;
-          // Базовый дрейф
-          if (Math.abs(p.vx) < 0.1) p.vx += (Math.random() - 0.5) * 0.05;
-          if (Math.abs(p.vy) < 0.1) p.vy += (Math.random() - 0.5) * 0.05;
         }
 
-        // Ограничение скорости
-        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        if (speed > 3) {
-          p.vx = (p.vx / speed) * 3;
-          p.vy = (p.vy / speed) * 3;
-        }
+        // Затухание скорости
+        p.vx *= 0.98;
+        p.vy *= 0.98;
 
-        // Рисуем частицу — свечение
-        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
-        if (p.hue === 25) {
-          gradient.addColorStop(0, `rgba(230, 136, 99, ${p.alpha})`);
-          gradient.addColorStop(0.5, `rgba(230, 136, 99, ${p.alpha * 0.3})`);
-          gradient.addColorStop(1, "rgba(230, 136, 99, 0)");
-        } else {
-          gradient.addColorStop(0, `rgba(214, 198, 178, ${p.alpha})`);
-          gradient.addColorStop(0.5, `rgba(214, 198, 178, ${p.alpha * 0.3})`);
-          gradient.addColorStop(1, "rgba(214, 198, 178, 0)");
-        }
-        
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
+        // Плавное появление
+        p.alpha += (p.baseAlpha - p.alpha) * 0.02;
 
-        // Ядро
+        // Рисуем частицу (простой круг вместо радиального градиента для производительности)
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = p.hue === 25 
-          ? `rgba(255, 200, 160, ${p.alpha})` 
-          : `rgba(245, 240, 232, ${p.alpha})`;
+        ctx.fillStyle = "hsla(" + p.hue + ", 80%, 65%, " + p.alpha + ")";
         ctx.fill();
       }
 
       raf = requestAnimationFrame(draw);
     }
 
-    function onMouseMove(e: MouseEvent) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    }
+    // Visibility API — пауза когда вкладка не видна
+    const handleVisibility = () => {
+      paused = document.hidden;
+      if (!paused && !raf) {
+        raf = requestAnimationFrame(draw);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
 
-    function onMouseLeave() {
-      mouseX = -1000;
-      mouseY = -1000;
-    }
+    // Обработка мыши
+    const handleMouse = (e: MouseEvent) => { mouseX = e.clientX; mouseY = e.clientY; };
+    window.addEventListener("mousemove", handleMouse, { passive: true });
+
+    // Обработка ресайза
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 200);
+    };
+    window.addEventListener("resize", handleResize, { passive: true });
 
     resize();
-    draw();
-    window.addEventListener("resize", resize);
-    document.addEventListener("mousemove", onMouseMove, { passive: true });
-    document.addEventListener("mouseleave", onMouseLeave);
+    raf = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseleave", onMouseLeave);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("mousemove", handleMouse);
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimer);
     };
   }, []);
-
-  if (typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches) {
-    return null;
-  }
 
   return (
     <canvas
       ref={canvasRef}
+      className="pointer-events-none fixed inset-0 z-0"
       aria-hidden="true"
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        pointerEvents: "none",
-        zIndex: 1,
-      }}
+      style={{ opacity: 0.8 }}
     />
   );
 }
+

@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limiter'
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 регистрации / час с одного IP
+    const ip = getClientIp(request)
+    const rateLimit = checkRateLimit(ip, 'register')
+    
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Слишком много попыток регистрации. Попробуйте позже.' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)),
+          }
+        }
+      )
+    }
+
     const body = await request.json()
     const { email, password, name, phone } = body
 
@@ -22,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create user via Payload CMS API
-    const res = await fetch(`${PAYLOAD_API_URL}/api/users`, {
+    const res = await fetch("" + PAYLOAD_API_URL + "/api/users", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -52,14 +69,13 @@ export async function POST(request: NextRequest) {
     const data = await res.json()
 
     // Auto-login: call Payload login to get token
-    const loginRes = await fetch(`${PAYLOAD_API_URL}/api/users/login`, {
+    const loginRes = await fetch("" + PAYLOAD_API_URL + "/api/users/login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     })
 
     if (!loginRes.ok) {
-      // User created but auto-login failed — return user without token
       return NextResponse.json({
         user: { id: data.doc.id, email: data.doc.email, name: data.doc.name, role: data.doc.role },
       }, { status: 201 })
@@ -81,3 +97,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Ошибка при регистрации' }, { status: 500 })
   }
 }
+

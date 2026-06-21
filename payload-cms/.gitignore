@@ -1,7 +1,55 @@
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Next.js
 .next/
-.env
-*.log
-media/
-dist/
+out/
+
+# Production
 build/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env*.local
+.env.before-*
+.env.restored
+.env.bak
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# === PRODUCTION HYGIENE ===
+# No backup files in version control
+*.bak
+*.before-*
+*.old
+*.backup
+*.orig
+
+# No design archives in source
+_design-archive/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
