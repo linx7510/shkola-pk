@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import { BlockRenderer } from "@/components/BlockRenderer";
+import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -17,7 +18,33 @@ async function fetchPage(slug: string) {
     if (!res.ok) return null;
     const data = await res.json();
     return data.docs?.[0] ?? null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page: any = await fetchPage("besplatno");
+  if (!page) return { title: "Бесплатно | Школа ПК" };
+  const title = page.meta?.title || page.title || "Бесплатные материалы — Школа ПК";
+  const description = page.meta?.description || "";
+  const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
+  return {
+    title,
+    description,
+    keywords: "потребительский кооператив, бесплатно, мини-курс, 13 уроков, закон 3085-1, ПК vs ООО, глоссарий",
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/besplatno`,
+      type: "website",
+      locale: "ru_RU",
+      siteName: "Школа ПК — Велеслав Старков",
+    },
+    alternates: {
+      canonical: `${BASE_URL}/besplatno`,
+    },
+  };
 }
 
 export default async function BesplatnoPage() {
@@ -32,9 +59,13 @@ export default async function BesplatnoPage() {
           <BlockRenderer blocks={blocks} />
         ) : (
           <section style={{ padding: "4rem 1.5rem", maxWidth: 800, margin: "0 auto" }}>
-            <h1 className="heading-sweep" data-text={(page as any).title || ''} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
+            <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2" }}>
+              {(page as any).title}
+            </h1>
           </section>
         )}
+        {/* AI-консультант — точная копия блока с главной страницы */}
+        <AIConsultant />
       </main>
     </>
   );
