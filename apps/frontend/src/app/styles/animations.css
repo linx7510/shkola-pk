@@ -202,3 +202,64 @@
   left: 0;
 }
 
+
+/* === HEADING-SWEEP — анимация заголовков как на velaslav.rus === */
+.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.heading-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(214,198,178,.18) 50%, transparent 100%);
+  animation: headingSweep 4s ease-in-out infinite;
+}
+
+.heading-sweep::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #C96E4D, #E68863, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heading-sweep.visible::after,
+.heading-sweep.reveal.visible::after {
+  transform: scaleX(1);
+}
+
+.heading-sweep.heading-hover::before {
+  animation-name: headingHoverSweep !important;
+  animation-duration: 0.7s !important;
+  animation-fill-mode: forwards !important;
+}
+
+@keyframes headingSweep {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes headingHoverSweep {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Также применить к h1 и h2 на второстепенных страницах */
+main h1.heading-sweep,
+main h2.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
