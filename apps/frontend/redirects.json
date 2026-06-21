@@ -3,11 +3,6 @@
   "lastUpdated": "2026-06-21",
   "redirects": [
     {
-      "source": "/about-us",
-      "destination": "/",
-      "permanent": true
-    },
-    {
       "source": "/onlayn-shkola-potrebitelskoy-kooperatsii",
       "destination": "/",
       "permanent": true
@@ -140,6 +135,11 @@
     {
       "source": "/blog/poleznaya-informatsiya",
       "destination": "/blog",
+      "permanent": true
+    },
+    {
+      "source": "/about",
+      "destination": "/about-us",
       "permanent": true
     }
   ]
