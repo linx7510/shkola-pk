@@ -38,11 +38,6 @@
       "permanent": true
     },
     {
-      "source": "/potrebitelskiy-kooperativ-konsultatsii",
-      "destination": "/konsultacii",
-      "permanent": true
-    },
-    {
       "source": "/uslugi",
       "destination": "/uslugi-dlya-potrebitelskih-kooperativov",
       "permanent": true
