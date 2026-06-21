@@ -1,3 +1,5 @@
+import Reveal from "@/components/Reveal"
+
 export interface TextBlockData {
   title?: string
   body: any  // Can be HTML string OR Lexical JSON
@@ -24,7 +26,7 @@ export function TextBlock({ data }: { data: TextBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem", background: bg }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        {data.title && <h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "1rem", fontWeight: 700 }}>{data.title}</h2>}
+        {data.title && <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "1rem", fontWeight: 700 }}>{data.title}</h2></Reveal>}
         <div style={{ color: "rgba(214,198,178,0.9)", fontSize: "1rem", lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: lexicalToHtml(data.body) }} />
       </div>
     </section>

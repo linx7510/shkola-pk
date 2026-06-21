@@ -405,7 +405,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                   {heroData?.description || "НДС, налог на прибыль и соц.платежи — 0% по закону РФ № 3085-1. Обучим работе с некоммерческими организациями. Защитите имущество от взысканий, обнулите налоги и работайте легально — более 120 предпринимателей уже открыли свои ПК с нашей помощью."}
                 </p>
                 <div className="hero-actions">
-                  <Link href={heroData?.ctaPrimaryLink || "/kursy"} className="btn-primary">{heroData?.ctaPrimaryText || "Выбрать курс"}</Link>
+                  <Link href={heroData?.ctaPrimaryLink || "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn"} className="btn-primary">{heroData?.ctaPrimaryText || "Выбрать курс"}</Link>
                   <Link href={heroData?.ctaSecondaryLink || "/konsultacii"} className="btn-secondary">{heroData?.ctaSecondaryText || "Бесплатная консультация"}</Link>
                 </div>
               </div>
@@ -670,7 +670,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                   <div style={{fontSize:"2.5rem", marginBottom:"0.5rem"}}>🎓</div>
                   <h3 style={{fontSize:"1.1rem", color:"#E7DCCF", marginBottom:"0.5rem"}}>Обучающий курс С500</h3>
                   <p style={{fontSize:"0.88rem", color:"rgba(214,198,178,0.85)", marginBottom:"0.75rem"}}>Полное открытие ПК под ключ. Документы и скрипты. Консалтинг 12 месяцев. Защита имущества. Оптимизация налогов</p>
-                  <Link href="/kursy" style={{display:"inline-block", padding:"0.5rem 1.25rem", background:"#E68863", color:"#fff", borderRadius:8, fontSize:"0.88rem", textDecoration:"none", fontWeight:600}}>Подробнее</Link>
+                  <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" style={{display:"inline-block", padding:"0.5rem 1.25rem", background:"#E68863", color:"#fff", borderRadius:8, fontSize:"0.88rem", textDecoration:"none", fontWeight:600}}>Подробнее</Link>
                 </div>
               </div>
             </div>
@@ -830,7 +830,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
               <div style={{fontWeight:600, color:"#E7DCCF", marginBottom:"1rem", fontSize:"0.9rem"}}>Навигация</div>
               <div style={{display:"flex", flexDirection:"column", gap:"0.5rem"}}>
                 <Link href="/uslugi" style={{fontSize:"0.85rem", color:"rgba(214,198,178,0.9)", textDecoration:"none"}}>Услуги для ПК</Link>
-                <Link href="/kursy" style={{fontSize:"0.85rem", color:"rgba(214,198,178,0.9)", textDecoration:"none"}}>Курсы</Link>
+                <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" style={{fontSize:"0.85rem", color:"rgba(214,198,178,0.9)", textDecoration:"none"}}>Курсы</Link>
                 <Link href="/blog" style={{fontSize:"0.85rem", color:"rgba(214,198,178,0.9)", textDecoration:"none"}}>Блог</Link>
                 <Link href="/glossary" style={{fontSize:"0.85rem", color:"rgba(214,198,178,0.9)", textDecoration:"none"}}>Глоссарий</Link>
                 <Link href="/faq" style={{fontSize:"0.85rem", color:"rgba(214,198,178,0.9)", textDecoration:"none"}}>FAQ</Link>
@@ -881,3 +881,4 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
     </>
   );
 }
+

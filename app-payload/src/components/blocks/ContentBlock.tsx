@@ -1,3 +1,5 @@
+import Reveal from "@/components/Reveal"
+
 export interface ContentBlockData {
   title?: string
   body?: any  // RichText (Lexical JSON) — Schema field name: body
@@ -23,7 +25,7 @@ export function ContentBlock({ data }: { data: ContentBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        {data.title && <h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "1rem", fontWeight: 700 }}>{data.title}</h2>}
+        {data.title && <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", marginBottom: "1rem", fontWeight: 700 }}>{data.title}</h2></Reveal>}
         {body && (
           <div style={{ color: "rgba(214,198,178,0.9)", fontSize: "1rem", lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: lexicalToHtml(body) }} />
         )}

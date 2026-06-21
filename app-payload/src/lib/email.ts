@@ -69,7 +69,7 @@ export function welcomeEmail(name: string): { subject: string; html: string } {
           <li>Отслеживать прогресс</li>
           <li>Задавать вопросы AI-ассистенту</li>
         </ul>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/courses" style="display: inline-block; padding: 0.75rem 2rem; background: #C96E4D; color: #F5F0E8; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 1rem 0;">Перейти к курсам</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" style="display: inline-block; padding: 0.75rem 2rem; background: #C96E4D; color: #F5F0E8; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 1rem 0;">Перейти к курсам</a>
         <p style="color: #8A7F74; font-size: 0.85rem; margin-top: 2rem;">Если у вас есть вопросы — напишите нам: boss@2980738.ru или @Veles_ST в Telegram</p>
       </div>
     `,
@@ -130,3 +130,4 @@ export function contactFormEmail(name: string, email: string, phone: string, mes
     `,
   };
 }
+

@@ -1,3 +1,5 @@
+import Reveal from "@/components/Reveal"
+
 export interface TestimonialsBlockData {
   title?: string
   testimonials?: Array<{ name: string; role?: string; text: string; avatar?: { url: string } | null }>
@@ -10,9 +12,9 @@ export function TestimonialsBlock({ data }: { data: TestimonialsBlockData }) {
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
         {data.title && (
-          <h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
+          <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
             {data.title}
-          </h2>
+          </h2></Reveal>
         )}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
           {items.map((t, i) => (

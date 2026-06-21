@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Reveal from "@/components/Reveal"
 
 export interface CtaBlockData {
   title: string
@@ -28,7 +29,7 @@ export function CtaBlock({ data }: { data: CtaBlockData }) {
           : "linear-gradient(135deg, rgba(201,110,77,0.15), rgba(214,198,178,0.05))",
         border: "1px solid rgba(201,110,77,0.3)", borderRadius: 16, textAlign: "center",
       }}>
-        <h2 style={{ fontSize: "1.8rem", color: "#F5F0E8", marginBottom: "0.75rem", fontWeight: 700 }}>{data.title}</h2>
+        <Reveal><h2 style={{ fontSize: "1.8rem", color: "#F5F0E8", marginBottom: "0.75rem", fontWeight: 700 }}>{data.title}</h2></Reveal>
         {description && (
           <p style={{ color: "rgba(214,198,178,0.85)", fontSize: "1.05rem", marginBottom: "1.5rem", lineHeight: 1.6, maxWidth: 600, margin: "0 auto 1.5rem" }}>
             {description}

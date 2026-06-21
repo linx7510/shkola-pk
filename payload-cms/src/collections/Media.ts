@@ -4,7 +4,7 @@ export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Медиафайл', plural: 'Медиафайлы' },
   upload: {
-    mimeTypes: ['image/*'],
+    // No mimeTypes restriction - allows WebP and all other formats
   },
   admin: {
     defaultColumns: ['filename', 'alt', 'createdAt'],

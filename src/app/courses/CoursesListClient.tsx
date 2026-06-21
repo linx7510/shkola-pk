@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import CursorLight from "@/components/CursorLight";
+import SnakeCanvas from "@/components/SnakeCanvas";
 
 interface CourseItem {
   id: string;
@@ -29,10 +31,12 @@ const coursePrices: Record<string, { amount: number; label: string }> = {
 
 export default function CoursesListClient({ courses }: { courses: CourseItem[] }) {
   const [enrollments, setEnrollments] = useState<string[]>([]);
-  const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const purchasing = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    setMounted(true);
     const token = localStorage.getItem("token");
     if (token) {
       fetch("/api/progress", { headers: { Authorization: `Bearer ${token}` } })
@@ -52,8 +56,6 @@ export default function CoursesListClient({ courses }: { courses: CourseItem[] }
 
     const price = coursePrices[courseId];
     if (!price) {
-      // Free enrollment
-      setPurchasing(courseId);
       try {
         const res = await fetch("/api/enroll", {
           method: "POST",
@@ -66,14 +68,10 @@ export default function CoursesListClient({ courses }: { courses: CourseItem[] }
         }
       } catch (err) {
         console.error("Enrollment error:", err);
-      } finally {
-        setPurchasing(null);
       }
       return;
     }
 
-    // Paid course — create payment
-    setPurchasing(courseId);
     try {
       const res = await fetch("/api/payment/create", {
         method: "POST",
@@ -89,8 +87,6 @@ export default function CoursesListClient({ courses }: { courses: CourseItem[] }
     } catch (err) {
       console.error("Payment error:", err);
       alert("Ошибка создания платежа");
-    } finally {
-      setPurchasing(null);
     }
   };
 
@@ -102,10 +98,22 @@ export default function CoursesListClient({ courses }: { courses: CourseItem[] }
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--color-bg-950)" }}>
-      <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "3rem var(--container-px)" }}>
-        <h1 className="heading-sweep" style={{ fontSize: "2rem", color: "var(--color-beige-200)", marginBottom: "0.5rem" }}>Каталог курсов</h1>
-        <p style={{ color: "var(--color-text-muted)", marginBottom: "2.5rem" }}>Выберите курс и начните обучение прямо сейчас</p>
+    <div style={{ minHeight: "100vh", background: "var(--color-bg-950)", position: "relative" }}>
+      {/* BEIGE NEON Animations - only on client, lightweight */}
+      {mounted && <CursorLight />}
+      {mounted && <SnakeCanvas />}
+
+      <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "3rem var(--container-px)", position: "relative", zIndex: 2 }}>
+        <h1
+          className="heading-sweep"
+          data-text="Каталог курсов"
+          style={{ fontSize: "2.5rem", color: "var(--color-beige-200)", marginBottom: "0.5rem" }}
+        >
+          Каталог курсов
+        </h1>
+        <p className="reveal" style={{ color: "var(--color-text-muted)", marginBottom: "2.5rem" }}>
+          Выберите курс и начните обучение прямо сейчас
+        </p>
 
         {courses.length === 0 ? (
           <div className="glass-2" style={{ padding: "3rem", textAlign: "center" }}>
@@ -114,12 +122,21 @@ export default function CoursesListClient({ courses }: { courses: CourseItem[] }
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: "1.5rem" }}>
-            {courses.map((course) => {
+            {courses.map((course, idx) => {
               const isEnrolled = enrollments.includes(course.id);
               const displayPrice = getDisplayPrice(course);
 
               return (
-                <div key={course.id} className="glass-2" style={{ padding: "2rem", display: "flex", flexDirection: "column" }}>
+                <div
+                  key={course.id}
+                  className="glass-2 reveal"
+                  style={{
+                    padding: "2rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    transitionDelay: `${idx * 80}ms`,
+                  }}
+                >
                   <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
                     <div style={{ width: 56, height: 56, borderRadius: 14, background: "rgba(201,110,77,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem" }}>
                       {course.icon || "📖"}
@@ -158,11 +175,10 @@ export default function CoursesListClient({ courses }: { courses: CourseItem[] }
                       ) : (
                         <button
                           onClick={() => handlePurchase(course.id)}
-                          disabled={purchasing === course.id}
                           className="btn-primary"
                           style={{ fontSize: "0.85rem", padding: "0.6rem 1.5rem" }}
                         >
-                          {purchasing === course.id ? "Обработка..." : displayPrice ? "Купить" : "Записаться"}
+                          {displayPrice ? "Купить" : "Записаться"}
                         </button>
                       )}
                       <Link

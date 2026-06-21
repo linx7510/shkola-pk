@@ -14,12 +14,13 @@ const nextConfig: NextConfig = {
       { source: '/obuchenie-na-onlayn-kursah-potrebitelskoy-kooperatsii', destination: '/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn', permanent: true },
       // /kursy — короткий алиас, редирект на оригинальный URL (для удобства навигации)
       { source: '/kursy', destination: '/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn', permanent: true },
+      // /courses — старый каталог, редирект на оригинальный URL
+      { source: '/courses', destination: '/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn', permanent: true },
       { source: '/potrebitelskiy-kooperativ-vse-vygody', destination: '/', permanent: true },
       { source: '/kak-otkryt-kooperativ-potrebitelskiy-obschestvo-sdelat-poshagovaya-instruktsiya', destination: '/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn', permanent: true },
       { source: '/potrebitelskiy-kooperativ-konsultatsii', destination: '/konsultacii', permanent: true },
-      { source: '/uslugi-dlya-potrebitelskih-kooperativov', destination: '/uslugi', permanent: true },
+      { source: '/uslugi', destination: '/uslugi-dlya-potrebitelskih-kooperativov', permanent: true },
       { source: '/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa', destination: '/uslugi/audit-ustava', permanent: true },
-      { source: '/besplatno', destination: '/besplatno', permanent: true },
       { source: '/pomosch-proektu', destination: '/', permanent: true },
       
       // === Курсы (пакеты) — старые промо-URL → оригинальный URL страницы курсов ===
@@ -38,6 +39,11 @@ const nextConfig: NextConfig = {
       { source: '/test-donat', destination: '/', permanent: true },
       { source: '/2323', destination: '/', permanent: true },
       
+      // === Алиасы навигации ===
+      { source: '/about', destination: '/#about', permanent: true },
+      { source: '/konsultacii', destination: '/#contacts', permanent: true },
+      { source: '/uslugi/audit-ustava', destination: '/uslugi-dlya-potrebitelskih-kooperativov', permanent: true },
+
       // === Блог: старые URL → новые (по slug) ===
       // Блоговые статьи перенесены с теми же slug, поэтому /blog/{slug} работает напрямую
       // Но старые не-блоговые статьи нужно redirect на /blog/{slug}
@@ -51,3 +57,6 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+
+

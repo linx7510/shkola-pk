@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useCallback } from "react"
 
 export interface SnakeAnimationBlockData {
   enabled?: boolean
@@ -7,393 +7,292 @@ export interface SnakeAnimationBlockData {
   explosionRadius?: number
 }
 
-// 8-битная Snake игра — классическая Snake как на Nokia
-// Змейка движется по сетке, поедает точки и РАСТЁТ, взрывается от мыши
+/* ─── Types ─── */
+interface Particle {
+  x: number; y: number; vx: number; vy: number
+  life: number; maxLife: number; size: number; hue: number
+}
 
-interface Point { x: number; y: number }
+interface FoodItem {
+  x: number; y: number; size: number; hue: number
+  pulse: number; pulseDir: number; eaten: boolean
+}
+
+interface SnakeSegment { x: number; y: number }
 
 interface Snake {
-  body: Point[]              // head = body[0], tail = body[body.length-1]
-  dir: Point                 // direction vector (1,0), (-1,0), (0,1), (0,-1)
-  color: string
-  alive: boolean
-  explodeTime: number
-  moveCounter: number        // throttle — move every N frames
+  segments: SnakeSegment[]
+  dx: number; dy: number; targetDx: number; targetDy: number
+  speed: number; moveTimer: number; moveInterval: number
+  hue: number; exploding: boolean; explodeTimer: number
+  particles: Particle[]; depth: number
 }
 
-interface Dot {
-  x: number
-  y: number
-  color: string
-  pulse: number
-}
+/* ─── Constants ─── */
+const GRID = 14
+const SEGMENT_GAP = 1
+const MAX_SEGMENTS = 28
+const FOOD_COUNT = 6
+const DEPTH_RANGE = 6
 
-interface Particle {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  size: number
-  color: string
-  alpha: number
-}
-
-// 8-бит палитра (классическая Snake)
-const SNAKE_COLORS = ["#6DB89A", "#4A9D7E", "#7FCB9E", "#5CB585"]  // зелёные оттенки
-const DOT_COLORS = ["#FFC96E", "#FF6B6B", "#FFE08C", "#FFAA3E"]    // тёплые точки
-
-const CELL = 12  // размер ячейки сетки (px)
-const MOVE_INTERVAL = 8  // move every N frames (lower = faster)
-
+/* ─── Component ─── */
 export function SnakeAnimationBlock({ data }: { data: SnakeAnimationBlockData }) {
+  const enabled = data?.enabled !== false
+  const maxSnakes = data?.maxSnakes ?? 3
+  const explosionRadius = data?.explosionRadius ?? 70
+
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const snakesRef = useRef<Snake[]>([])
+  const foodsRef = useRef<FoodItem[]>([])
+  const rafRef = useRef<number>(0)
+  const mouseRef = useRef<{ x: number; y: number } | null>(null)
+  const dimensionsRef = useRef({ w: 0, h: 0 })
 
-  useEffect(() => {
-    if (!data?.enabled) return
-    if (typeof window === "undefined") return
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (prefersReduced) return
-
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const EXPLOSION_RADIUS = data?.explosionRadius || 70
-    const REFORM_DELAY = 2500
-
-    let mouseX = -9999
-    let mouseY = -9999
-    let rafId = 0
-    let running = true
-    let frame = 0
-
-    function resize() {
-      if (!canvas) return
-      canvas.width = window.innerWidth
-      canvas.height = document.documentElement.scrollHeight
-    }
-    resize()
-    window.addEventListener("resize", resize)
-
-    let ro: ResizeObserver | null = null
-    if (typeof ResizeObserver !== "undefined") {
-      ro = new ResizeObserver(() => resize())
-      ro.observe(document.body)
-    }
-
-    const onMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX
-      mouseY = e.clientY + window.scrollY
-    }
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        mouseX = e.touches[0].clientX
-        mouseY = e.touches[0].clientY + window.scrollY
-      }
-    }
-    document.addEventListener("mousemove", onMouseMove, { passive: true })
-    document.addEventListener("touchmove", onTouchMove, { passive: true })
-
-    const onVisibility = () => {
-      if (document.hidden) {
-        running = false
-        if (rafId) cancelAnimationFrame(rafId)
-      } else {
-        running = true
-        rafId = requestAnimationFrame(animate)
-      }
-    }
-    document.addEventListener("visibilitychange", onVisibility)
-
-    // === Helpers ===
-    function randomCell(): Point {
-      const cw = canvas!.width
-      const ch = canvas!.height
-      return {
-        x: Math.floor(Math.random() * (cw / CELL)) * CELL,
-        y: Math.floor(Math.random() * (ch / CELL)) * CELL,
-      }
-    }
-
-    function createSnake(): Snake {
-      const start = randomCell()
-      const dirs: Point[] = [{x:1,y:0}, {x:-1,y:0}, {x:0,y:1}, {x:0,y:-1}]
-      const dir = dirs[Math.floor(Math.random() * 4)]
-      const body: Point[] = []
-      for (let i = 0; i < 5; i++) {
-        body.push({ x: start.x - i * dir.x * CELL, y: start.y - i * dir.y * CELL })
+  const createSnake = useCallback(
+    (w: number, h: number, index: number): Snake => {
+      const startX = Math.floor(Math.random() * (w / GRID - 10)) + 5
+      const startY = Math.floor(Math.random() * (h / GRID - 10)) + 5
+      const directions = [
+        { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+        { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
+      ]
+      const dir = directions[Math.floor(Math.random() * directions.length)]
+      const hue = (index * 120 + Math.random() * 60) % 360
+      const segments: SnakeSegment[] = []
+      for (let i = 0; i < 12; i++) {
+        segments.push({ x: startX - dir.dx * i * SEGMENT_GAP, y: startY - dir.dy * i * SEGMENT_GAP })
       }
       return {
-        body,
-        dir,
-        color: SNAKE_COLORS[Math.floor(Math.random() * SNAKE_COLORS.length)],
-        alive: true,
-        explodeTime: 0,
-        moveCounter: 0,
+        segments, dx: dir.dx, dy: dir.dy, targetDx: dir.dx, targetDy: dir.dy,
+        speed: 0.6 + Math.random() * 0.5, moveTimer: 0,
+        moveInterval: 3 + Math.floor(Math.random() * 4), hue,
+        exploding: false, explodeTimer: 0, particles: [],
+        depth: 3 + Math.floor(Math.random() * (DEPTH_RANGE - 2)),
       }
-    }
+    }, [],
+  )
 
-    function spawnDot(): Dot {
-      const cell = randomCell()
-      return {
-        x: cell.x + CELL / 2,
-        y: cell.y + CELL / 2,
-        color: DOT_COLORS[Math.floor(Math.random() * DOT_COLORS.length)],
-        pulse: Math.random() * Math.PI * 2,
-      }
-    }
+  const createFood = useCallback(
+    (w: number, h: number, existingSnakes: Snake[]): FoodItem => {
+      let x: number, y: number, attempts = 0
+      do {
+        x = Math.floor(Math.random() * (w / GRID - 4)) + 2
+        y = Math.floor(Math.random() * (h / GRID - 4)) + 2
+        attempts++
+      } while (
+        attempts < 50 &&
+        existingSnakes.some((s) => s.segments.some((seg) => Math.abs(seg.x - x) < 3 && Math.abs(seg.y - y) < 3))
+      )
+      return { x, y, size: 1, hue: 40 + Math.random() * 30, pulse: 0, pulseDir: 1, eaten: false }
+    }, [],
+  )
 
-    // === State ===
-    const snakes: Snake[] = [createSnake()]
-    const particles: Particle[] = []
-    const dots: Dot[] = []
-    for (let i = 0; i < 15; i++) dots.push(spawnDot())
+  const init = useCallback(
+    (canvas: HTMLCanvasElement) => {
+      const w = window.innerWidth
+      const h = document.documentElement.scrollHeight
+      canvas.width = w; canvas.height = h
+      dimensionsRef.current = { w, h }
+      const snakes: Snake[] = []
+      for (let i = 0; i < Math.min(maxSnakes, 3); i++) { snakes.push(createSnake(w, h, i)) }
+      snakesRef.current = snakes
+      const foods: FoodItem[] = []
+      for (let i = 0; i < FOOD_COUNT; i++) { foods.push(createFood(w, h, snakes)) }
+      foodsRef.current = foods
+    },
+    [maxSnakes, createSnake, createFood],
+  )
 
-    // === AI: find nearest dot, turn towards it ===
-    function aiTurn(s: Snake) {
-      if (s.body.length === 0) return
-      const head = s.body[0]
-      if (dots.length === 0) return
-      // Find nearest dot
-      let nearest = dots[0]
-      let minDist = Infinity
-      for (const d of dots) {
-        const dx = d.x - head.x
-        const dy = d.y - head.y
-        const dist = dx * dx + dy * dy
-        if (dist < minDist) { minDist = dist; nearest = d }
-      }
-      // Decide direction: prefer horizontal or vertical based on dot position
-      const dx = nearest.x - head.x
-      const dy = nearest.y - head.y
-      // 80% chance to move towards dot, 20% random (to avoid getting stuck)
-      if (Math.random() < 0.8) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          // Move horizontally
-          const newDir = { x: dx > 0 ? 1 : -1, y: 0 }
-          // Don't reverse
-          if (newDir.x !== -s.dir.x || newDir.y !== -s.dir.y) s.dir = newDir
-        } else {
-          const newDir = { x: 0, y: dy > 0 ? 1 : -1 }
-          if (newDir.x !== -s.dir.x || newDir.y !== -s.dir.y) s.dir = newDir
+  const update = useCallback(() => {
+    const { w, h } = dimensionsRef.current
+    const cols = Math.floor(w / GRID)
+    const rows = Math.floor(h / GRID)
+    for (const snake of snakesRef.current) {
+      if (snake.exploding) {
+        snake.explodeTimer--
+        for (const p of snake.particles) {
+          p.x += p.vx; p.y += p.vy; p.vy += 0.08
+          p.life--; p.vx *= 0.98; p.vy *= 0.98
         }
-      } else {
-        // Random 90-degree turn
-        const dirs: Point[] = [{x:1,y:0}, {x:-1,y:0}, {x:0,y:1}, {x:0,y:-1}]
-        const valid = dirs.filter(d => d.x !== -s.dir.x || d.y !== -s.dir.y)
-        s.dir = valid[Math.floor(Math.random() * valid.length)]
+        snake.particles = snake.particles.filter((p) => p.life > 0)
+        if (snake.explodeTimer <= 0 && snake.particles.length === 0) {
+          const idx = snakesRef.current.indexOf(snake)
+          snakesRef.current[idx] = createSnake(w, h, idx)
+        }
+        continue
       }
-    }
-
-    function moveSnake(s: Snake) {
-      const head = s.body[0]
-      const newHead = {
-        x: head.x + s.dir.x * CELL,
-        y: head.y + s.dir.y * CELL,
+      snake.moveTimer++
+      if (snake.moveTimer < snake.moveInterval) continue
+      snake.moveTimer = 0
+      if (Math.random() < 0.12) {
+        const options = [
+          { dx: 1, dy: 0 }, { dx: -1, dy: 0 },
+          { dx: 0, dy: 1 }, { dx: 0, dy: -1 },
+        ].filter((d) => !(d.dx === -snake.dx && d.dy === -snake.dy))
+        const pick = options[Math.floor(Math.random() * options.length)]
+        snake.targetDx = pick.dx; snake.targetDy = pick.dy
       }
-      // Wrap around
-      const cw = canvas!.width
-      const ch = canvas!.height
-      if (newHead.x < 0) newHead.x = cw - CELL
-      if (newHead.x >= cw) newHead.x = 0
-      if (newHead.y < 0) newHead.y = ch - CELL
-      if (newHead.y >= ch) newHead.y = 0
-
-      s.body.unshift(newHead)
-
-      // Check if eats dot
+      snake.dx = snake.targetDx; snake.dy = snake.targetDy
+      const head = snake.segments[0]
+      let nx = head.x + snake.dx; let ny = head.y + snake.dy
+      if (nx < 0) nx = cols - 1; if (nx >= cols) nx = 0
+      if (ny < 0) ny = rows - 1; if (ny >= rows) ny = 0
+      snake.segments.unshift({ x: nx, y: ny })
       let ate = false
-      for (let i = dots.length - 1; i >= 0; i--) {
-        const d = dots[i]
-        const dx = d.x - (newHead.x + CELL / 2)
-        const dy = d.y - (newHead.y + CELL / 2)
-        if (Math.sqrt(dx * dx + dy * dy) < CELL) {
-          dots.splice(i, 1)
-          ate = true
-          // Spawn new dot
-          dots.push(spawnDot())
+      for (const food of foodsRef.current) {
+        if (!food.eaten && food.x === nx && food.y === ny) {
+          food.eaten = true; ate = true
+          const idx = foodsRef.current.indexOf(food)
+          foodsRef.current[idx] = createFood(w, h, snakesRef.current)
           break
         }
       }
-
-      // If ate, DON'T remove tail (snake grows)
-      if (!ate) {
-        s.body.pop()
-      }
+      if (!ate || snake.segments.length > MAX_SEGMENTS) { snake.segments.pop() }
     }
+  }, [createSnake, createFood])
 
-    function drawSnake(s: Snake) {
-      if (!ctx) return
-      // Draw body segments (8-bit style: solid squares)
-      for (let i = s.body.length - 1; i >= 0; i--) {
-        const seg = s.body[i]
-        const isHead = i === 0
-        ctx.fillStyle = isHead ? "#FFFFFF" : s.color
-        // 8-bit: solid square with slight glow on head
-        if (isHead) {
-          ctx.shadowColor = s.color
-          ctx.shadowBlur = 10
-        } else {
-          ctx.shadowBlur = 0
-        }
-        ctx.fillRect(seg.x + 1, seg.y + 1, CELL - 2, CELL - 2)
+  const draw = useCallback(
+    (ctx: CanvasRenderingContext2D) => {
+      const { w, h } = dimensionsRef.current
+      ctx.clearRect(0, 0, w, h)
+      // Draw food (3D style)
+      for (const food of foodsRef.current) {
+        if (food.eaten) continue
+        food.pulse += 0.04 * food.pulseDir
+        if (food.pulse > 1 || food.pulse < 0) food.pulseDir *= -1
+        const px = food.x * GRID + GRID / 2; const py = food.y * GRID + GRID / 2
+        const baseSize = GRID * 0.55; const pulseSize = baseSize + food.pulse * 3; const depthOff = 4
+        ctx.fillStyle = `hsla(${food.hue}, 80%, 25%, 0.25)`
+        ctx.beginPath(); ctx.arc(px + depthOff, py + depthOff, pulseSize, 0, Math.PI * 2); ctx.fill()
+        const grad = ctx.createRadialGradient(px - 2, py - 2, 1, px, py, pulseSize)
+        grad.addColorStop(0, `hsla(${food.hue}, 90%, 75%, 0.9)`)
+        grad.addColorStop(0.6, `hsla(${food.hue}, 85%, 55%, 0.85)`)
+        grad.addColorStop(1, `hsla(${food.hue}, 80%, 35%, 0.7)`)
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(px, py, pulseSize, 0, Math.PI * 2); ctx.fill()
+        ctx.fillStyle = `hsla(${food.hue}, 100%, 90%, 0.6)`
+        ctx.beginPath(); ctx.arc(px - pulseSize * 0.25, py - pulseSize * 0.25, pulseSize * 0.3, 0, Math.PI * 2); ctx.fill()
       }
-      // Eyes on head (8-bit style: 2 black pixels)
-      ctx.shadowBlur = 0
-      ctx.fillStyle = "#0D0C0A"
-      const head = s.body[0]
-      const eyeSize = 2
-      const eyeOffset = 3
-      // Eyes perpendicular to direction
-      if (s.dir.x !== 0) {
-        // Moving horizontally
-        const ex = head.x + (s.dir.x > 0 ? CELL - eyeSize - eyeOffset : eyeOffset)
-        ctx.fillRect(ex, head.y + eyeOffset, eyeSize, eyeSize)
-        ctx.fillRect(ex, head.y + CELL - eyeSize - eyeOffset, eyeSize, eyeSize)
-      } else {
-        // Moving vertically
-        const ey = head.y + (s.dir.y > 0 ? CELL - eyeSize - eyeOffset : eyeOffset)
-        ctx.fillRect(head.x + eyeOffset, ey, eyeSize, eyeSize)
-        ctx.fillRect(head.x + CELL - eyeSize - eyeOffset, ey, eyeSize, eyeSize)
-      }
-    }
-
-    function drawDot(d: Dot) {
-      if (!ctx) return
-      d.pulse += 0.1
-      const pulseSize = (CELL - 4) / 2 + Math.sin(d.pulse) * 1.5
-      // Glow
-      ctx.shadowColor = d.color
-      ctx.shadowBlur = 14
-      ctx.fillStyle = d.color
-      ctx.beginPath()
-      ctx.arc(d.x, d.y, pulseSize, 0, Math.PI * 2)
-      ctx.fill()
-      // Bright core (8-bit style: white center)
-      ctx.shadowBlur = 0
-      ctx.fillStyle = "#FFF8E0"
-      ctx.beginPath()
-      ctx.arc(d.x, d.y, pulseSize * 0.4, 0, Math.PI * 2)
-      ctx.fill()
-    }
-
-    function explodeSnake(s: Snake, t: number) {
-      s.alive = false
-      s.explodeTime = t
-      // Each segment explodes into 6-10 particles
-      for (const seg of s.body) {
-        const n = 6 + Math.floor(Math.random() * 4)
-        for (let i = 0; i < n; i++) {
-          const angle = Math.random() * Math.PI * 2
-          const speed = 1.5 + Math.random() * 3.5
-          particles.push({
-            x: seg.x + CELL / 2,
-            y: seg.y + CELL / 2,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            size: 2 + Math.random() * 3,
-            color: s.color,
-            alpha: 1,
-          })
-        }
-      }
-    }
-
-    function animate(t: number) {
-      if (!running || !ctx || !canvas) return
-      frame++
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      // Draw dots (with glow + pulse)
-      ctx.globalAlpha = 1
-      for (const d of dots) drawDot(d)
-
-      // Update + draw particles
-      ctx.shadowBlur = 0
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i]
-        p.x += p.vx
-        p.y += p.vy
-        p.vx *= 0.95
-        p.vy *= 0.95
-        p.alpha -= 0.015
-        if (p.alpha <= 0) {
-          particles.splice(i, 1)
+      // Draw snakes (3D)
+      for (const snake of snakesRef.current) {
+        if (snake.exploding) {
+          for (const p of snake.particles) {
+            const alpha = (p.life / p.maxLife) * 0.9; const depthOff = 3
+            ctx.fillStyle = `hsla(${p.hue}, 80%, 20%, ${alpha * 0.3})`
+            ctx.beginPath(); ctx.arc(p.x + depthOff, p.y + depthOff, p.size, 0, Math.PI * 2); ctx.fill()
+            ctx.fillStyle = `hsla(${p.hue}, 90%, 60%, ${alpha})`
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill()
+          }
           continue
         }
-        ctx.globalAlpha = p.alpha
-        ctx.fillStyle = p.color
-        ctx.shadowColor = p.color
-        ctx.shadowBlur = 8
-        // 8-bit style: square particles
-        ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
-      }
-      ctx.globalAlpha = 1
-      ctx.shadowBlur = 0
-
-      // Update + draw snakes
-      for (let i = 0; i < snakes.length; i++) {
-        const s = snakes[i]
-
-        // Respawn dead snake after delay
-        if (!s.alive && t - s.explodeTime > REFORM_DELAY) {
-          snakes[i] = createSnake()
-          continue
+        const depth = snake.depth
+        for (let i = snake.segments.length - 1; i >= 0; i--) {
+          const seg = snake.segments[i]
+          const px = seg.x * GRID + GRID / 2; const py = seg.y * GRID + GRID / 2
+          const t = i / snake.segments.length
+          const segSize = GRID * (i === 0 ? 0.52 : 0.42 - t * 0.12)
+          ctx.fillStyle = `hsla(${snake.hue}, 60%, 15%, ${0.2 - t * 0.1})`
+          ctx.beginPath(); ctx.arc(px + depth, py + depth, segSize + 1, 0, Math.PI * 2); ctx.fill()
+          const lightness = i === 0 ? 55 : 45 - t * 15
+          const sat = 75 - t * 10
+          const bodyGrad = ctx.createRadialGradient(px - segSize * 0.3, py - segSize * 0.3, 0, px, py, segSize + 2)
+          bodyGrad.addColorStop(0, `hsla(${snake.hue}, ${sat + 15}%, ${lightness + 20}%, 0.95)`)
+          bodyGrad.addColorStop(0.5, `hsla(${snake.hue}, ${sat}%, ${lightness}%, 0.9)`)
+          bodyGrad.addColorStop(1, `hsla(${snake.hue}, ${sat - 10}%, ${lightness - 15}%, 0.8)`)
+          ctx.fillStyle = bodyGrad; ctx.beginPath(); ctx.arc(px, py, segSize, 0, Math.PI * 2); ctx.fill()
+          if (i < 5) {
+            ctx.fillStyle = `hsla(${snake.hue}, 100%, 90%, ${0.5 - i * 0.08})`
+            ctx.beginPath(); ctx.arc(px - segSize * 0.25, py - segSize * 0.25, segSize * 0.35, 0, Math.PI * 2); ctx.fill()
+          }
+          if (i === 0) {
+            const eyeOff = segSize * 0.3; const eyeR = segSize * 0.18
+            const ex1 = px + snake.dy * eyeOff - snake.dx * eyeOff * 0.3
+            const ey1 = py - snake.dx * eyeOff - snake.dy * eyeOff * 0.3
+            const ex2 = px + snake.dy * eyeOff + snake.dx * eyeOff * 0.3
+            const ey2 = py - snake.dx * eyeOff + snake.dy * eyeOff * 0.3
+            ctx.fillStyle = 'rgba(255,255,255,0.9)'
+            ctx.beginPath(); ctx.arc(ex1, ey1, eyeR, 0, Math.PI * 2); ctx.fill()
+            ctx.beginPath(); ctx.arc(ex2, ey2, eyeR, 0, Math.PI * 2); ctx.fill()
+            ctx.fillStyle = 'rgba(20,20,20,0.9)'
+            ctx.beginPath(); ctx.arc(ex1 + snake.dx * 1.2, ey1 + snake.dy * 1.2, eyeR * 0.55, 0, Math.PI * 2); ctx.fill()
+            ctx.beginPath(); ctx.arc(ex2 + snake.dx * 1.2, ey2 + snake.dy * 1.2, eyeR * 0.55, 0, Math.PI * 2); ctx.fill()
+          }
         }
-        if (!s.alive) continue
-
-        // AI: decide turn every 5 moves
-        s.moveCounter++
-        if (s.moveCounter % 5 === 0) aiTurn(s)
-
-        // Move on interval
-        if (frame % MOVE_INTERVAL === 0) moveSnake(s)
-
-        // Check mouse proximity — EXPLODE!
-        const head = s.body[0]
-        const dx = head.x - mouseX
-        const dy = head.y - mouseY
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < EXPLOSION_RADIUS) {
-          explodeSnake(s, t)
-          continue
-        }
-
-        drawSnake(s)
       }
+    }, [],
+  )
 
-      rafId = requestAnimationFrame(animate)
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      const rect = canvasRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const mx = e.clientX - rect.left + window.scrollX
+      const my = e.clientY - rect.top + window.scrollY
+      mouseRef.current = { x: mx, y: my }
+      for (const snake of snakesRef.current) {
+        if (snake.exploding) continue
+        for (const seg of snake.segments) {
+          const px = seg.x * GRID + GRID / 2; const py = seg.y * GRID + GRID / 2
+          const dist = Math.sqrt((mx - px) ** 2 + (my - py) ** 2)
+          if (dist < explosionRadius) {
+            snake.exploding = true; snake.explodeTimer = 60; snake.particles = []
+            for (const s of snake.segments) {
+              const sx = s.x * GRID + GRID / 2; const sy = s.y * GRID + GRID / 2
+              for (let p = 0; p < 3; p++) {
+                const angle = Math.random() * Math.PI * 2
+                const speed = 1 + Math.random() * 4
+                snake.particles.push({
+                  x: sx, y: sy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 2,
+                  life: 30 + Math.floor(Math.random() * 30), maxLife: 60,
+                  size: 2 + Math.random() * 3, hue: snake.hue + Math.random() * 40 - 20,
+                })
+              }
+            }
+            break
+          }
+        }
+      }
+    },
+    [explosionRadius],
+  )
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || !enabled) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    init(canvas)
+    let running = true
+    const loop = () => {
+      if (!running) return
+      update(); draw(ctx)
+      rafRef.current = requestAnimationFrame(loop)
     }
-
-    rafId = requestAnimationFrame(animate)
-
+    rafRef.current = requestAnimationFrame(loop)
+    window.addEventListener("mousemove", handleMouseMove)
+    const onResize = () => {
+      const w = window.innerWidth; const h = document.documentElement.scrollHeight
+      canvas.width = w; canvas.height = h
+      dimensionsRef.current = { w, h }
+    }
+    window.addEventListener("resize", onResize)
     return () => {
-      running = false
-      if (rafId) cancelAnimationFrame(rafId)
-      window.removeEventListener("resize", resize)
-      document.removeEventListener("mousemove", onMouseMove)
-      document.removeEventListener("touchmove", onTouchMove)
-      document.removeEventListener("visibilitychange", onVisibility)
-      if (ro) ro.disconnect()
+      running = false; cancelAnimationFrame(rafRef.current)
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("resize", onResize)
     }
-  }, [data?.enabled, data?.maxSnakes, data?.explosionRadius])
+  }, [enabled, init, update, draw, handleMouseMove])
+
+  if (!enabled) return null
 
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        pointerEvents: "none",
-        zIndex: 9999,
-        opacity: 0.55,
-        imageRendering: "pixelated",
-      }}
       aria-hidden="true"
+      style={{
+        position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+        pointerEvents: "none", zIndex: 9999, opacity: 0.6,
+        imageRendering: "auto",
+      }}
     />
   )
 }

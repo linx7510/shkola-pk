@@ -43,7 +43,6 @@ next-env.d.ts
 /src/generated/prisma
 
 # Production app folders (separate Next.js instances)
-app-payload/
 app-payload-backup/
 frontend/
 
@@ -53,8 +52,6 @@ node_modules/
 payload-cms/node_modules/
 payload-cms/.next/
 payload-cms/media/
-app-payload/node_modules/
-app-payload/.next/
 .next/
 package-lock.json.bak
 

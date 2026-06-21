@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Reveal from "@/components/Reveal"
 
 export interface HeroBlockData {
   title: string
@@ -20,9 +21,9 @@ export function HeroBlock({ data }: { data: HeroBlockData }) {
         : "linear-gradient(135deg, #181613, #0D0C0A)",
       borderRadius: 16,
     }}>
-      <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#F5F0E8", fontWeight: 700, marginBottom: "1rem", lineHeight: 1.2 }}>
+      <Reveal><h1 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", color: "#F5F0E8", fontWeight: 700, marginBottom: "1rem", lineHeight: 1.2 }}>
         {data.title}
-      </h1>
+      </h1></Reveal>
       {data.subtitle && (
         <p style={{ fontSize: "1.1rem", color: "rgba(214,198,178,0.9)", maxWidth: 700, margin: "0 auto 2rem", lineHeight: 1.6 }}
            dangerouslySetInnerHTML={{ __html: data.subtitle }} />

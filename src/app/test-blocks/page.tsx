@@ -12,7 +12,7 @@ const demoBlocks = [
     title: "Потребительский кооператив — защита активов",
     subtitle: "Обучение, консультации, готовые решения от Велеслава Старкова",
     ctaText: "Выбрать курс",
-    ctaLink: "/kursy",
+    ctaLink: "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
   },
   {
     blockType: "stats",
@@ -71,3 +71,4 @@ export default function TestBlocksPage() {
     </>
   )
 }
+

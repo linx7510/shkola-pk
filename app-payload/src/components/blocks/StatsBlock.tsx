@@ -1,3 +1,5 @@
+import Reveal from "@/components/Reveal"
+
 export interface StatItem {
   value: string
   label: string
@@ -13,9 +15,9 @@ export function StatsBlock({ data }: { data: StatsBlockData }) {
   return (
     <section style={{ padding: "2.5rem 1.5rem" }}>
       {data.title && (
-        <h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "1.5rem", fontWeight: 700 }}>
+        <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "1.5rem", fontWeight: 700 }}>
           {data.title}
-        </h2>
+        </h2></Reveal>
       )}
       <div style={{
         display: "grid", gridTemplateColumns: `repeat(${data.stats.length}, 1fr)`,

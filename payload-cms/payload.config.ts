@@ -2,6 +2,7 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { seoPlugin } from '@payloadcms/plugin-seo'
+import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -52,6 +53,24 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const plugins: any[] = [
+  s3Storage({
+    collections: {
+      media: {
+        prefix: 'media',
+      },
+    },
+    bucket: process.env.S3_BUCKET || 'shkola-pk-media',
+    config: {
+      endpoint: process.env.S3_ENDPOINT || 'https://s3.regru.cloud',
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+      },
+      region: process.env.S3_REGION || 'ru-1',
+      forcePathStyle: true,
+    },
+  }),
+
   seoPlugin({
     collections: ['blog-posts', 'courses', 'glossary-terms', 'pages'],
     uploadsCollection: 'media',

@@ -1,4 +1,6 @@
+
 "use client"
+import Reveal from "@/components/Reveal"
 import { useState } from "react"
 
 export interface FaqItem {
@@ -28,9 +30,9 @@ export function FaqBlock({ data }: { data: FaqBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem", maxWidth: 900, margin: "0 auto" }}>
       {data.title && (
-        <h2 style={{ fontSize: "2rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
+        <Reveal><h2 style={{ fontSize: "2rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
           {data.title}
-        </h2>
+        </h2></Reveal>
       )}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
         {(data.items || []).map((item, i) => (

@@ -407,7 +407,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                   {heroData?.description || "НДС, налог на прибыль и соц.платежи — 0% по закону РФ № 3085-1. Обучим работе с некоммерческими организациями. Защитите имущество от взысканий, обнулите налоги и работайте легально — более 120 предпринимателей уже открыли свои ПК с нашей помощью."}
                 </p>
                 <div className="hero-actions">
-                  <Link href={heroData?.ctaPrimaryLink || "/kursy"} className="btn-primary">{heroData?.ctaPrimaryText || "Выбрать курс"}</Link>
+                  <Link href={heroData?.ctaPrimaryLink || "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn"} className="btn-primary">{heroData?.ctaPrimaryText || "Выбрать курс"}</Link>
                   <Link href={heroData?.ctaSecondaryLink || "/konsultacii"} className="btn-secondary">{heroData?.ctaSecondaryText || "Бесплатная консультация"}</Link>
                 </div>
               </div>
@@ -682,7 +682,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                     <li>✅ 12 месяцев поддержки</li>
                     <li>✅ Доступ к закрытому сообществу</li>
                   </ul>
-                  <Link href="/kursy" className="c500-btn c500-btn-featured">Подробнее →</Link>
+                  <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" className="c500-btn c500-btn-featured">Подробнее →</Link>
                 </div>
               </div>
             </div>
@@ -963,3 +963,4 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
     </>
   );
 }
+

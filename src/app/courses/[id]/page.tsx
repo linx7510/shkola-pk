@@ -100,7 +100,7 @@ export default async function CourseDetailPage({ params }: Props) {
                 marginBottom: "2rem",
               }}
             >
-              <a href="/courses" style={{ color: "var(--color-text-muted)", textDecoration: "none" }}>
+              <a href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" style={{ color: "var(--color-text-muted)", textDecoration: "none" }}>
                 Каталог
               </a>
               <span>/</span>
@@ -211,3 +211,4 @@ export default async function CourseDetailPage({ params }: Props) {
     </div>
   );
 }
+

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Reveal from "@/components/Reveal"
 
 export interface PricingPlan {
   name: string
@@ -28,9 +29,9 @@ export function PricingBlock({ data }: { data: PricingBlockData }) {
   return (
     <section style={{ padding: "3rem 1.5rem" }}>
       {data.title && (
-        <h2 style={{ fontSize: "2rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
+        <Reveal><h2 style={{ fontSize: "2rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
           {data.title}
-        </h2>
+        </h2></Reveal>
       )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem", maxWidth: 1200, margin: "0 auto" }}>
         {(data.plans || []).map((plan, i) => {
@@ -50,7 +51,7 @@ export function PricingBlock({ data }: { data: PricingBlockData }) {
                   borderRadius: 12, fontSize: "0.75rem", fontWeight: 600,
                 }}>Популярный</div>
               )}
-              <h3 style={{ color: "#E7DCCF", fontSize: "1.2rem", marginBottom: "0.5rem", fontWeight: 600 }}>{plan.name}</h3>
+              <Reveal><h3 style={{ color: "#E7DCCF", fontSize: "1.2rem", marginBottom: "0.5rem", fontWeight: 600 }}>{plan.name}</h3></Reveal>
               <div style={{ color: "#C96E4D", fontSize: "1.8rem", fontWeight: 700, marginBottom: "0.5rem" }}>{formatPrice(plan.price)}</div>
               {description && <p style={{ color: "rgba(214,198,178,0.7)", fontSize: "0.9rem", marginBottom: "1rem" }}>{description}</p>}
               {plan.features && Array.isArray(plan.features) && (

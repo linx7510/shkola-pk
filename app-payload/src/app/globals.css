@@ -659,7 +659,10 @@ a:hover { color: var(--color-orange-400); }
 }
 
 /* Only hide if JS is active */
-.js /* .reveal opacity:0 removed — using .js .reveal instead */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
 
 .js .reveal.visible {
   opacity: 1;

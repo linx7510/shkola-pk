@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Reveal from "@/components/Reveal"
 
 export interface InstructorBlockData {
   title?: string
@@ -13,9 +14,9 @@ export function InstructorBlock({ data }: { data: InstructorBlockData }) {
     <section style={{ padding: "3rem 1.5rem" }}>
       <div style={{ maxWidth: 1000, margin: "0 auto" }}>
         {data.title && (
-          <h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
+          <Reveal><h2 style={{ fontSize: "1.8rem", color: "#E7DCCF", textAlign: "center", marginBottom: "2rem", fontWeight: 700 }}>
             {data.title}
-          </h2>
+          </h2></Reveal>
         )}
         <div style={{
           display: "grid", gridTemplateColumns: "auto 1fr", gap: "2rem",
@@ -35,9 +36,9 @@ export function InstructorBlock({ data }: { data: InstructorBlockData }) {
             />
           )}
           <div>
-            <h3 style={{ color: "#E7DCCF", fontSize: "1.4rem", marginBottom: "1rem", fontWeight: 700 }}>
+            <Reveal><h3 style={{ color: "#E7DCCF", fontSize: "1.4rem", marginBottom: "1rem", fontWeight: 700 }}>
               {data.name}
-            </h3>
+            </h3></Reveal>
             {data.facts && data.facts.length > 0 && (
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {data.facts.map((f, i) => (

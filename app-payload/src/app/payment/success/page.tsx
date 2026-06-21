@@ -57,7 +57,7 @@ function PaymentSuccessContent() {
             </p>
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
               <Link href="/dashboard" className="btn-primary" style={{ textDecoration: "none" }}>Перейти к обучению</Link>
-              <Link href="/courses" className="btn-secondary" style={{ textDecoration: "none" }}>Все курсы</Link>
+              <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" className="btn-secondary" style={{ textDecoration: "none" }}>Все курсы</Link>
             </div>
           </>
         )}
@@ -81,3 +81,4 @@ export default function PaymentSuccessPage() {
     </Suspense>
   );
 }
+

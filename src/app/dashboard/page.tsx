@@ -217,7 +217,7 @@ export default function DashboardPage() {
                 <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📚</div>
                 <div style={{ color: "var(--color-beige-200)", marginBottom: "0.5rem", fontWeight: 600 }}>У вас пока нет курсов</div>
                 <div style={{ color: "var(--color-text-muted)", marginBottom: "1.5rem" }}>Запишитесь на первый курс и начните обучение</div>
-                <Link href="/courses" className="btn-primary" style={{ display: "inline-block" }}>Выбрать курс</Link>
+                <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" className="btn-primary" style={{ display: "inline-block" }}>Выбрать курс</Link>
               </div>
             ) : (
               <div style={{ display: "grid", gap: "1rem" }}>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
               <div className="glass-2" style={{ padding: "3rem", textAlign: "center" }}>
                 <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📚</div>
                 <div style={{ color: "var(--color-beige-200)", marginBottom: "0.5rem", fontWeight: 600 }}>Нет записанных курсов</div>
-                <Link href="/courses" className="btn-primary" style={{ display: "inline-block" }}>Выбрать курс</Link>
+                <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" className="btn-primary" style={{ display: "inline-block" }}>Выбрать курс</Link>
               </div>
             ) : (
               <div style={{ display: "grid", gap: "1.5rem" }}>
@@ -407,3 +407,4 @@ function CourseDetail({ course, onToggleLesson }: { course: CourseWithProgress; 
     </div>
   );
 }
+
