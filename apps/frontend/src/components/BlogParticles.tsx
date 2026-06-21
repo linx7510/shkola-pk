@@ -23,9 +23,9 @@ export default function BlogParticles() {
     let paused = false;
     let mouseX = -1000;
     let mouseY = -1000;
-    const REPEL_RADIUS = 100;
-    const REPEL_FORCE = 0.5;
-    const MAX_PARTICLES = 25;
+    const REPEL_RADIUS = 110;
+    const REPEL_FORCE = 0.6;
+    const MAX_PARTICLES = 45;
 
     interface Particle {
       x: number;
@@ -45,17 +45,17 @@ export default function BlogParticles() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      const count = Math.min(MAX_PARTICLES, Math.floor((canvas.width * canvas.height) / 50000));
+      const count = Math.min(MAX_PARTICLES, Math.floor((canvas.width * canvas.height) / 30000));
       particles = [];
       
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.25,
-          vy: (Math.random() - 0.5) * 0.25,
-          r: Math.random() * 2 + 0.5,
-          baseAlpha: Math.random() * 0.35 + 0.12,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          r: Math.random() * 1.8 + 0.8,
+          baseAlpha: Math.random() * 0.3 + 0.28,
           alpha: 0,
           hue: Math.random() > 0.5 ? 25 : 35,
         });
@@ -94,12 +94,22 @@ export default function BlogParticles() {
         p.vy *= 0.98;
 
         // Плавное появление
-        p.alpha += (p.baseAlpha - p.alpha) * 0.02;
+        p.alpha += (p.baseAlpha - p.alpha) * 0.03;
 
-        // Рисуем частицу (простой круг вместо радиального градиента для производительности)
+        // Мягкое свечение вокруг точки (лёгкий 3D-эффект)
+        const glowR = Math.max(0.1, p.r * 2.2);
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
+        glow.addColorStop(0, "hsla(" + p.hue + ", 80%, 65%, " + (p.alpha * 0.5) + ")");
+        glow.addColorStop(1, "hsla(" + p.hue + ", 80%, 65%, 0)");
+        ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = "hsla(" + p.hue + ", 80%, 65%, " + p.alpha + ")";
+        ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Сама точка
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(0.1, p.r), 0, Math.PI * 2);
+        ctx.fillStyle = "hsla(" + p.hue + ", 85%, 72%, " + Math.min(1, p.alpha * 1.2) + ")";
         ctx.fill();
       }
 
@@ -144,7 +154,7 @@ export default function BlogParticles() {
       ref={canvasRef}
       className="pointer-events-none fixed inset-0 z-0"
       aria-hidden="true"
-      style={{ opacity: 0.8 }}
+      style={{ opacity: 0.95 }}
     />
   );
 }
