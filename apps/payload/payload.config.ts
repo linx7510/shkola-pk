@@ -17,6 +17,8 @@ import { Courses } from './src/collections/Courses'
 import { Modules } from './src/collections/Modules'
 import { Lessons } from './src/collections/Lessons'
 import { Leads } from './src/collections/Leads'
+import { ServiceTemplates } from './src/collections/ServiceTemplates'
+import { ClientProjects } from './src/collections/ClientProjects'
 import { Orders } from './src/collections/Orders'
 import { Services } from './src/collections/Services'
 import { Enrollments } from './src/collections/Enrollments'
@@ -84,7 +86,7 @@ export default buildConfig({
     dateFormat: 'dd.MM.yyyy',
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress],
+  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects],
   globals: [Settings],
   // === 20 BLOCKS ===
   blocks: [

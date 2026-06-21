@@ -1,4 +1,5 @@
 "use client";
+import ClientDashboard from "@/components/ClientDashboard";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,7 +41,7 @@ interface CourseWithProgress {
 export default function DashboardPage() {
   const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [courses, setCourses] = useState<CourseWithProgress[]>([]);
-  const [activeTab, setActiveTab] = useState<"overview" | "courses" | "profile">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "courses" | "profile" | "projects">("overview");
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -160,7 +161,7 @@ export default function DashboardPage() {
       <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "2rem var(--container-px)" }}>
         {/* Tabs */}
         <div style={{ display: "flex", gap: "0.5rem", marginBottom: "2rem" }}>
-          {(["overview", "courses", "profile"] as const).map((tab) => (
+          {(["overview", "courses", "projects", "profile"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -176,7 +177,7 @@ export default function DashboardPage() {
                 transition: "all 0.2s",
               }}
             >
-              {tab === "overview" ? "Обзор" : tab === "courses" ? "Мои курсы" : "Профиль"}
+              {tab === "overview" ? "Обзор" : tab === "courses" ? "Мои курсы" : tab === "projects" ? "📁 Мои проекты" : "Профиль"}
             </button>
           ))}
         </div>
@@ -268,6 +269,19 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Projects Tab */}
+        {activeTab === "projects" && (
+          <div>
+            <h1 className="heading-sweep" data-text="📁 Мои проекты" style={{ fontSize: "1.8rem", color: "var(--color-beige-200)", marginBottom: "0.5rem" }}>
+              📁 Мои проекты
+            </h1>
+            <p style={{ color: "var(--color-text-muted)", marginBottom: "2rem" }}>
+              Отслеживайте прогресс создания вашего кооператива — от анкет до регистрации в ФНС.
+            </p>
+            <ClientDashboard />
           </div>
         )}
 
