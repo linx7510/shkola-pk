@@ -18,11 +18,6 @@
       "permanent": true
     },
     {
-      "source": "/courses",
-      "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
-    },
-    {
       "source": "/potrebitelskiy-kooperativ-vse-vygody",
       "destination": "/",
       "permanent": true
@@ -35,11 +30,6 @@
     {
       "source": "/uslugi",
       "destination": "/uslugi-dlya-potrebitelskih-kooperativov",
-      "permanent": true
-    },
-    {
-      "source": "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
-      "destination": "/uslugi/audit-ustava",
       "permanent": true
     },
     {
@@ -108,11 +98,6 @@
       "permanent": true
     },
     {
-      "source": "/uslugi/audit-ustava",
-      "destination": "/uslugi-dlya-potrebitelskih-kooperativov",
-      "permanent": true
-    },
-    {
       "source": "/blog/yuridicheskaya-baza",
       "destination": "/blog",
       "permanent": true
@@ -140,6 +125,11 @@
     {
       "source": "/about",
       "destination": "/about-us",
+      "permanent": true
+    },
+    {
+      "source": "/uslugi/audit-ustava",
+      "destination": "/uslugi/audit-ustava-potrebitelskogo-kooperativa",
       "permanent": true
     }
   ]
