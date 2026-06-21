@@ -388,7 +388,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       <Header />
 
       {/* ===== HERO ===== */}
-      <section id="hero" style={{minHeight:"100vh",display:"flex",alignItems:"center",background:"var(--color-bg,#0D0C0A)",paddingTop:"calc(var(--header-h,72px) + 3rem)",position:"relative",overflow:"hidden"}}>
+      <section id="hero" style={{minHeight:"100vh",display:"flex",alignItems:"center",background:"transparent",paddingTop:"calc(var(--header-h,72px) + 3rem)",position:"relative",overflow:"hidden"}}>
         <div className="hero__ambient" />
         <div style={{...I,width:"100%",position:"relative",zIndex:2}}>
           <Reveal>
