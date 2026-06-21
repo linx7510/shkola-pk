@@ -29,8 +29,9 @@ PREV_FRONTEND="ok"
 PREV_CMS="ok"
 PREV_DISK="ok"
 PREV_MEM="ok"
+PREV_DISK="ok"
 if [ -f "$STATE_FILE" ]; then
-    source "$STATE_FILE"
+    source "$STATE_FILE" 2>/dev/null
 fi
 
 CURRENT_FRONTEND="ok"
@@ -67,6 +68,23 @@ else
     echo "$DATE [OK] Payload CMS running" >> $LOG
     if [ "$PREV_CMS" = "down" ]; then
         send_telegram "✅ <b>Школа ПК: Payload CMS восстановлен</b>"
+    fi
+fi
+
+
+# Check disk space
+DISK_USAGE=$(df -h / | awk 'NR==2 {print $5}' | tr -d '%')
+DISK_THRESHOLD=${DISK_THRESHOLD:-85}
+if [ "$DISK_USAGE" -ge "$DISK_THRESHOLD" ]; then
+    echo "$DATE [WARNING] Disk usage: ${DISK_USAGE}% (threshold: ${DISK_THRESHOLD}%)" >> $LOG
+    CURRENT_DISK="warning"
+    if [ "$PREV_DISK" = "ok" ]; then
+        send_telegram "⚠ <b>Школа ПК: Диск заполнен на ${DISK_USAGE}%</b>%0A%0AПорог: ${DISK_THRESHOLD}%0AПроверьте /var/www/shkola-pk/ и /var/backups/"
+    fi
+else
+    echo "$DATE [OK] Disk usage: ${DISK_USAGE}%" >> $LOG
+    if [ "$PREV_DISK" = "warning" ]; then
+        send_telegram "✅ <b>Школа ПК: Диск в норме</b>%0A%0AИспользование: ${DISK_USAGE}%"
     fi
 fi
 
