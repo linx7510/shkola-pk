@@ -1,7 +1,7 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { seoPlugin } from '@payloadcms/plugin-seo'
+// import { seoPlugin } from '@payloadcms/plugin-seo'  # DISABLED: importmap bug
 // import { s3Storage } from '@payloadcms/storage-s3'  # DISABLED
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -74,10 +74,11 @@ const plugins: any[] = [
     },
   }), */
 
+/* DISABLED: SEO plugin importmap bug
   seoPlugin({
     collections: ['blog-posts', 'courses', 'glossary-terms', 'pages'],
     uploadsCollection: 'media',
-  }),
+  }), */
 ]
 
 export default buildConfig({

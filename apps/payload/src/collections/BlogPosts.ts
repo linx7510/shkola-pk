@@ -20,15 +20,24 @@ export const BlogPosts: CollectionConfig = {
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг', admin: { position: 'sidebar' } },
     { name: 'excerpt', type: 'textarea', maxLength: 300, label: 'Анонс' },
-    { name: 'content', type: 'richText', required: true, label: 'Содержание' },
+    { name: 'content', type: 'textarea', required: true, label: 'Содержание статьи (HTML)', admin: { description: 'Редактируйте текст в HTML. Заголовки: <h2>текст</h2>, абзацы: <p>текст</p>, списки: <ul><li>пункт</li></ul>, цитаты: <blockquote>текст</blockquote>' } },
     { name: 'coverImage', type: 'upload', relationTo: 'media', label: 'Обложка' },
     { name: 'category', type: 'relationship', relationTo: 'categories', label: 'Категория', filterOptions: { type: { equals: 'blog' } } },
     { name: 'tags', type: 'text', label: 'Теги (через запятую)', admin: { position: 'sidebar' } },
     { name: 'author', type: 'relationship', relationTo: 'users', label: 'Автор', admin: { position: 'sidebar' } },
     { name: 'isPublished', type: 'checkbox', defaultValue: false, label: 'Опубликован', admin: { position: 'sidebar' } },
     { name: 'publishedAt', type: 'date', label: 'Дата публикации', admin: { position: 'sidebar', date: { displayFormat: 'dd.MM.yyyy' } } },
+    {
+      name: 'meta',
+      type: 'group',
+      label: 'SEO мета-теги',
+      admin: { position: 'sidebar' },
+      fields: [
+        { name: 'title', type: 'text', label: 'Meta Title' },
+        { name: 'description', type: 'textarea', label: 'Meta Description' },
+      ],
+    },
   ],
-    hooks: createAuditHooks('blog-post'),
+  hooks: createAuditHooks('blog-post'),
   timestamps: true,
 }
-
