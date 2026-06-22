@@ -52,6 +52,8 @@ export const Pages: CollectionConfig = {
       ],
     },
     { name: 'content', type: 'richText', label: 'Содержание (SEO)' },
+  { name: 'headCode', type: 'textarea', label: 'Код в HEAD', admin: { position: 'sidebar', description: 'Код для head' } },
+  { name: 'bodyCode', type: 'textarea', label: 'Код в BODY', admin: { position: 'sidebar', description: 'Код для body' } },
     {
       name: 'blocks',
       type: 'blocks',

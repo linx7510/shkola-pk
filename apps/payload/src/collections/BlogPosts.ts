@@ -27,6 +27,8 @@ export const BlogPosts: CollectionConfig = {
     { name: 'author', type: 'relationship', relationTo: 'users', label: 'Автор', admin: { position: 'sidebar' } },
     { name: 'isPublished', type: 'checkbox', defaultValue: false, label: 'Опубликован', admin: { position: 'sidebar' } },
     { name: 'publishedAt', type: 'date', label: 'Дата публикации', admin: { position: 'sidebar', date: { displayFormat: 'dd.MM.yyyy' } } },
+    { name: 'headCode', type: 'textarea', label: 'Код в HEAD', admin: { position: 'sidebar', description: 'Вставьте код для head' } },
+    { name: 'bodyCode', type: 'textarea', label: 'Код в BODY', admin: { position: 'sidebar', description: 'Вставьте код для body' } },
     {
       name: 'meta',
       type: 'group',

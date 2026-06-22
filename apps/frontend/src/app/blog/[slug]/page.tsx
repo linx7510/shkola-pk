@@ -96,6 +96,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.meta?.title || post.title ? `${post.title} | Школа ПК` : "Статья | Школа ПК",
     description: post.meta?.description || post.excerpt || "",
+    other: (post as any)?.headCode ? { 'custom-head': (post as any).headCode } : undefined,
   };
 }
 
