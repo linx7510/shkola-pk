@@ -1,0 +1,366 @@
+/**
+ * Courses Page Enhancement Patch
+ * Injected via Payload CMS media
+ * 
+ * Features:
+ * - 3D Snake animation with explosion on hover
+ * - Heading scroll animations
+ * - Hreflang tags
+ * - Image alt improvements
+ */
+(function() {
+  'use strict';
+  
+  console.log('[PK-PATCH] Loading courses page enhancements...');
+  
+  /* ═══════════════════════════════════════════
+     1. HREFLANG TAGS
+     ═══════════════════════════════════════════ */
+  function addHreflang() {
+    const url = 'https://2980738.ru/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn';
+    const existing = document.querySelector('link[hreflang="ru"]');
+    if (existing) return;
+    
+    const ru = document.createElement('link');
+    ru.rel = 'alternate';
+    ru.hrefLang = 'ru';
+    ru.href = url;
+    document.head.appendChild(ru);
+    
+    const def = document.createElement('link');
+    def.rel = 'alternate';
+    def.hrefLang = 'x-default';
+    def.href = url;
+    document.head.appendChild(def);
+    
+    console.log('[PK-PATCH] Hreflang tags added');
+  }
+  
+  /* ═══════════════════════════════════════════
+     2. HEADING ANIMATIONS
+     ═══════════════════════════════════════════ */
+  function addHeadingAnimations() {
+    const headings = document.querySelectorAll('h1, h2, h3');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    
+    headings.forEach(h => {
+      // Only animate headings inside main content
+      if (!h.closest('header') && !h.closest('nav') && !h.closest('footer')) {
+        h.style.opacity = '0';
+        h.style.transform = 'translateY(24px)';
+        h.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+        observer.observe(h);
+      }
+    });
+    
+    console.log('[PK-PATCH] Heading animations added (' + headings.length + ' headings)');
+  }
+  
+  /* ═══════════════════════════════════════════
+     3. 3D SNAKE ANIMATION
+     ═══════════════════════════════════════════ */
+  function replaceSnakeAnimation() {
+    // Find and remove the existing flat canvas
+    const oldCanvas = document.querySelector('canvas[aria-hidden="true"]');
+    if (!oldCanvas) {
+      console.log('[PK-PATCH] No existing canvas found, creating new one');
+    }
+    if (oldCanvas) {
+      oldCanvas.remove();
+    }
+    
+    const GRID = 14;
+    const MAX_SEGMENTS = 28;
+    const FOOD_COUNT = 6;
+    const DEPTH = 5;
+    const EXPLOSION_RADIUS = 70;
+    
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;opacity:0.55;image-rendering:auto';
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    let w, h, cols, rows;
+    let snakes = [];
+    let foods = [];
+    let running = true;
+    
+    function resize() {
+      w = window.innerWidth;
+      h = document.documentElement.scrollHeight;
+      canvas.width = w;
+      canvas.height = h;
+      cols = Math.floor(w / GRID);
+      rows = Math.floor(h / GRID);
+    }
+    
+    function createSnake(index) {
+      const startX = Math.floor(Math.random() * (cols - 10)) + 5;
+      const startY = Math.floor(Math.random() * (rows - 10)) + 5;
+      const dirs = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
+      const dir = dirs[Math.floor(Math.random() * dirs.length)];
+      const hue = (index * 120 + Math.random() * 60) % 360;
+      const segments = [];
+      for (let i = 0; i < 12; i++) {
+        segments.push({ x: startX - dir.dx * i, y: startY - dir.dy * i });
+      }
+      return {
+        segments, dx: dir.dx, dy: dir.dy,
+        targetDx: dir.dx, targetDy: dir.dy,
+        moveTimer: 0, moveInterval: 3 + Math.floor(Math.random() * 4),
+        hue, exploding: false, explodeTimer: 0, particles: [],
+        depth: 3 + Math.floor(Math.random() * 4),
+      };
+    }
+    
+    function createFood() {
+      return {
+        x: Math.floor(Math.random() * (cols - 4)) + 2,
+        y: Math.floor(Math.random() * (rows - 4)) + 2,
+        size: 1, hue: 40 + Math.random() * 30,
+        pulse: 0, pulseDir: 1, eaten: false,
+      };
+    }
+    
+    function init() {
+      resize();
+      snakes = [];
+      for (let i = 0; i < 3; i++) snakes.push(createSnake(i));
+      foods = [];
+      for (let i = 0; i < FOOD_COUNT; i++) foods.push(createFood());
+    }
+    
+    function update() {
+      for (const snake of snakes) {
+        if (snake.exploding) {
+          snake.explodeTimer--;
+          for (const p of snake.particles) {
+            p.x += p.vx; p.y += p.vy;
+            p.vy += 0.08; p.life--;
+            p.vx *= 0.98; p.vy *= 0.98;
+          }
+          snake.particles = snake.particles.filter(p => p.life > 0);
+          if (snake.explodeTimer <= 0 && snake.particles.length === 0) {
+            const idx = snakes.indexOf(snake);
+            snakes[idx] = createSnake(idx);
+          }
+          continue;
+        }
+        
+        snake.moveTimer++;
+        if (snake.moveTimer < snake.moveInterval) continue;
+        snake.moveTimer = 0;
+        
+        if (Math.random() < 0.12) {
+          const options = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}]
+            .filter(d => !(d.dx === -snake.dx && d.dy === -snake.dy));
+          const pick = options[Math.floor(Math.random() * options.length)];
+          snake.targetDx = pick.dx; snake.targetDy = pick.dy;
+        }
+        
+        snake.dx = snake.targetDx; snake.dy = snake.targetDy;
+        const head = snake.segments[0];
+        let nx = head.x + snake.dx;
+        let ny = head.y + snake.dy;
+        if (nx < 0) nx = cols - 1;
+        if (nx >= cols) nx = 0;
+        if (ny < 0) ny = rows - 1;
+        if (ny >= rows) ny = 0;
+        
+        snake.segments.unshift({ x: nx, y: ny });
+        
+        let ate = false;
+        for (let fi = 0; fi < foods.length; fi++) {
+          if (!foods[fi].eaten && foods[fi].x === nx && foods[fi].y === ny) {
+            foods[fi].eaten = true;
+            foods[fi] = createFood();
+            ate = true;
+            break;
+          }
+        }
+        if (!ate || snake.segments.length > MAX_SEGMENTS) {
+          snake.segments.pop();
+        }
+      }
+    }
+    
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      
+      // Draw food (3D)
+      for (const food of foods) {
+        if (food.eaten) continue;
+        food.pulse += 0.04 * food.pulseDir;
+        if (food.pulse > 1 || food.pulse < 0) food.pulseDir *= -1;
+        
+        const px = food.x * GRID + GRID / 2;
+        const py = food.y * GRID + GRID / 2;
+        const baseSize = GRID * 0.55;
+        const pulseSize = baseSize + food.pulse * 3;
+        const d = 4;
+        
+        // Shadow
+        ctx.fillStyle = 'hsla(' + food.hue + ',80%,25%,0.25)';
+        ctx.beginPath(); ctx.arc(px + d, py + d, pulseSize, 0, Math.PI * 2); ctx.fill();
+        
+        // Body gradient
+        const grad = ctx.createRadialGradient(px - 2, py - 2, 1, px, py, pulseSize);
+        grad.addColorStop(0, 'hsla(' + food.hue + ',90%,75%,0.9)');
+        grad.addColorStop(0.6, 'hsla(' + food.hue + ',85%,55%,0.85)');
+        grad.addColorStop(1, 'hsla(' + food.hue + ',80%,35%,0.7)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(px, py, pulseSize, 0, Math.PI * 2); ctx.fill();
+        
+        // Highlight
+        ctx.fillStyle = 'hsla(' + food.hue + ',100%,90%,0.6)';
+        ctx.beginPath(); ctx.arc(px - pulseSize * 0.25, py - pulseSize * 0.25, pulseSize * 0.3, 0, Math.PI * 2); ctx.fill();
+      }
+      
+      // Draw snakes
+      for (const snake of snakes) {
+        if (snake.exploding) {
+          for (const p of snake.particles) {
+            const alpha = (p.life / p.maxLife) * 0.9;
+            ctx.fillStyle = 'hsla(' + p.hue + ',80%,20%,' + (alpha * 0.3) + ')';
+            ctx.beginPath(); ctx.arc(p.x + 3, p.y + 3, p.size, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'hsla(' + p.hue + ',90%,60%,' + alpha + ')';
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+          }
+          continue;
+        }
+        
+        const depth = snake.depth;
+        
+        for (let i = snake.segments.length - 1; i >= 0; i--) {
+          const seg = snake.segments[i];
+          const px = seg.x * GRID + GRID / 2;
+          const py = seg.y * GRID + GRID / 2;
+          const t = i / snake.segments.length;
+          const segSize = GRID * (i === 0 ? 0.52 : 0.42 - t * 0.12);
+          const lightness = i === 0 ? 55 : 45 - t * 15;
+          const sat = 75 - t * 10;
+          
+          // 3D Shadow
+          ctx.fillStyle = 'hsla(' + snake.hue + ',60%,15%,' + (0.2 - t * 0.1) + ')';
+          ctx.beginPath(); ctx.arc(px + depth, py + depth, segSize + 1, 0, Math.PI * 2); ctx.fill();
+          
+          // 3D Body gradient
+          const bodyGrad = ctx.createRadialGradient(px - segSize * 0.3, py - segSize * 0.3, 0, px, py, segSize + 2);
+          bodyGrad.addColorStop(0, 'hsla(' + snake.hue + ',' + (sat + 15) + '%,' + (lightness + 20) + '%,0.95)');
+          bodyGrad.addColorStop(0.5, 'hsla(' + snake.hue + ',' + sat + '%,' + lightness + '%,0.9)');
+          bodyGrad.addColorStop(1, 'hsla(' + snake.hue + ',' + (sat - 10) + '%,' + (lightness - 15) + '%,0.8)');
+          ctx.fillStyle = bodyGrad;
+          ctx.beginPath(); ctx.arc(px, py, segSize, 0, Math.PI * 2); ctx.fill();
+          
+          // Specular highlight
+          if (i < 5) {
+            ctx.fillStyle = 'hsla(' + snake.hue + ',100%,90%,' + (0.5 - i * 0.08) + ')';
+            ctx.beginPath(); ctx.arc(px - segSize * 0.25, py - segSize * 0.25, segSize * 0.35, 0, Math.PI * 2); ctx.fill();
+          }
+          
+          // Eyes on head
+          if (i === 0) {
+            const eo = segSize * 0.3;
+            const er = segSize * 0.18;
+            const ex1 = px + snake.dy * eo - snake.dx * eo * 0.3;
+            const ey1 = py - snake.dx * eo - snake.dy * eo * 0.3;
+            const ex2 = px + snake.dy * eo + snake.dx * eo * 0.3;
+            const ey2 = py - snake.dx * eo + snake.dy * eo * 0.3;
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.beginPath(); ctx.arc(ex1, ey1, er, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(ex2, ey2, er, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'rgba(20,20,20,0.9)';
+            ctx.beginPath(); ctx.arc(ex1 + snake.dx * 1.2, ey1 + snake.dy * 1.2, er * 0.55, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(ex2 + snake.dx * 1.2, ey2 + snake.dy * 1.2, er * 0.55, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+      }
+    }
+    
+    // Mouse hover → explode
+    document.addEventListener('mousemove', function(e) {
+      const mx = e.clientX + window.scrollX;
+      const my = e.clientY + window.scrollY;
+      
+      for (const snake of snakes) {
+        if (snake.exploding) continue;
+        for (const seg of snake.segments) {
+          const px = seg.x * GRID + GRID / 2;
+          const py = seg.y * GRID + GRID / 2;
+          const dist = Math.sqrt((mx - px) ** 2 + (my - py) ** 2);
+          if (dist < EXPLOSION_RADIUS) {
+            snake.exploding = true;
+            snake.explodeTimer = 60;
+            snake.particles = [];
+            for (const s of snake.segments) {
+              const sx = s.x * GRID + GRID / 2;
+              const sy = s.y * GRID + GRID / 2;
+              for (let p = 0; p < 3; p++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1 + Math.random() * 4;
+                snake.particles.push({
+                  x: sx, y: sy,
+                  vx: Math.cos(angle) * speed,
+                  vy: Math.sin(angle) * speed - 2,
+                  life: 30 + Math.floor(Math.random() * 30),
+                  maxLife: 60,
+                  size: 2 + Math.random() * 3,
+                  hue: snake.hue + Math.random() * 40 - 20,
+                });
+              }
+            }
+            break;
+          }
+        }
+      }
+    });
+    
+    function loop() {
+      if (!running) return;
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+    
+    init();
+    requestAnimationFrame(loop);
+    
+    window.addEventListener('resize', resize);
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+      running = false;
+    });
+    
+    console.log('[PK-PATCH] 3D Snake animation initialized');
+  }
+  
+  /* ═══════════════════════════════════════════
+     4. INIT ALL ENHANCEMENTS
+     ═══════════════════════════════════════════ */
+  function initAll() {
+    addHreflang();
+    addHeadingAnimations();
+    replaceSnakeAnimation();
+    console.log('[PK-PATCH] All enhancements loaded successfully');
+  }
+  
+  // Wait for DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+  
+})();

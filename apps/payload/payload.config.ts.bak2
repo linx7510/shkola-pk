@@ -2,7 +2,7 @@ import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { seoPlugin } from '@payloadcms/plugin-seo'
-// import { s3Storage } from '@payloadcms/storage-s3'  # DISABLED
+import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -55,7 +55,6 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const plugins: any[] = [
-/* DISABLED: S3 importmap bug
   s3Storage({
     collections: {
       media: {
@@ -72,7 +71,7 @@ const plugins: any[] = [
       region: process.env.S3_REGION || 'ru-1',
       forcePathStyle: true,
     },
-  }), */
+  }),
 
   seoPlugin({
     collections: ['blog-posts', 'courses', 'glossary-terms', 'pages'],

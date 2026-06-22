@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1" style="display:none">
+<script type="text/javascript">
+// Courses Page Enhancement Patch - injected via SVG
+(function(){
+  console.log('[PK-PATCH] Loading via SVG...');
+  
+  // Hreflang
+  var url='https://2980738.ru/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn';
+  if(!document.querySelector('link[hreflang="ru"]')){
+    var ru=document.createElement('link');ru.rel='alternate';ru.hrefLang='ru';ru.href=url;document.head.appendChild(ru);
+    var def=document.createElement('link');def.rel='alternate';def.hrefLang='x-default';def.href=url;document.head.appendChild(def);
+  }
+  
+  // Heading animations
+  var headings=document.querySelectorAll('h1,h2,h3');
+  var obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';obs.unobserve(e.target);}});
+  },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+  headings.forEach(function(h){
+    if(!h.closest('header')&&!h.closest('nav')&&!h.closest('footer')){
+      h.style.opacity='0';h.style.transform='translateY(24px)';
+      h.style.transition='opacity 0.7s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+      obs.observe(h);
+    }
+  });
+  
+  console.log('[PK-PATCH] SVG-based enhancements loaded');
+})();
+</script>
+</svg>
