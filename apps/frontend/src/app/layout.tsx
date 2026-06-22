@@ -98,7 +98,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           ]
         })}} />
         {children}
-        <script dangerouslySetInnerHTML={{__html: "(function(){var s=document.createElement(script);s.src=/api/custom-code.js;document.head.appendChild(s);})();"}} />
         <Footer />
       </body>
     </html>
