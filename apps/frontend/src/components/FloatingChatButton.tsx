@@ -29,7 +29,7 @@ export default function FloatingChatButton() {
         body: JSON.stringify({message: msg}),
       });
       const data = await res.json();
-      const reply = data.reply || data.message || data.text ||
+      const reply = data.response || data.reply || data.message || data.text ||
         "Спасибо за ваш вопрос! Наш консультант свяжется с вами в ближайшее время. Также вы можете задать вопрос через форму ниже или по телефону +7 (902) 472-07-38.";
       setMessages(prev => [...prev, {role: "bot", text: reply}]);
     } catch {
