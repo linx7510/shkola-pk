@@ -15,7 +15,6 @@ const serverFunction: ServerFunctionClient = async function (args) {
 const Layout = ({ children }: Args) => (
   <RootLayout config={config} importMap={{}} serverFunction={serverFunction}>
     {children}
-    <Script src="/blog-editor-nav.js" strategy="afterInteractive" />
     <Script src="/wysiwyg-inject.js" strategy="afterInteractive" />
   </RootLayout>
 )
