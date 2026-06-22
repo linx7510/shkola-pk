@@ -102,7 +102,7 @@
     ];
 
     var toolbar = document.createElement("div");
-    toolbar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px 8px 0 0;align-items:center";
+    toolbar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px 8px 0 0;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.3)";
 
     // BLOCKS DROPDOWN
     var blocksContainer = document.createElement("div");
@@ -213,7 +213,7 @@
     var editor = document.createElement("div");
     editor.contentEditable = true;
     editor.className = "article-content";
-    editor.style.cssText = "min-height:400px;padding:16px;background:#0d0c0a;border:1px solid #333;border-radius:0 0 8px 8px;color:#d6c6b2;font-size:15px;line-height:1.8;font-family:Inter,sans-serif;outline:none;overflow-y:auto";
+    editor.style.cssText = "min-height:400px;padding:16px;background:#0d0c0a;border:1px solid #333;border-radius:0 0 8px 8px;color:#d6c6b2;font-size:15px;line-height:1.8;font-family:Inter,sans-serif;outline:none";
     editor.innerHTML = contentTextarea.value || "";
 
     // SOURCE VIEW
@@ -233,7 +233,7 @@
     editor.onkeyup = saveSelection;
 
     var wrapper = document.createElement("div");
-    wrapper.style.cssText = "margin:10px 0;position:relative";
+    wrapper.style.cssText = "margin:10px 0;position:relative;max-height:80vh;overflow-y:auto";
     wrapper.appendChild(toolbar);
     wrapper.appendChild(editor);
     wrapper.appendChild(sourceView);
