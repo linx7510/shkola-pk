@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./styles/tokens.css";
+import "./styles/layout.css";
+import "./styles/blocks.css";
+import "./styles/animations.css";
+import "./styles/components.css";
 import "./header-mobile.css";
 import Footer from "@/components/Footer";
 
