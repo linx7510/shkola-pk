@@ -7,6 +7,7 @@ import "./styles/animations.css";
 import "./styles/components.css";
 import "./header-mobile.css";
 import Footer from "@/components/Footer";
+import FloatingChatButton from "@/components/FloatingChatButton";
 
 export const metadata: Metadata = {
   title: {
@@ -98,6 +99,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           ]
         })}} />
         {children}
+        <FloatingChatButton />
         <Footer />
       </body>
     </html>
