@@ -1,1 +1,185 @@
-.reveal{opacity:1;transform:none;transition:opacity 800ms var(--ease-premium),transform 800ms var(--ease-premium)} .js .reveal{opacity:0;transform:translateY(20px)} .js .reveal.visible,.reveal.visible{opacity:1;transform:translateY(0)} .reveal-delay-1{transition-delay:100ms} .reveal-delay-2{transition-delay:200ms} .reveal-delay-3{transition-delay:300ms} .reveal-delay-4{transition-delay:400ms} .reveal-delay-5{transition-delay:500ms} .reveal-delay-6{transition-delay:600ms} @keyframes ambientDrift{0%,100%{transform:translate(0,0) scale(1)} 25%{transform:translate(20px,-15px) scale(1.05)} 50%{transform:translate(-10px,20px) scale(0.95)} 75%{transform:translate(15px,10px) scale(1.02)}} @keyframes logoFloat{0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)}} @keyframes logoGlow{0%,100%{opacity:0.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)}} @keyframes logoRing{from{transform:rotate(0deg)} to{transform:rotate(360deg)}} @keyframes pulse{0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)}} @keyframes ctaGlow{0%,100%{box-shadow:0 0 40px rgba(201,110,77,0.08)} 50%{box-shadow:0 0 60px rgba(201,110,77,0.15)}} @keyframes tagAppear{from{opacity:0;transform:translateY(10px) scale(0.9)} to{opacity:1;transform:translateY(0) scale(1)}} @keyframes textGradient{0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}} .heading-sweep{position:relative;display:inline-block;overflow:visible;cursor:default;transition:color 0.35s cubic-bezier(0.16,1,0.3,1),text-shadow 0.35s cubic-bezier(0.16,1,0.3,1),transform 0.35s cubic-bezier(0.16,1,0.3,1)} .heading-sweep::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(214,198,178,.28) 45%,rgba(245,240,232,.35) 50%,rgba(214,198,178,.28) 55%,transparent 100%);animation:headingSweep 4s ease-in-out infinite;pointer-events:none;z-index:1;will-change:left} .heading-sweep::after{content:'';position:absolute;bottom:-4px;left:0;width:100%;height:2px;background:linear-gradient(90deg,#C96E4D,#E68863,#F5F0E8,#E68863,#C96E4D);background-size:200% 100%;transform:scaleX(0);transform-origin:left center;transition:transform 0.55s cubic-bezier(0.16,1,0.3,1),background-position 0.8s ease;box-shadow:0 0 12px rgba(230,136,99,0.55);pointer-events:none;z-index:2} .heading-sweep.visible::after,.heading-sweep.reveal.visible::after,.js .reveal.visible .heading-sweep::after{transform:scaleX(1)} .heading-sweep:hover{color:#F5F0E8 !important;text-shadow:0 0 24px rgba(230,136,99,0.45),0 0 8px rgba(245,240,232,0.25);transform:translateY(-1px)} .heading-sweep:hover::before{animation:headingHoverSweep 0.8s ease forwards} .heading-sweep:hover::after{transform:scaleX(1);background-position:100% 50%} main h1.heading-sweep,main h2.heading-sweep,main h3.heading-sweep{position:relative;display:inline-block;overflow:visible} @keyframes headingSweep{0%{left:-100%} 40%{left:100%} 100%{left:100%}} @keyframes headingHoverSweep{0%{left:-100%} 100%{left:100%}} .hero-block{position:relative;transition:box-shadow 0.4s cubic-bezier(0.16,1,0.3,1),border-color 0.4s cubic-bezier(0.16,1,0.3,1),transform 0.4s cubic-bezier(0.16,1,0.3,1)} .hero-block:hover{box-shadow:0 0 60px rgba(201,110,77,0.18),inset 0 0 0 1px rgba(230,136,99,0.25)}
+/* ─── 17. Reveal Animation ─── */
+/* Reveal: VISIBLE by default (progressive enhancement).
+   Only hide if JavaScript is available (.js class on <html>). */
+.reveal {
+  opacity: 1;
+  transform: none;
+  transition: opacity 800ms var(--ease-premium), transform 800ms var(--ease-premium);
+}
+
+/* Only hide if JS is active */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.js .reveal.visible,
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 100ms; }
+.reveal-delay-2 { transition-delay: 200ms; }
+.reveal-delay-3 { transition-delay: 300ms; }
+.reveal-delay-4 { transition-delay: 400ms; }
+.reveal-delay-5 { transition-delay: 500ms; }
+.reveal-delay-6 { transition-delay: 600ms; }
+
+
+/* ─── 18. Keyframe Animations ─── */
+@keyframes ambientDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, -15px) scale(1.05); }
+  50% { transform: translate(-10px, 20px) scale(0.95); }
+  75% { transform: translate(15px, 10px) scale(1.02); }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes logoGlow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes logoRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 0 40px rgba(201,110,77,0.08); }
+  50% { box-shadow: 0 0 60px rgba(201,110,77,0.15); }
+}
+
+@keyframes tagAppear {
+  from { opacity: 0; transform: translateY(10px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes textGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
+/* ─── 25. Heading Sweep — ЕДИНОЕ ОПРЕДЕЛЕНИЕ для главной и второстепенных страниц ───
+   Эффект: всегда работающая бесконечная подсветка (4s) + при hover — усиление свечения,
+   цвет в бежевый, лёгкий подъём вверх, и подчёркивание снизу раскрывается на всю ширину.
+   Это ТОТ ЖЕ эффект, что применяется на главной странице 2980738.ru.
+   ВАЖНО: overflow: visible — чтобы «пробегающий свет» ВЫЛЕТАЛ за правый край заголовка
+   (как было на исходнике velaslav.rus до правок). */
+.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+  cursor: default;
+  transition: color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              text-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Бесконечная «бегущая подсветка» — всегда работает, даже без hover.
+   Свет стартует слева за пределами заголовка (left:-100%), доезжает до правого края
+   и ВЫЛЕТАЕТ за него (left:100% — при width:100% правый край ::before уходит
+   за правый край заголовка). */
+.heading-sweep::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(214,198,178,.28) 45%, rgba(245,240,232,.35) 50%, rgba(214,198,178,.28) 55%, transparent 100%);
+  animation: headingSweep 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+  will-change: left;
+}
+
+/* Подчёркивание снизу — раскрывается на всю ширину при hover или появлении */
+.heading-sweep::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #C96E4D, #E68863, #F5F0E8, #E68863, #C96E4D);
+  background-size: 200% 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              background-position 0.8s ease;
+  box-shadow: 0 0 12px rgba(230, 136, 99, 0.55);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* На главной странице после scroll-reveal добавляется .visible — подчёркивание видно */
+.heading-sweep.visible::after,
+.heading-sweep.reveal.visible::after,
+.js .reveal.visible .heading-sweep::after {
+  transform: scaleX(1);
+}
+
+/* HOVER — усиливаем свечение, меняем цвет, лёгкий подъём */
+.heading-sweep:hover {
+  color: #F5F0E8 !important;
+  text-shadow: 0 0 24px rgba(230, 136, 99, 0.45), 0 0 8px rgba(245, 240, 232, 0.25);
+  transform: translateY(-1px);
+}
+
+.heading-sweep:hover::before {
+  animation: headingHoverSweep 0.8s ease forwards;
+}
+
+.heading-sweep:hover::after {
+  transform: scaleX(1);
+  background-position: 100% 50%;
+}
+
+/* Гарантируем, что на второстепенных страницах h1/h2 с heading-sweep тоже работают
+   и свет тоже вылетает за правый край (overflow: visible) */
+main h1.heading-sweep,
+main h2.heading-sweep,
+main h3.heading-sweep {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+
+@keyframes headingSweep {
+  0%   { left: -100%; }   /* старт за левым краем */
+  40%  { left: 100%; }    /* выехал за правый край */
+  100% { left: 100%; }    /* пауза перед следующим циклом */
+}
+
+@keyframes headingHoverSweep {
+  0%   { left: -100%; }
+  100% { left: 100%; }
+}
+
+
+/* ─── Hero block hover (второстепенные страницы) ───
+   Лёгкий border-glow при наведении мышью на hero-секцию — то же самое, что
+   неявно происходит на главной за счёт ambient glow + ctaGlow. */
+.hero-block {
+  position: relative;
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-block:hover {
+  box-shadow: 0 0 60px rgba(201,110,77,0.18), inset 0 0 0 1px rgba(230,136,99,0.25);
+}

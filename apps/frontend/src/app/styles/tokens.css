@@ -1,1 +1,18 @@
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0} html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale} body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--color-bg-950);color:var(--color-text-secondary);line-height:1.6;letter-spacing:0.03em;overflow-x:hidden;min-height:100vh}
+/* ─── 2. Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--color-bg-950);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  overflow-x: hidden;
+  min-height: 100vh;
+}

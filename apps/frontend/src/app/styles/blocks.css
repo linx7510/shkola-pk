@@ -1,1 +1,593 @@
-.glass-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2rem;transition:all var(--motion-base) var(--ease-premium);position:relative;overflow:hidden} .glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--color-orange-500),transparent);opacity:0;transition:opacity var(--motion-base) var(--ease-premium)} .glass-card:hover{border-color:rgba(214,198,178,0.28);box-shadow:var(--glow-beige);transform:translateY(-3px)} .glass-card:hover::before{opacity:1} .value-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:1.5rem;transition:all var(--motion-base) var(--ease-premium)} .value-card:hover{border-color:rgba(214,198,178,0.18);box-shadow:0 0 20px rgba(214,198,178,0.08);transform:translateY(-2px)} .value-card__icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1rem} .value-card__icon--orange{background:rgba(201,110,77,0.12)} .value-card__icon--green{background:rgba(76,154,122,0.12)} .value-card__icon--blue{background:rgba(58,109,140,0.12)} .value-card__title{font-weight:600;font-size:1rem;color:var(--color-text-primary);margin-bottom:0.4rem} .value-card__desc{font-size:0.88rem;color:var(--color-text-muted);line-height:1.6} .advantage-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:1.75rem;transition:all var(--motion-base) var(--ease-premium);position:relative;overflow:hidden} .advantage-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity var(--motion-base) var(--ease-premium)} .advantage-card:hover{transform:translateY(-3px)} .advantage-card:hover::before{opacity:1} .advantage-card--orange::before{background:var(--color-orange-500)} .advantage-card--green::before{background:var(--color-green-500)} .advantage-card--blue::before{background:var(--color-blue-500)} .advantage-card--orange:hover{border-color:rgba(201,110,77,0.25);box-shadow:0 0 25px rgba(201,110,77,0.1)} .advantage-card--green:hover{border-color:rgba(76,154,122,0.25);box-shadow:0 0 25px rgba(76,154,122,0.1)} .advantage-card--blue:hover{border-color:rgba(58,109,140,0.25);box-shadow:0 0 25px rgba(58,109,140,0.1)} .advantage-card__icon{font-size:1.6rem;margin-bottom:0.75rem} .advantage-card__title{font-weight:700;font-size:1.05rem;color:var(--color-text-primary);margin-bottom:0.4rem} .advantage-card__desc{font-size:0.88rem;color:var(--color-text-muted);line-height:1.6} .stats-bar__inner{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;text-align:center;padding:2rem 0} .stats-bar__number{font-size:clamp(2rem,4vw,2.8rem);font-weight:800;line-height:1.1;margin-bottom:0.25rem} .stats-bar__number--beige{color:var(--color-beige-200)} .stats-bar__number--orange{color:var(--color-orange-400)} .stats-bar__number--green{color:var(--color-green-400)} .stats-bar__number--blue{color:var(--color-blue-400)} .stats-bar__label{font-size:0.85rem;color:var(--color-text-muted)} .faq-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;transition:all var(--motion-base) var(--ease-premium)} .faq-item:hover{border-color:rgba(214,198,178,0.15)} .faq-item.open{border-color:rgba(214,198,178,0.2);box-shadow:0 0 15px rgba(214,198,178,0.06)} .faq-item__question{width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem 1.5rem;background:none;border:none;color:var(--color-text-primary);font-size:1rem;font-weight:600;cursor:pointer;text-align:left;transition:color var(--motion-fast)} .faq-item__question:hover{color:var(--color-orange-400)} .faq-item__icon{font-size:1.2rem;color:var(--color-text-muted);transition:transform var(--motion-base) var(--ease-premium);flex-shrink:0} .faq-item.open .faq-item__icon{transform:rotate(45deg)} .faq-item__answer{max-height:0;overflow:hidden;transition:max-height var(--motion-slow) var(--ease-smooth)} .faq-item__answer-inner{padding:0 1.5rem 1.25rem;font-size:0.92rem;color:var(--color-text-muted);line-height:1.7} .cta__inner{text-align:center;padding:3.5rem 2rem;border-radius:20px;background:rgba(201,110,77,0.06);border:1px solid rgba(201,110,77,0.2);box-shadow:0 0 40px rgba(201,110,77,0.08);animation:ctaGlow 8s ease-in-out infinite} .cta__title{font-size:clamp(1.8rem,3vw,2.5rem);margin-bottom:0.75rem} .cta__desc{font-size:1.05rem;color:var(--color-text-muted);margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto} .contacts__grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:2.5rem} .contact-block{padding:1rem 0;border-bottom:1px solid rgba(255,255,255,0.04)} .contact-block__label{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:0.25rem} .contact-block__value{font-size:1rem;color:var(--color-text-primary)} .contact-block__value a:hover{color:var(--color-orange-400)} .text-gradient{background:linear-gradient(135deg,var(--color-beige-100),var(--color-orange-400),var(--color-beige-200));background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:textGradient 6s ease-in-out infinite} .course-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;transition:all var(--motion-base) var(--ease-premium);position:relative} .course-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--color-orange-500),var(--color-green-500));opacity:0;transition:opacity var(--motion-base)} .course-card:hover{transform:translateY(-3px);border-color:rgba(214,198,178,0.2);box-shadow:var(--glow-beige)} .course-card:hover::before{opacity:1} .course-card__image{width:100%;height:180px;background:var(--color-bg-700);display:flex;align-items:center;justify-content:center;font-size:3rem} .course-card__body{padding:1.5rem} .course-card__badge{display:inline-flex;padding:0.25rem 0.6rem;border-radius:6px;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem} .course-card__badge--orange{background:rgba(201,110,77,0.15);color:var(--color-orange-400)} .course-card__badge--green{background:rgba(76,154,122,0.15);color:var(--color-green-400)} .course-card__badge--blue{background:rgba(58,109,140,0.15);color:var(--color-blue-400)} .course-card__title{font-size:1.1rem;font-weight:700;color:var(--color-text-primary);margin-bottom:0.5rem} .course-card__desc{font-size:0.88rem;color:var(--color-text-muted);line-height:1.6;margin-bottom:1rem} .course-card__meta{display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--color-text-muted)} .hero__logo-img{position:relative;z-index:20;width:320px;max-width:80%;height:auto;object-fit:contain;animation:logoFloat 6s ease-in-out infinite;filter:brightness(1.25) contrast(1.1) drop-shadow(0 0 40px rgba(255,230,200,0.4)) drop-shadow(0 0 80px rgba(214,198,178,0.2))} .quote-block{text-align:center;padding:4rem 2rem;max-width:900px;margin:2rem auto;background:linear-gradient(135deg,rgba(230,136,99,0.05),rgba(214,198,178,0.02));border-left:3px solid rgba(230,136,99,0.3);border-right:3px solid rgba(230,136,99,0.3);border-radius:12px} .quote-text{font-size:clamp(1.3rem,3vw,2rem);color:#F5F0E8;font-style:italic;line-height:1.5;margin-bottom:1rem;font-weight:300} .quote-author{color:#E68863;font-size:1rem;font-style:normal} .seo-faq-item{padding:1.5rem;background:rgba(214,198,178,0.04);border:1px solid rgba(214,198,178,0.12);border-radius:12px;margin-bottom:1.25rem} .seo-faq-item > h3{cursor:pointer;position:relative;padding-right:2rem} .seo-faq-item > h3::after{content:'+';position:absolute;right:0;color:#E68863;font-size:1.4rem} .seo-faq-item > p{max-height:0;overflow:hidden;transition:max-height 0.3s ease,margin-top 0.3s ease;margin-top:0} .seo-faq-item.open > p{max-height:500px;margin-top:0.75rem} .seo-faq-item.open > h3::after{content:'−'} .service-card{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:1.75rem;background:rgba(214,198,178,0.03);border:1px solid rgba(214,198,178,0.08);border-radius:14px;text-decoration:none;color:inherit;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);min-height:280px;overflow:hidden} .service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--color-orange-500),var(--color-orange-600));opacity:0;transition:opacity 0.3s cubic-bezier(0.16,1,0.3,1)} .service-card:hover{border-color:rgba(230,136,99,0.3);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.3),0 0 25px rgba(230,136,99,0.08)} .service-card:hover::before{opacity:1} .service-card__head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;gap:1rem} .service-card__icon{font-size:2rem;line-height:1;flex-shrink:0} .service-card__title{font-size:1.1rem;font-weight:600;color:#E7DCCF;margin-bottom:0.6rem;line-height:1.3} .service-card__desc{font-size:0.88rem;color:rgba(214,198,178,0.95);line-height:1.6} .service-card__more{margin-top:1rem;font-size:0.85rem;color:#E68863;font-weight:500} .service-card__more:hover{color:#F5F0E8} .service-card-price{display:inline-flex;flex-direction:column;align-items:flex-end;padding:0.4rem 0.85rem;background:linear-gradient(135deg,rgba(230,136,99,0.18),rgba(201,110,77,0.08));border:1px solid rgba(230,136,99,0.3);border-radius:10px;white-space:nowrap;flex-shrink:0;box-shadow:0 4px 12px rgba(201,110,77,0.12)} .service-card-price__value{font-size:1.05rem;font-weight:700;color:#FFD4B8;text-shadow:0 0 10px rgba(230,136,99,0.4);line-height:1.1} .service-card-price__note{font-size:0.7rem;font-weight:500;color:rgba(245,240,232,0.7);margin-top:0.15rem;letter-spacing:0.03em} .price-plaque{margin:1rem 0;padding:1rem 1.5rem;background:linear-gradient(135deg,rgba(214,198,178,0.08),rgba(214,198,178,0.03));border-top:1px solid rgba(230,136,99,0.2);border-bottom:1px solid rgba(230,136,99,0.2);text-align:center} .price-plaque--featured{background:linear-gradient(135deg,rgba(201,110,77,0.25),rgba(230,136,99,0.15));border-top-color:rgba(230,136,99,0.4);border-bottom-color:rgba(230,136,99,0.4)} .price-plaque__value{color:#E68863;font-size:2.4rem;font-weight:800;line-height:1.2;text-shadow:0 0 15px rgba(230,136,99,0.3)} .price-plaque--featured .price-plaque__value{color:#FFD4B8;text-shadow:0 0 30px rgba(230,136,99,0.5)} .price-plaque__note{font-size:0.8rem;color:rgba(245,240,232,0.65);margin-top:0.3rem}
+/* ─── 7. Cards ─── */
+.glass-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all var(--motion-base) var(--ease-premium);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-orange-500), transparent);
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--ease-premium);
+}
+
+.glass-card:hover {
+  border-color: rgba(214,198,178,0.28);
+  box-shadow: var(--glow-beige);
+  transform: translateY(-3px);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Value cards (smaller, about section) */
+.value-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: all var(--motion-base) var(--ease-premium);
+}
+
+.value-card:hover {
+  border-color: rgba(214,198,178,0.18);
+  box-shadow: 0 0 20px rgba(214,198,178,0.08);
+  transform: translateY(-2px);
+}
+
+.value-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.value-card__icon--orange { background: rgba(201,110,77,0.12); }
+.value-card__icon--green { background: rgba(76,154,122,0.12); }
+.value-card__icon--blue { background: rgba(58,109,140,0.12); }
+
+.value-card__title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.value-card__desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* Advantage cards */
+.advantage-card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 1.75rem;
+  transition: all var(--motion-base) var(--ease-premium);
+  position: relative;
+  overflow: hidden;
+}
+
+.advantage-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0;
+  transition: opacity var(--motion-base) var(--ease-premium);
+}
+
+.advantage-card:hover {
+  transform: translateY(-3px);
+}
+
+.advantage-card:hover::before {
+  opacity: 1;
+}
+
+.advantage-card--orange::before { background: var(--color-orange-500); }
+.advantage-card--green::before { background: var(--color-green-500); }
+.advantage-card--blue::before { background: var(--color-blue-500); }
+
+.advantage-card--orange:hover { border-color: rgba(201,110,77,0.25); box-shadow: 0 0 25px rgba(201,110,77,0.1); }
+.advantage-card--green:hover { border-color: rgba(76,154,122,0.25); box-shadow: 0 0 25px rgba(76,154,122,0.1); }
+.advantage-card--blue:hover { border-color: rgba(58,109,140,0.25); box-shadow: 0 0 25px rgba(58,109,140,0.1); }
+
+.advantage-card__icon { font-size: 1.6rem; margin-bottom: 0.75rem; }
+.advantage-card__title { font-weight: 700; font-size: 1.05rem; color: var(--color-text-primary); margin-bottom: 0.4rem; }
+.advantage-card__desc { font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.6; }
+
+
+/* ─── 10. Stats Bar ─── */
+.stats-bar__inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.stats-bar__number {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 0.25rem;
+}
+
+.stats-bar__number--beige { color: var(--color-beige-200); }
+.stats-bar__number--orange { color: var(--color-orange-400); }
+.stats-bar__number--green { color: var(--color-green-400); }
+.stats-bar__number--blue { color: var(--color-blue-400); }
+
+.stats-bar__label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+
+/* ─── 11. FAQ Accordion ─── */
+.faq-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all var(--motion-base) var(--ease-premium);
+}
+
+.faq-item:hover {
+  border-color: rgba(214,198,178,0.15);
+}
+
+.faq-item.open {
+  border-color: rgba(214,198,178,0.2);
+  box-shadow: 0 0 15px rgba(214,198,178,0.06);
+}
+
+.faq-item__question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--motion-fast);
+}
+
+.faq-item__question:hover {
+  color: var(--color-orange-400);
+}
+
+.faq-item__icon {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  transition: transform var(--motion-base) var(--ease-premium);
+  flex-shrink: 0;
+}
+
+.faq-item.open .faq-item__icon {
+  transform: rotate(45deg);
+}
+
+.faq-item__answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--motion-slow) var(--ease-smooth);
+}
+
+.faq-item__answer-inner {
+  padding: 0 1.5rem 1.25rem;
+  font-size: 0.92rem;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+
+/* ─── 12. CTA Block ─── */
+.cta__inner {
+  text-align: center;
+  padding: 3.5rem 2rem;
+  border-radius: 20px;
+  background: rgba(201,110,77,0.06);
+  border: 1px solid rgba(201,110,77,0.2);
+  box-shadow: 0 0 40px rgba(201,110,77,0.08);
+  animation: ctaGlow 8s ease-in-out infinite;
+}
+
+.cta__title {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  margin-bottom: 0.75rem;
+}
+
+.cta__desc {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+/* ─── 13. Contacts ─── */
+.contacts__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 2.5rem;
+}
+
+.contact-block {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.contact-block__label {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.contact-block__value {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+}
+
+.contact-block__value a:hover {
+  color: var(--color-orange-400);
+}
+
+
+/* ─── 19. Gradient Text ─── */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-beige-100), var(--color-orange-400), var(--color-beige-200));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: textGradient 6s ease-in-out infinite;
+}
+
+
+/* ─── 23. Course Cards ─── */
+.course-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all var(--motion-base) var(--ease-premium);
+  position: relative;
+}
+
+.course-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-orange-500), var(--color-green-500));
+  opacity: 0;
+  transition: opacity var(--motion-base);
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(214,198,178,0.2);
+  box-shadow: var(--glow-beige);
+}
+
+.course-card:hover::before {
+  opacity: 1;
+}
+
+.course-card__image {
+  width: 100%;
+  height: 180px;
+  background: var(--color-bg-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+}
+
+.course-card__body {
+  padding: 1.5rem;
+}
+
+.course-card__badge {
+  display: inline-flex;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.course-card__badge--orange { background: rgba(201,110,77,0.15); color: var(--color-orange-400); }
+.course-card__badge--green { background: rgba(76,154,122,0.15); color: var(--color-green-400); }
+.course-card__badge--blue { background: rgba(58,109,140,0.15); color: var(--color-blue-400); }
+
+.course-card__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.course-card__desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.course-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+
+/* ─── 28. Hero Logo Image ─── */
+.hero__logo-img {
+  position: relative;
+  z-index: 20;
+  width: 320px;
+  max-width: 80%;
+  height: auto;
+  object-fit: contain;
+  animation: logoFloat 6s ease-in-out infinite;
+  filter: brightness(1.25) contrast(1.1) drop-shadow(0 0 40px rgba(255,230,200,0.4)) drop-shadow(0 0 80px rgba(214,198,178,0.2));
+}
+
+
+/* === QUOTE BLOCK === */
+.quote-block {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  background: linear-gradient(135deg, rgba(230,136,99,0.05), rgba(214,198,178,0.02));
+  border-left: 3px solid rgba(230,136,99,0.3);
+  border-right: 3px solid rgba(230,136,99,0.3);
+  border-radius: 12px;
+}
+.quote-text {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  color: #F5F0E8;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-weight: 300;
+}
+.quote-author {
+  color: #E68863;
+  font-size: 1rem;
+  font-style: normal;
+}
+
+
+
+/* === SEO FAQ — collapsible === */
+.seo-faq-item {
+  padding: 1.5rem;
+  background: rgba(214,198,178,0.04);
+  border: 1px solid rgba(214,198,178,0.12);
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+}
+.seo-faq-item > h3 {
+  cursor: pointer;
+  position: relative;
+  padding-right: 2rem;
+}
+.seo-faq-item > h3::after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  color: #E68863;
+  font-size: 1.4rem;
+}
+.seo-faq-item > p {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, margin-top 0.3s ease;
+  margin-top: 0;
+}
+.seo-faq-item.open > p {
+  max-height: 500px;
+  margin-top: 0.75rem;
+}
+.seo-faq-item.open > h3::after {
+  content: '−';
+}
+
+
+/* === SERVICE CARDS (второстепенные страницы — Унифицированы с главной) ===
+   На главной странице услуги отображаются в виде карточек со следующей структурой:
+   иконка + цена-плашка в одной строке, название, описание, ссылка «Подробнее →».
+   Здесь — та же визуальная модель для всех карточек на второстепенных страницах. */
+.service-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem;
+  background: rgba(214,198,178,0.03);
+  border: 1px solid rgba(214,198,178,0.08);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 280px;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-orange-500), var(--color-orange-600));
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-card:hover {
+  border-color: rgba(230,136,99,0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 25px rgba(230,136,99,0.08);
+}
+
+.service-card:hover::before {
+  opacity: 1;
+}
+
+.service-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.service-card__icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.service-card__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #E7DCCF;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+.service-card__desc {
+  font-size: 0.88rem;
+  color: rgba(214,198,178,0.95);
+  line-height: 1.6;
+}
+
+.service-card__more {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #E68863;
+  font-weight: 500;
+}
+
+.service-card__more:hover {
+  color: #F5F0E8;
+}
+
+/* === ЦЕНОВАЯ ПЛАШКА — отдельный блок, как на главной ===
+   Большая, яркая, с background-gradient и text-shadow.
+   Эта плашка УНИФИЦИРОВАНА с главной страницей (раздел «Услуги»). */
+.service-card-price {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0.4rem 0.85rem;
+  background: linear-gradient(135deg, rgba(230,136,99,0.18), rgba(201,110,77,0.08));
+  border: 1px solid rgba(230,136,99,0.3);
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(201,110,77,0.12);
+}
+
+.service-card-price__value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #FFD4B8;
+  text-shadow: 0 0 10px rgba(230,136,99,0.4);
+  line-height: 1.1;
+}
+
+.service-card-price__note {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: rgba(245,240,232,0.7);
+  margin-top: 0.15rem;
+  letter-spacing: 0.03em;
+}
+
+/* Большая ценовая плашка — для PricingBlock и выделенных предложений */
+.price-plaque {
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(214,198,178,0.08), rgba(214,198,178,0.03));
+  border-top: 1px solid rgba(230,136,99,0.2);
+  border-bottom: 1px solid rgba(230,136,99,0.2);
+  text-align: center;
+}
+
+.price-plaque--featured {
+  background: linear-gradient(135deg, rgba(201,110,77,0.25), rgba(230,136,99,0.15));
+  border-top-color: rgba(230,136,99,0.4);
+  border-bottom-color: rgba(230,136,99,0.4);
+}
+
+.price-plaque__value {
+  color: #E68863;
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-shadow: 0 0 15px rgba(230,136,99,0.3);
+}
+
+.price-plaque--featured .price-plaque__value {
+  color: #FFD4B8;
+  text-shadow: 0 0 30px rgba(230,136,99,0.5);
+}
+
+.price-plaque__note {
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.65);
+  margin-top: 0.3rem;
+}
