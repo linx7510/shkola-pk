@@ -21,6 +21,38 @@
     contentTextarea.setAttribute("data-wysiwyg", "true");
     contentTextarea.style.display = "none";
 
+    // Find React's internal instance to properly update state
+    var reactKey = Object.keys(contentTextarea).find(function(k) {
+      return k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$") || k.startsWith("__reactProps$");
+    });
+    var reactPropsKey = Object.keys(contentTextarea).find(function(k) {
+      return k.startsWith("__reactProps$");
+    });
+
+    function setReactValue(value) {
+      // Method 1: Use native setter to trigger React's onChange
+      var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+      nativeInputValueSetter.call(contentTextarea, value);
+
+      // Method 2: Dispatch input event (React listens to this)
+      contentTextarea.dispatchEvent(new Event("input", { bubbles: true }));
+
+      // Method 3: Also call React's onChange directly if we found the props
+      if (reactPropsKey && contentTextarea[reactPropsKey] && contentTextarea[reactPropsKey].onChange) {
+        try {
+          var fakeEvent = {
+            target: contentTextarea,
+            currentTarget: contentTextarea,
+            type: "change",
+            bubbles: true,
+            preventDefault: function() {},
+            stopPropagation: function() {}
+          };
+          contentTextarea[reactPropsKey].onChange(fakeEvent);
+        } catch(e) {}
+      }
+    }
+
     var toolbar = document.createElement("div");
     toolbar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px 8px 0 0";
 
@@ -91,11 +123,7 @@
     document.head.appendChild(st);
 
     function sync() {
-      contentTextarea.value = editor.innerHTML;
-      var ev = new Event("input", {bubbles: true});
-      contentTextarea.dispatchEvent(ev);
-      var ce = new Event("change", {bubbles: true});
-      contentTextarea.dispatchEvent(ce);
+      setReactValue(editor.innerHTML);
     }
     editor.oninput = sync;
     editor.onblur = sync;
@@ -106,13 +134,26 @@
     wrapper.appendChild(editor);
     contentTextarea.parentElement.appendChild(wrapper);
 
-    var form = contentTextarea.closest("form");
-    if (form) form.addEventListener("submit", function() { contentTextarea.value = editor.innerHTML; });
-
-    setInterval(function() {
-      var sbtns = document.querySelectorAll('button[type="submit"]');
-      sbtns.forEach(function(b) { b.addEventListener("click", function() { contentTextarea.value = editor.innerHTML; }); });
-    }, 2000);
+    // Hook into Payload's save mechanism
+    // Payload uses React, so we need to intercept the form submit
+    // and also hook into any save button clicks
+    function hookSaveButtons() {
+      var allButtons = document.querySelectorAll("button");
+      allButtons.forEach(function(btn) {
+        var text = (btn.textContent || "").toLowerCase().trim();
+        if ((text.indexOf("save") !== -1 || text.indexOf("\u0441\u043E\u0445\u0440\u0430\u043D") !== -1 || btn.type === "submit") && !btn.getAttribute("data-wysiwyg-hooked")) {
+          btn.setAttribute("data-wysiwyg-hooked", "true");
+          btn.addEventListener("click", function() {
+            setReactValue(editor.innerHTML);
+            // Also try to force update after a tiny delay
+            setTimeout(function() { setReactValue(editor.innerHTML); }, 50);
+            setTimeout(function() { setReactValue(editor.innerHTML); }, 200);
+          }, true);
+        }
+      });
+    }
+    hookSaveButtons();
+    setInterval(hookSaveButtons, 1500);
   }
 
   if (document.readyState === "loading") {
