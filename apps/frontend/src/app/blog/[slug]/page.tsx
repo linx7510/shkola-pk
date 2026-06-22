@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Header from "@/components/Header";
+import CursorLight from "@/components/CursorLight";
+import BlogParticles from "@/components/BlogParticles";
 import Link from "next/link";
 import AIConsultant from "@/components/AIConsultant";
 
@@ -111,6 +113,8 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <>
       <Header />
+        <CursorLight />
+        <BlogParticles />
       <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
         <article style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--container-px)" }}>
           <Link
