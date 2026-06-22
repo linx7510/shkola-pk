@@ -21,41 +21,100 @@
     contentTextarea.setAttribute("data-wysiwyg", "true");
     contentTextarea.style.display = "none";
 
-    // Find React's internal instance to properly update state
-    var reactKey = Object.keys(contentTextarea).find(function(k) {
-      return k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$") || k.startsWith("__reactProps$");
-    });
     var reactPropsKey = Object.keys(contentTextarea).find(function(k) {
       return k.startsWith("__reactProps$");
     });
 
     function setReactValue(value) {
-      // Method 1: Use native setter to trigger React's onChange
       var nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
       nativeInputValueSetter.call(contentTextarea, value);
-
-      // Method 2: Dispatch input event (React listens to this)
       contentTextarea.dispatchEvent(new Event("input", { bubbles: true }));
-
-      // Method 3: Also call React's onChange directly if we found the props
       if (reactPropsKey && contentTextarea[reactPropsKey] && contentTextarea[reactPropsKey].onChange) {
         try {
-          var fakeEvent = {
-            target: contentTextarea,
-            currentTarget: contentTextarea,
-            type: "change",
-            bubbles: true,
-            preventDefault: function() {},
-            stopPropagation: function() {}
-          };
+          var fakeEvent = { target: contentTextarea, currentTarget: contentTextarea, type: "change", bubbles: true, preventDefault: function() {}, stopPropagation: function() {} };
           contentTextarea[reactPropsKey].onChange(fakeEvent);
         } catch(e) {}
       }
     }
 
     var toolbar = document.createElement("div");
-    toolbar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px 8px 0 0";
+    toolbar.style.cssText = "display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:#1a1a1a;border:1px solid #333;border-radius:8px 8px 0 0;align-items:center";
 
+    // === BLOCK TEMPLATES ===
+    var blocks = [
+      {
+        name: "\u275D \u0426\u0438\u0442\u0430\u0442\u0430",
+        html: '<blockquote><p>\u0412\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u0442\u0435\u043A\u0441\u0442 \u0446\u0438\u0442\u0430\u0442\u044B \u0441\u044E\u0434\u0430</p></blockquote>'
+      },
+      {
+        name: "\u2139\uFE0F \u0418\u043D\u0444\u043E-\u0431\u043B\u043E\u043A",
+        html: '<div class="info-box"><p>\u0412\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044E \u0441\u044E\u0434\u0430</p></div>'
+      },
+      {
+        name: "\u26A0\uFE0F \u041F\u0440\u0435\u0434\u0443\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435",
+        html: '<div class="warning-box"><p>\u0412\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u043F\u0440\u0435\u0434\u0443\u043F\u0440\u0435\u0436\u0434\u0435\u043D\u0438\u0435 \u0441\u044E\u0434\u0430</p></div>'
+      },
+      {
+        name: "\u2705 \u0423\u0441\u043F\u0435\u0445",
+        html: '<div class="success-box"><p>\u0412\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044E \u043E\u0431 \u0443\u0441\u043F\u0435\u0445\u0435 \u0441\u044E\u0434\u0430</p></div>'
+      },
+      {
+        name: "\u{1F4DD} \u041F\u0440\u0438\u0437\u044B\u0432 (CTA)",
+        html: '<div class="cta-block"><h3>\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A \u043F\u0440\u0438\u0437\u044B\u0432\u0430</h3><p>\u041E\u043F\u0438\u0448\u0438\u0442\u0435, \u0447\u0442\u043E \u043D\u0443\u0436\u043D\u043E \u0441\u0434\u0435\u043B\u0430\u0442\u044C</p><a href="#" class="btn">\u041A\u043D\u043E\u043F\u043A\u0430</a></div>'
+      },
+      {
+        name: "\u{1F4CA} \u0422\u0430\u0431\u043B\u0438\u0446\u0430",
+        html: '<table><thead><tr><th>\u041F\u0430\u0440\u0430\u043C\u0435\u0442\u0440</th><th>\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435</th></tr></thead><tbody><tr><td>\u041F\u0430\u0440\u0430\u043C\u0435\u0442\u0440 1</td><td>\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435 1</td></tr><tr><td>\u041F\u0430\u0440\u0430\u043C\u0435\u0442\u0440 2</td><td>\u0417\u043D\u0430\u0447\u0435\u043D\u0438\u0435 2</td></tr></tbody></table>'
+      },
+      {
+        name: "\u{1F4CB} \u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0438",
+        html: '<div class="cards-row"><div class="card-item"><h4>\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A 1</h4><p>\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u0435\u0440\u0432\u043E\u0439 \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438</p></div><div class="card-item"><h4>\u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A 2</h4><p>\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u0432\u0442\u043E\u0440\u043E\u0439 \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438</p></div></div>'
+      },
+      {
+        name: "\u2500 \u0420\u0430\u0437\u0434\u0435\u043B\u0438\u0442\u0435\u043B\u044C",
+        html: '<hr/>'
+      }
+    ];
+
+    // === BLOCKS DROPDOWN BUTTON ===
+    var blocksContainer = document.createElement("div");
+    blocksContainer.style.cssText = "position:relative;display:inline-block";
+
+    var blocksBtn = document.createElement("button");
+    blocksBtn.type = "button";
+    blocksBtn.innerHTML = "\u{1F4E6} \u0411\u043B\u043E\u043A\u0438";
+    blocksBtn.style.cssText = "padding:4px 10px;border-radius:4px;background:#C96E4D;border:1px solid #E68863;color:#fff;cursor:pointer;font-size:13px;font-weight:600";
+    blocksContainer.appendChild(blocksBtn);
+
+    var dropdown = document.createElement("div");
+    dropdown.style.cssText = "display:none;position:absolute;top:100%;left:0;background:#1a1a1a;border:1px solid #444;border-radius:8px;padding:4px;z-index:10000;min-width:180px;box-shadow:0 8px 30px rgba(0,0,0,0.5)";
+
+    blocks.forEach(function(blk) {
+      var item = document.createElement("div");
+      item.innerHTML = blk.name;
+      item.style.cssText = "padding:8px 12px;color:#e7dccf;cursor:pointer;border-radius:4px;font-size:13px;white-space:nowrap";
+      item.onmouseenter = function() { item.style.background = "rgba(230,136,99,0.15)"; };
+      item.onmouseleave = function() { item.style.background = "transparent"; };
+      item.onclick = function(e) {
+        e.preventDefault();
+        document.execCommand("insertHTML", false, blk.html);
+        editor.focus();
+        sync();
+        dropdown.style.display = "none";
+      };
+      dropdown.appendChild(item);
+    });
+
+    blocksContainer.appendChild(dropdown);
+    blocksBtn.onclick = function(e) {
+      e.preventDefault();
+      dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+    };
+    document.addEventListener("click", function(e) {
+      if (!blocksContainer.contains(e.target)) dropdown.style.display = "none";
+    });
+
+    // === STANDARD BUTTONS ===
     var btns = [
       {c:"bold",h:"<b>B</b>",t:"\u0416\u0438\u0440\u043D\u044B\u0439"},
       {c:"italic",h:"<i>I</i>",t:"\u041A\u0443\u0440\u0441\u0438\u0432"},
@@ -68,7 +127,6 @@
       {c:"insertUnorderedList",h:"\u2022 \u0421\u043F\u0438\u0441\u043E\u043A",t:"\u041C\u0430\u0440\u043A\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439"},
       {c:"insertOrderedList",h:"1. \u0421\u043F\u0438\u0441\u043E\u043A",t:"\u041D\u0443\u043C\u0435\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439"},
       {s:1},
-      {c:"formatBlock",v:"<blockquote>",h:"\u275D \u0426\u0438\u0442\u0430\u0442\u0430",t:"\u0426\u0438\u0442\u0430\u0442\u0430"},
       {c:"link",h:"\uD83D\uDD17",t:"\u0421\u0441\u044B\u043B\u043A\u0430"},
       {c:"image",h:"\uD83D\uDDBC",t:"\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435"},
       {s:1},
@@ -76,6 +134,14 @@
       {c:"redo",h:"\u21B7",t:"\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C"},
       {c:"removeFormat",h:"\u2715",t:"\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C"}
     ];
+
+    // Add blocks dropdown first
+    toolbar.appendChild(blocksContainer);
+
+    // Add separator
+    var sep1 = document.createElement("div");
+    sep1.style.cssText = "width:1px;background:#333;margin:0 4px";
+    toolbar.appendChild(sep1);
 
     for (var i = 0; i < btns.length; i++) {
       var b = btns[i];
@@ -119,12 +185,10 @@
     editor.innerHTML = contentTextarea.value || "";
 
     var st = document.createElement("style");
-    st.textContent = '[contenteditable] h2{font-size:22px;font-weight:700;color:#e7dccf;margin:20px 0 10px;padding-bottom:5px;border-bottom:2px solid rgba(230,136,99,0.3)}[contenteditable] h3{font-size:18px;font-weight:600;color:#e68863;margin:15px 0 8px}[contenteditable] p{margin:0 0 12px}[contenteditable] ul,[contenteditable] ol{margin:0 0 12px 20px}[contenteditable] li{margin-bottom:6px}[contenteditable] blockquote{border-left:3px solid rgba(230,136,99,0.4);padding:8px 0 8px 16px;margin:15px 0;color:rgba(214,198,178,0.8);font-style:italic;background:rgba(230,136,99,0.05);border-radius:0 8px 8px 0}[contenteditable] a{color:#e68863;text-decoration:underline}[contenteditable] img{max-width:100%;border-radius:12px;margin:10px 0}[contenteditable] table{width:100%;border-collapse:collapse;margin:15px 0}[contenteditable] th,[contenteditable] td{padding:8px;border:1px solid #333;text-align:left}[contenteditable] th{background:rgba(201,110,77,0.15);color:#e68863}[contenteditable]:focus{border-color:rgba(230,136,99,0.4)!important}[contenteditable]:empty:before{content:"\\041D\\0430\\0447\\043D\\0438\\0442\\0435 \\043F\\0435\\0447\\0430\\0442\\0430\\0442\\044C...";color:rgba(214,198,178,0.3)}';
+    st.textContent = '[contenteditable] h2{font-size:22px;font-weight:700;color:#e7dccf;margin:20px 0 10px;padding-bottom:5px;border-bottom:2px solid rgba(230,136,99,0.3)}[contenteditable] h3{font-size:18px;font-weight:600;color:#e68863;margin:15px 0 8px}[contenteditable] p{margin:0 0 12px}[contenteditable] ul,[contenteditable] ol{margin:0 0 12px 20px}[contenteditable] li{margin-bottom:6px}[contenteditable] blockquote{border-left:3px solid rgba(230,136,99,0.4);padding:8px 0 8px 16px;margin:15px 0;color:rgba(214,198,178,0.8);font-style:italic;background:rgba(230,136,99,0.05);border-radius:0 8px 8px 0}[contenteditable] a{color:#e68863;text-decoration:underline}[contenteditable] img{max-width:100%;border-radius:12px;margin:10px 0}[contenteditable] table{width:100%;border-collapse:collapse;margin:15px 0}[contenteditable] th,[contenteditable] td{padding:8px;border:1px solid #333;text-align:left}[contenteditable] th{background:rgba(201,110,77,0.15);color:#e68863}[contenteditable] .info-box{background:rgba(91,141,170,0.08);border-left:4px solid #5B8DAA;padding:12px 16px;border-radius:0 8px 8px 0;margin:15px 0}[contenteditable] .warning-box{background:rgba(201,110,77,0.08);border-left:4px solid #C96E4D;padding:12px 16px;border-radius:0 8px 8px 0;margin:15px 0}[contenteditable] .success-box{background:rgba(109,184,154,0.08);border-left:4px solid #6DB89A;padding:12px 16px;border-radius:0 8px 8px 0;margin:15px 0}[contenteditable] .cta-block{background:linear-gradient(135deg,rgba(201,110,77,0.12),rgba(214,198,178,0.04));border:1px solid rgba(201,110,77,0.25);border-radius:12px;padding:20px;text-align:center;margin:20px 0}[contenteditable] .cta-block h3{color:#E68863;margin-top:0}[contenteditable] .cta-block .btn{display:inline-block;padding:8px 20px;background:linear-gradient(135deg,#C96E4D,#E68863);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;margin-top:10px}[contenteditable] .cards-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:15px 0}[contenteditable] .card-item{background:rgba(214,198,178,0.04);border:1px solid rgba(214,198,178,0.1);border-radius:8px;padding:12px}[contenteditable] .card-item h4{color:#E68863;font-size:14px;font-weight:600;margin:0 0 4px}[contenteditable] .card-item p{margin:0;font-size:13px}[contenteditable] hr{border:none;height:1px;background:rgba(214,198,178,0.2);margin:20px 0}[contenteditable]:focus{border-color:rgba(230,136,99,0.4)!important}[contenteditable]:empty:before{content:"\\041D\\0430\\0447\\043D\\0438\\0442\\0435 \\043F\\0435\\0447\\0430\\0442\\0430\\0442\\044C...";color:rgba(214,198,178,0.3)}';
     document.head.appendChild(st);
 
-    function sync() {
-      setReactValue(editor.innerHTML);
-    }
+    function sync() { setReactValue(editor.innerHTML); }
     editor.oninput = sync;
     editor.onblur = sync;
 
@@ -134,21 +198,13 @@
     wrapper.appendChild(editor);
     contentTextarea.parentElement.appendChild(wrapper);
 
-    // Hook into Payload's save mechanism
-    // Payload uses React, so we need to intercept the form submit
-    // and also hook into any save button clicks
     function hookSaveButtons() {
       var allButtons = document.querySelectorAll("button");
       allButtons.forEach(function(btn) {
         var text = (btn.textContent || "").toLowerCase().trim();
         if ((text.indexOf("save") !== -1 || text.indexOf("\u0441\u043E\u0445\u0440\u0430\u043D") !== -1 || btn.type === "submit") && !btn.getAttribute("data-wysiwyg-hooked")) {
           btn.setAttribute("data-wysiwyg-hooked", "true");
-          btn.addEventListener("click", function() {
-            setReactValue(editor.innerHTML);
-            // Also try to force update after a tiny delay
-            setTimeout(function() { setReactValue(editor.innerHTML); }, 50);
-            setTimeout(function() { setReactValue(editor.innerHTML); }, 200);
-          }, true);
+          btn.addEventListener("click", function() { setReactValue(editor.innerHTML); setTimeout(function() { setReactValue(editor.innerHTML); }, 50); setTimeout(function() { setReactValue(editor.innerHTML); }, 200); }, true);
         }
       });
     }
@@ -156,11 +212,7 @@
     setInterval(hookSaveButtons, 1500);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initWysiwyg);
-  } else {
-    initWysiwyg();
-  }
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", initWysiwyg); } else { initWysiwyg(); }
   var obs = new MutationObserver(function() { initWysiwyg(); });
   document.addEventListener("DOMContentLoaded", function() { obs.observe(document.body, {childList: true, subtree: true}); });
   setInterval(initWysiwyg, 1500);

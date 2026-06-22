@@ -149,7 +149,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           {contentHtml && (
             <div
-              style={{ color: "rgba(214,198,178,0.75)", fontSize: "1.05rem", lineHeight: 1.8 }}
+              className="article-content"
               dangerouslySetInnerHTML={{ __html: contentHtml }}
             />
           )}

@@ -388,3 +388,140 @@ a.ci-value:hover { color:#E68863; }
   color: #E68863;
   transform: translateY(-2px);
 }
+
+/* === ARTICLE CONTENT STYLES === */
+.article-content {
+  color: rgba(214,198,178,0.85);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  font-family: Inter, system-ui, sans-serif;
+}
+.article-content > *:first-child { margin-top: 0; }
+.article-content h2 {
+  font-size: 1.6rem; font-weight: 700; color: #E7DCCF;
+  margin: 2.5rem 0 1rem; padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(230,136,99,0.3);
+}
+.article-content h3 {
+  font-size: 1.25rem; font-weight: 600; color: #E68863;
+  margin: 2rem 0 0.75rem;
+}
+.article-content p { margin: 0 0 1.2rem; }
+.article-content ul, .article-content ol { margin: 0 0 1.2rem 1.5rem; }
+.article-content li { margin-bottom: 0.5rem; }
+.article-content a { color: #E68863; text-decoration: underline; }
+.article-content a:hover { color: #F5F0E8; }
+.article-content img { max-width: 100%; border-radius: 12px; margin: 1.5rem 0; }
+.article-content strong { color: #F5F0E8; font-weight: 700; }
+.article-content em { color: #E7DCCF; }
+
+/* Цитата */
+.article-content blockquote {
+  border-left: 4px solid #C96E4D;
+  padding: 1rem 0 1rem 1.5rem;
+  margin: 2rem 0;
+  background: rgba(201,110,77,0.06);
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  color: #E7DCCF;
+  font-size: 1.1rem;
+}
+.article-content blockquote p { margin: 0; }
+
+/* Таблицы */
+.article-content table {
+  width: 100%; border-collapse: collapse; margin: 1.5rem 0;
+  font-size: 0.95rem; overflow: hidden; border-radius: 12px;
+}
+.article-content th {
+  padding: 0.75rem 1rem; text-align: left;
+  background: rgba(201,110,77,0.15); color: #E68863;
+  font-weight: 600; border-bottom: 2px solid rgba(201,110,77,0.3);
+}
+.article-content td {
+  padding: 0.65rem 1rem; border-bottom: 1px solid rgba(214,198,178,0.08);
+  color: rgba(214,198,178,0.9);
+}
+
+/* Инфо-блок */
+.article-content .info-box {
+  background: rgba(91,141,170,0.08);
+  border: 1px solid rgba(91,141,170,0.25);
+  border-left: 4px solid #5B8DAA;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 12px 12px 0;
+  margin: 1.5rem 0;
+}
+.article-content .info-box p { margin: 0; }
+
+/* Предупреждение */
+.article-content .warning-box {
+  background: rgba(201,110,77,0.08);
+  border: 1px solid rgba(201,110,77,0.25);
+  border-left: 4px solid #C96E4D;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 12px 12px 0;
+  margin: 1.5rem 0;
+}
+.article-content .warning-box p { margin: 0; }
+
+/* Успех */
+.article-content .success-box {
+  background: rgba(109,184,154,0.08);
+  border: 1px solid rgba(109,184,154,0.25);
+  border-left: 4px solid #6DB89A;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0 12px 12px 0;
+  margin: 1.5rem 0;
+}
+.article-content .success-box p { margin: 0; }
+
+/* CTA-блок */
+.article-content .cta-block {
+  background: linear-gradient(135deg, rgba(201,110,77,0.12), rgba(214,198,178,0.04));
+  border: 1px solid rgba(201,110,77,0.25);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+.article-content .cta-block h3 {
+  margin-top: 0; color: #E68863;
+}
+.article-content .cta-block .btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #C96E4D, #E68863);
+  color: #fff !important;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+/* Карточки */
+.article-content .cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.article-content .card-item {
+  background: rgba(214,198,178,0.04);
+  border: 1px solid rgba(214,198,178,0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+.article-content .card-item h4 {
+  color: #E68863; font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem;
+}
+.article-content .card-item p { margin: 0; font-size: 0.9rem; }
+
+/* Разделитель */
+.article-content hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(214,198,178,0.2), transparent);
+  margin: 2.5rem 0;
+}
