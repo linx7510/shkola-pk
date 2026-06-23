@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import "./styles/tokens.css";
 import "./styles/layout.css";
@@ -7,7 +8,9 @@ import "./styles/animations.css";
 import "./styles/components.css";
 import "./header-mobile.css";
 import Footer from "@/components/Footer";
-import FloatingChatButton from "@/components/FloatingChatButton";
+import dynamic from "next/dynamic";
+
+const FloatingChatButton = dynamic(() => import("@/components/FloatingChatButton"), { loading: () => null });
 
 export const metadata: Metadata = {
   title: {
@@ -43,6 +46,8 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
 };
+
+const METRIKA_ID = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || "53164504";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -92,22 +97,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             {"@type": "Question", "name": "Что такое модель С500?", "acceptedAnswer": {"@type": "Answer", "text": "Авторская методика Велеслава Старкова, структурирующая процесс создания и ведения потребительского общества в пять этапов. Ни один ПК, созданный по модели С500, не был ликвидирован по решению ФНС."}}
           ]
         })}} />
+
         {children}
-        <FloatingChatButton />
+
         <Footer />
-      
-        {/* Yandex.Metrika counter */}
-        <script
-          type="text/javascript"
-          dangerouslySetInnerHTML={{
-            __html: `(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || 53164504}, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,trackHash:true,ecommerce:"dataLayer"});`,
-          }}
-        />
+        <FloatingChatButton />
+
+        {/* Yandex.Metrika counter — loaded via next/script for proper async (afterInteractive) */}
+        <Script id="yandex-metrika-init" strategy="afterInteractive">
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,trackHash:true,ecommerce:"dataLayer"});`}
+        </Script>
         <noscript>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`https://mc.yandex.ru/watch/${process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || 53164504}`}
+              src={`https://mc.yandex.ru/watch/${METRIKA_ID}`}
               style={{ position: 'absolute', left: '-9999px' }}
               alt=""
             />

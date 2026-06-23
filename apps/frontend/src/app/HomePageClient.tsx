@@ -4,7 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
 const CursorLight = dynamic(() => import("@/components/CursorLight"), { ssr: false });
-import BlogParticles from "@/components/BlogParticles";
+const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
 import Reveal from "@/components/Reveal";
 import { BlockRenderer } from "@/components/BlockRenderer";
 
