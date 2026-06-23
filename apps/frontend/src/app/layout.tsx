@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { headers } from "next/headers";
 import "./globals.css";
 import "./styles/tokens.css";
 import "./styles/layout.css";
@@ -49,7 +50,10 @@ export const metadata: Metadata = {
 
 const METRIKA_ID = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || "53164504";
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Read nonce from middleware-set request header
+  const nonce = (await headers()).get("x-nonce") || "";
+
   return (
     <html lang="ru">
       <head>
@@ -59,8 +63,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="twitter:data2" content="@Veles_ST" />
       </head>
       <body className="antialiased">
-        <script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
+        <script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} nonce={nonce} />
+        <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{__html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "EducationalOrganization",
           "name": "Школа ПК — Первая онлайн Школа Потребительской кооперации",
@@ -85,7 +89,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           "email": "boss@2980738.ru",
           "sameAs": ["https://t.me/Veles_ST"]
         })}} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
+        <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{__html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "FAQPage",
           "mainEntity": [
@@ -103,8 +107,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Footer />
         <FloatingChatButton />
 
-        {/* Yandex.Metrika counter — loaded via next/script for proper async (afterInteractive) */}
-        <Script id="yandex-metrika-init" strategy="afterInteractive">
+        {/* Yandex.Metrika counter — loaded via next/script with nonce for CSP */}
+        <Script id="yandex-metrika-init" strategy="afterInteractive" nonce={nonce}>
           {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,trackHash:true,ecommerce:"dataLayer"});`}
         </Script>
         <noscript>
