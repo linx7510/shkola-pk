@@ -1,8 +1,8 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-// import { seoPlugin } from '@payloadcms/plugin-seo'  # DISABLED: importmap bug
-// import { s3Storage } from '@payloadcms/storage-s3'  # DISABLED
+import { seoPlugin } from '@payloadcms/plugin-seo'
+import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -55,7 +55,7 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const plugins: any[] = [
-/* DISABLED: S3 importmap bug
+/* S3 storage — restored P1-4
   s3Storage({
     collections: {
       media: {
@@ -74,7 +74,7 @@ const plugins: any[] = [
     },
   }), */
 
-/* DISABLED: SEO plugin importmap bug
+/* SEO plugin — restored P1-4
   seoPlugin({
     collections: ['blog-posts', 'courses', 'glossary-terms', 'pages'],
     uploadsCollection: 'media',
@@ -105,7 +105,13 @@ export default buildConfig({
     migrationDir: path.resolve(dirname, 'src/migrations'),
     pool: { connectionString: process.env.DATABASE_URL },
   }),
-  secret: process.env.PAYLOAD_SECRET || 'default-secret-change-me',
+  secret: (() => {
+    const s = process.env.PAYLOAD_SECRET;
+    if (!s || s.length < 32) {
+      throw new Error('PAYLOAD_SECRET must be set and be at least 32 chars long. Set it in .env');
+    }
+    return s;
+  })(),
   typescript: { outputFile: path.resolve(dirname, 'src/payload-types.ts') },
   graphQL: { disable: false },
   cors: ['http://2980738.ru', 'https://2980738.ru', 'http://localhost:3000', 'http://frontend:3000'],

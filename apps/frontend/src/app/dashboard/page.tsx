@@ -46,33 +46,33 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const token = "";  // auth_token cookie is sent automatically
+    if (false) {  // check moved to /api/auth/me response below
       router.push("/login");
       return;
     }
 
     // Fetch user
     fetch("/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
+      // auth_token cookie sent automatically
     })
       .then((r) => r.json())
       .then((data) => {
         if (data.error) {
-          localStorage.removeItem("token");
+          fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
           router.push("/login");
           return;
         }
         setUser(data);
       })
       .catch(() => {
-        localStorage.removeItem("token");
+        fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
         router.push("/login");
       });
 
     // Fetch enrollments with progress
     fetch("/api/progress", {
-      headers: { Authorization: `Bearer ${token}` },
+      // auth_token cookie sent automatically
     })
       .then((r) => r.json())
       .then((data) => {
@@ -85,19 +85,19 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleEnroll = async (courseId: string) => {
-    const token = localStorage.getItem("token");
+    const token = "";  // auth_token cookie is sent automatically
     if (!token) return;
     try {
       const res = await fetch("/api/enroll", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" }, // auth_token cookie sent automatically
         body: JSON.stringify({ courseId }),
       });
       const data = await res.json();
       if (data.enrollment) {
         // Refetch progress
         const progressRes = await fetch("/api/progress", {
-          headers: { Authorization: `Bearer ${token}` },
+          // auth_token cookie sent automatically
         });
         const progressData = await progressRes.json();
         if (progressData.enrollments) {
@@ -110,17 +110,17 @@ export default function DashboardPage() {
   };
 
   const toggleLesson = async (lessonId: string, currentCompleted: boolean) => {
-    const token = localStorage.getItem("token");
+    const token = "";  // auth_token cookie is sent automatically
     if (!token) return;
     try {
       await fetch("/api/progress", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" }, // auth_token cookie sent automatically
         body: JSON.stringify({ lessonId, completed: !currentCompleted }),
       });
       // Refetch
       const progressRes = await fetch("/api/progress", {
-        headers: { Authorization: `Bearer ${token}` },
+        // auth_token cookie sent automatically
       });
       const progressData = await progressRes.json();
       if (progressData.enrollments) {
@@ -132,7 +132,7 @@ export default function DashboardPage() {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     router.push("/");
   };
 

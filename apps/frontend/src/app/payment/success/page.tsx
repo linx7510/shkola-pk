@@ -19,12 +19,12 @@ function PaymentSuccessContent() {
 
     if (isTest) {
       // Test mode — simulate payment completion
-      const token = localStorage.getItem("token");
+      const token = "";  // auth_token cookie sent automatically
       if (token) {
         // Auto-complete test payment
         fetch("/api/payment/complete-test", {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: { "Content-Type": "application/json" }, // auth_token cookie sent automatically
           body: JSON.stringify({ orderId }),
         }).then(() => setStatus("test")).catch(() => setStatus("error"));
       } else {

@@ -43,14 +43,17 @@ export default function BlogEditor({ params }: { params: Promise<{ id: string }>
     if (!post || !editorRef.current) return;
     setSaving(true);
     setSaved(false);
-    const token = localStorage.getItem("token") || "";
+    // Token is now in httpOnly cookie; for admin API calls we fetch it via /api/auth/me
+    const meRes = await fetch("/api/auth/me");
+    const meData = meRes.ok ? await meRes.json() : null;
+    const token = meData?.user ? "from-cookie" : "";  // cookie will be sent automatically
     const html = editorRef.current.innerHTML;
     try {
       const res = await fetch("/api/blog-posts/" + postId, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: "Bearer " + token } : {}),
+          // auth_token cookie sent automatically
         },
         body: JSON.stringify({
           title: post.title,

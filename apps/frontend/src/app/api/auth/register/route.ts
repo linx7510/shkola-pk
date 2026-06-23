@@ -5,18 +5,15 @@ const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting: 3 регистрации / час с одного IP
     const ip = getClientIp(request)
     const rateLimit = checkRateLimit(ip, 'register')
-    
+
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Слишком много попыток регистрации. Попробуйте позже.' },
-        { 
+        {
           status: 429,
-          headers: {
-            'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)),
-          }
+          headers: { 'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) }
         }
       )
     }
@@ -25,21 +22,14 @@ export async function POST(request: NextRequest) {
     const { email, password, name, phone } = body
 
     if (!email || !password || !name) {
-      return NextResponse.json(
-        { error: 'Email, пароль и имя обязательны' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Email, пароль и имя обязательны' }, { status: 400 })
     }
 
     if (password.length < 6) {
-      return NextResponse.json(
-        { error: 'Пароль минимум 6 символов' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Пароль минимум 6 символов' }, { status: 400 })
     }
 
-    // Create user via Payload CMS API
-    const res = await fetch("" + PAYLOAD_API_URL + "/api/users", {
+    const res = await fetch(`${PAYLOAD_API_URL}/api/users`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -68,33 +58,21 @@ export async function POST(request: NextRequest) {
 
     const data = await res.json()
 
-    // Auto-login: call Payload login to get token
-    const loginRes = await fetch("" + PAYLOAD_API_URL + "/api/users/login", {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-
-    if (!loginRes.ok) {
-      return NextResponse.json({
-        user: { id: data.doc.id, email: data.doc.email, name: data.doc.name, role: data.doc.role },
-      }, { status: 201 })
-    }
-
-    const loginData = await loginRes.json()
-
+    // Don't auto-login — user must verify email first
+    // No cookie is set; user needs to click verification link in email, then login
     return NextResponse.json({
       user: {
         id: data.doc.id,
         email: data.doc.email,
         name: data.doc.name,
         role: data.doc.role,
+        verified: data.doc._verified || false,
       },
-      token: loginData.token,
+      message: 'На указанный email отправлена ссылка для подтверждения. Проверьте почту и завершите регистрацию.',
+      requireVerification: true,
     }, { status: 201 })
   } catch (error) {
     console.error('Register error:', error)
     return NextResponse.json({ error: 'Ошибка при регистрации' }, { status: 500 })
   }
 }
-

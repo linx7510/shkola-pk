@@ -85,9 +85,9 @@ export default function ClientDashboard() {
 
   useEffect(() => {
     // Fetch client projects from Payload API
-    const token = localStorage.getItem('token');
+    const token = '';  // auth_token cookie sent automatically
     fetch('/api/client-projects/me', {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      // auth_token cookie sent automatically
     })
       .then((r) => r.json())
       .then((data) => {

@@ -47,8 +47,8 @@ export default function RegisterPage() {
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      
       router.push("/dashboard");
     } catch {
       setError("Ошибка подключения к серверу");

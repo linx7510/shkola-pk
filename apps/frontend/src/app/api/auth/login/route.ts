@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter'
 import { Pool } from 'pg'
+import { buildAuthCookieHeader } from '@/lib/api-middleware'
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
-// Pool для audit_logs (в shkola_pk БД)
 const auditPool = new Pool({
-  connectionString: process.env.DATABASE_URL  // Одна БД
+  connectionString: process.env.DATABASE_URL
 })
 
 async function logFailedLogin(email: string, ip: string | null, userAgent: string | null) {
@@ -19,7 +19,6 @@ async function logFailedLogin(email: string, ip: string | null, userAgent: strin
       [id, null, 'login_failed', 'user', JSON.stringify({ email }), ip, userAgent ? userAgent.slice(0, 500) : null]
     )
   } catch (e) {
-    // Silent fail — don't block login flow
     console.error('[audit] Failed to log login failure:', e)
   }
 }
@@ -28,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request)
     const rateLimit = checkRateLimit(ip, 'login')
-    
+
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Слишком много попыток входа. Попробуйте позже.' },
@@ -52,7 +51,6 @@ export async function POST(request: NextRequest) {
     })
 
     if (!res.ok) {
-      // ═══ ЛОГИРУЕМ НЕУДАЧНЫЙ ЛОГИН ═══
       const userAgent = request.headers.get('user-agent') || ''
       await logFailedLogin(email, ip, userAgent)
 
@@ -65,6 +63,14 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await res.json()
+
+    // ═══ ПРОВЕРКА ПОДТВЕРЖДЕНИЯ EMAIL ═══
+    if (data.user._verified === false) {
+      return NextResponse.json(
+        { error: 'Email не подтверждён. Проверьте почту и перейдите по ссылке для активации аккаунта.', requireVerification: true },
+        { status: 403 }
+      )
+    }
 
     // Логируем успешный логин
     try {
@@ -80,12 +86,19 @@ export async function POST(request: NextRequest) {
       console.error('[audit] Failed to log login success:', e)
     }
 
-    return NextResponse.json({
+    // ═══ УСТАНАВЛИВАЕМ httpOnly COOKIE ═══
+    // Token also returned in body for API clients, but browser will use cookie
+    const response = NextResponse.json({
       user: { id: data.user.id, email: data.user.email, name: data.user.name, role: data.user.role, avatar: data.user.avatar },
-      token: data.token,
+      token: data.token, // still return for API clients
     }, {
-      headers: { 'X-RateLimit-Remaining': String(rateLimit.remaining) }
+      headers: {
+        'X-RateLimit-Remaining': String(rateLimit.remaining),
+        'Set-Cookie': buildAuthCookieHeader(data.token),
+      }
     })
+
+    return response
   } catch (error: any) {
     console.error('Login error:', error)
     return NextResponse.json({ error: 'Внутренняя ошибка сервера' }, { status: 500 })
