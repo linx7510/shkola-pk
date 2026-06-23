@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import FaqListClient from "./FaqListClient";
-import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -49,7 +48,6 @@ export default async function FaqPage() {
     <>
       <Header />
       <FaqListClient items={items} />
-      <AIConsultant />
     </>
   );
 }

@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import GlossaryListClient from "./GlossaryListClient";
-import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -34,7 +33,6 @@ export default async function GlossaryPage() {
     <>
       <Header />
       <GlossaryListClient terms={terms} />
-      <AIConsultant />
     </>
   );
 }

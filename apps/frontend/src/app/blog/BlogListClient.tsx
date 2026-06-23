@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import BlogParticles from "@/components/BlogParticles";
 
 interface BlogPost {
   id: string;
@@ -69,7 +68,6 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
 
   return (
     <>
-    <BlogParticles />
     <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
       <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "0 var(--container-px)" }}>
         {/* Заголовок */}

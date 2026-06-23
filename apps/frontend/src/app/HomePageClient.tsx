@@ -437,16 +437,6 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
         </div>
       </section>
 
-      {/* ===== QUOTE ===== */}
-      <section style={{padding:"2rem 0", background:"rgba(214,198,178,0.02)"}}>
-        <div style={I}>
-          <blockquote className="quote-block">
-            <p className="quote-text">{quoteData?.text || "«Кооперация — это не бизнес-модель. Это архитектура доверия.»"}</p>
-            <cite className="quote-author">— {quoteData?.author || "Велеслав Старков"}</cite>
-          </blockquote>
-        </div>
-      </section>
-
       {/* ===== ADVANTAGES (TABLE) ===== */}
       <section id="advantages" style={{...S,background:"rgba(214,198,178,0.02)"}}>
         <div style={I}>
@@ -500,6 +490,16 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ===== QUOTE ===== */}
+      <section style={{padding:"2rem 0", background:"rgba(214,198,178,0.02)"}}>
+        <div style={I}>
+          <blockquote className="quote-block">
+            <p className="quote-text">{quoteData?.text || "«Кооперация — это не бизнес-модель. Это архитектура доверия.»"}</p>
+            <cite className="quote-author">— {quoteData?.author || "Велеслав Старков"}</cite>
+          </blockquote>
         </div>
       </section>
 
