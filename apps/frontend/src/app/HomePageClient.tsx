@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
-import CursorLight from "@/components/CursorLight";
+import dynamic from "next/dynamic";
+const CursorLight = dynamic(() => import("@/components/CursorLight"), { ssr: false });
 import BlogParticles from "@/components/BlogParticles";
 import Reveal from "@/components/Reveal";
 import { BlockRenderer } from "@/components/BlockRenderer";

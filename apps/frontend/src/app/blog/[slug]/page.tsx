@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Header from "@/components/Header";
-import CursorLight from "@/components/CursorLight";
-import BlogParticles from "@/components/BlogParticles";
+const CursorLight = dynamic(() => import("@/components/CursorLight"));
+const BlogParticles = dynamic(() => import("@/components/BlogParticles"));
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
