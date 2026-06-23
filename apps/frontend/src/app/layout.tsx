@@ -51,12 +51,17 @@ export const metadata: Metadata = {
 const METRIKA_ID = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || "53164504";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  // Read nonce from middleware-set request header
   const nonce = (await headers()).get("x-nonce") || "";
 
   return (
     <html lang="ru">
       <head>
+        {/* Preload LCP image — hero logo (35KB webp) */}
+        <link rel="preload" as="image" href="/images/hero-logo.webp" fetchPriority="high" />
+        {/* Preconnect to Yandex Metrika origin (saves DNS+TLS on tag.js fetch) */}
+        <link rel="preconnect" href="https://mc.yandex.ru" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://mc.yandex.ru" />
+
         <meta name="twitter:label1" content="Телефон" />
         <meta name="twitter:data1" content="+7 (902) 472-07-38" />
         <meta name="twitter:label2" content="Telegram" />
@@ -107,9 +112,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <Footer />
         <FloatingChatButton />
 
-        {/* Yandex.Metrika counter — loaded via next/script with nonce for CSP */}
-        <Script id="yandex-metrika-init" strategy="afterInteractive" nonce={nonce}>
-          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,trackHash:true,ecommerce:"dataLayer"});`}
+        {/* Yandex.Metrika counter — strategy="lazyOnload" loads during browser idle time,
+            does NOT block main thread during initial render.
+            Initial pageview still tracked via inline ym() call below. */}
+        <Script id="yandex-metrika-init" strategy="lazyOnload" nonce={nonce}>
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,trackHash:true,ecommerce:"dataLayer",defer:true});`}
         </Script>
         <noscript>
           <div>
