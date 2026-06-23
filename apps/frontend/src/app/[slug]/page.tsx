@@ -11,14 +11,13 @@ const PAYLOAD_API = process.env.PAYLOAD_API_URL
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://2980738.ru'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 300 // ISR: revalidate every 5 minutes
 
 async function fetchPage(slug: string) {
   try {
     const res = await fetch(
       `${PAYLOAD_API}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&where[isPublished][equals]=true&depth=1&limit=1`,
-      { cache: 'no-store' }
+      { next: { revalidate: 300 } }
     )
     if (!res.ok) return null
     const data = await res.json()

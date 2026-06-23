@@ -4,7 +4,7 @@ module.exports = {
       name: "shkola-pk-cms",
       script: "node_modules/next/dist/bin/next",
       args: "start --port 3001",
-      cwd: "/var/www/shkola-pk/payload-cms",
+      cwd: "/var/www/shkola-pk/apps/payload",
       env: {
         NODE_ENV: "production",
       },
@@ -20,8 +20,8 @@ module.exports = {
     {
       name: "shkola-pk-frontend",
       script: "node_modules/next/dist/bin/next",
-      args: "start",
-      cwd: "/var/www/shkola-pk/app-payload",
+      args: "start --port 3000",
+      cwd: "/var/www/shkola-pk/apps/frontend",
       env: {
         NODE_ENV: "production",
         PORT: 3000,
@@ -37,4 +37,3 @@ module.exports = {
     },
   ],
 };
-

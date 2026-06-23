@@ -6,14 +6,13 @@ import AIConsultant from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300; // ISR: revalidate every 5 minutes
 
 async function fetchPage(slug: string) {
   try {
     const res = await fetch(
       `${PAYLOAD_API_URL}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&where[isPublished][equals]=true&depth=2&limit=1`,
-      { cache: "no-store" }
+      { next: { revalidate: 300 } }
     );
     if (!res.ok) return null;
     const data = await res.json();

@@ -48,12 +48,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru">
       <head>
-        <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"/>
-        <meta http-equiv="Pragma" content="no-cache"/>
-        <meta http-equiv="Expires" content="0"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
         <meta name="twitter:label1" content="Телефон" />
         <meta name="twitter:data1" content="+7 (902) 472-07-38" />
         <meta name="twitter:label2" content="Telegram" />
