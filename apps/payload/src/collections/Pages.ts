@@ -34,6 +34,15 @@ export const Pages: CollectionConfig = {
   access: { read: () => true },
   hooks: {
     ...createAuditHooks('page'),
+    beforeRead: [
+      ({ req }: any) => {
+        // Default sort: most recently updated first
+        if (!req.query || !req.query.sort) {
+          if (!req.query) req.query = {}
+          req.query.sort = '-updatedAt'
+        }
+      },
+    ],
   },
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
