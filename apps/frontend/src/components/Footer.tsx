@@ -1,7 +1,22 @@
 "use client"
+import { useState, useEffect } from "react";
 import Link from "next/link"
 
 export default function Footer() {
+  const [footerData, setFooterData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/globals/footer")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setFooterData(data); })
+      .catch(() => {});
+  }, []);
+
+  // Use footer data if available, otherwise null (fallback to hardcoded below)
+  const columns = footerData?.columns;
+  const copyright = footerData?.bottomBar?.copyright;
+  const contacts = footerData?.contacts;
+
   return (
     <footer style={{
       background: "rgba(13,12,10,0.95)",

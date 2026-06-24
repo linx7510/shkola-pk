@@ -16,7 +16,7 @@ const serviceLinks = [
   { label: "Полный прайс-лист", href: "/uslugi#pricing" },
 ];
 
-const navItems = [
+const defaultNavItems = [
   { label: "Курсы", href: "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" },
   { label: "Услуги для ПК", href: "/uslugi", dropdown: serviceLinks },
   { label: "Бесплатно", href: "/besplatno" },
@@ -29,6 +29,8 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [navItems, setNavItems] = useState(defaultNavItems);
+  const [headerData, setHeaderData] = useState<any>(null);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,6 +39,27 @@ export default function Header() {
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Fetch header global from CMS (with fallback to defaults)
+  useEffect(() => {
+    fetch("/api/globals/header")
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        setHeaderData(data);
+        if (Array.isArray(data.menuItems) && data.menuItems.length > 0) {
+          setNavItems(data.menuItems.map((item: any) => ({
+            label: item.label,
+            href: item.href,
+            openInNewTab: item.openInNewTab,
+            dropdown: item.hasDropdown && Array.isArray(item.dropdownItems)
+              ? item.dropdownItems.map((d: any) => ({ label: d.label, href: d.href }))
+              : undefined,
+          })));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {

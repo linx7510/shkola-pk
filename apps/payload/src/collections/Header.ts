@@ -2,7 +2,6 @@ import type { GlobalConfig } from 'payload'
 
 /**
  * Header Global — управление шапкой сайта (горизонтальное меню)
- * Упрощённая версия — без arrays внутри (массивы вынесены в отдельные поля-текст)
  */
 export const Header: GlobalConfig = {
   slug: 'header',
@@ -13,56 +12,59 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
-      name: 'menuItemsJson',
-      type: 'textarea',
-      label: 'Пункты меню (JSON)',
-      admin: {
-        description: 'JSON-массив пунктов меню. Формат: [{"label":"Курсы","href":"/kursy"},{"label":"Услуги","href":"/uslugi","dropdown":[{"label":"Аудит","href":"/uslugi#audit"}]}]. Оставьте пустым — будет использоваться меню по умолчанию из кода.',
-      },
+      name: 'menuItems',
+      type: 'array',
+      label: 'Пункты горизонтального меню',
+      labels: { singular: 'Пункт меню', plural: 'Пункты меню' },
+      fields: [
+        { name: 'label', type: 'text', required: true, label: 'Название пункта' },
+        { name: 'href', type: 'text', required: true, label: 'Ссылка (URL)' },
+        {
+          name: 'hasDropdown',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Есть выпадающее подменю',
+        },
+        {
+          name: 'dropdownItems',
+          type: 'array',
+          label: 'Подпункты выпадающего меню',
+          admin: { condition: (_, sibling) => sibling?.hasDropdown === true },
+          fields: [
+            { name: 'label', type: 'text', required: true, label: 'Название' },
+            { name: 'href', type: 'text', required: true, label: 'Ссылка' },
+          ],
+        },
+        {
+          name: 'openInNewTab',
+          type: 'checkbox',
+          defaultValue: false,
+          label: 'Открывать в новой вкладке',
+        },
+      ],
     },
     {
-      name: 'logoText',
-      type: 'text',
-      label: 'Текстовый логотип',
-      defaultValue: 'Школа ПК',
+      name: 'logo',
+      type: 'group',
+      label: 'Логотип в шапке',
+      fields: [
+        { name: 'image', type: 'upload', relationTo: 'media', label: 'Изображение логотипа' },
+        { name: 'text', type: 'text', label: 'Текстовый логотип', defaultValue: 'Школа ПК' },
+        { name: 'href', type: 'text', label: 'Ссылка при клике', defaultValue: '/' },
+      ],
     },
     {
-      name: 'logoImage',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Изображение логотипа (заменяет текст)',
+      name: 'rightBlock',
+      type: 'group',
+      label: 'Правый блок шапки (контакты/кнопка)',
+      fields: [
+        { name: 'phone', type: 'text', label: 'Телефон' },
+        { name: 'phoneHref', type: 'text', label: 'Ссылка телефона (tel:...)' },
+        { name: 'ctaText', type: 'text', label: 'Текст кнопки' },
+        { name: 'ctaHref', type: 'text', label: 'Ссылка кнопки' },
+      ],
     },
-    {
-      name: 'phone',
-      type: 'text',
-      label: 'Телефон в шапке',
-    },
-    {
-      name: 'phoneHref',
-      type: 'text',
-      label: 'Ссылка телефона (tel:...)',
-    },
-    {
-      name: 'ctaText',
-      type: 'text',
-      label: 'Текст кнопки (правый блок)',
-    },
-    {
-      name: 'ctaHref',
-      type: 'text',
-      label: 'Ссылка кнопки',
-    },
-    {
-      name: 'headCode',
-      type: 'textarea',
-      label: 'Код в HEAD (для шапки)',
-      admin: { position: 'sidebar', description: 'Дополнительный код в <head> для шапки (мета-теги, стили)' },
-    },
-    {
-      name: 'bodyCode',
-      type: 'textarea',
-      label: 'Код в BODY (для шапки)',
-      admin: { position: 'sidebar', description: 'Дополнительный код для шапки (скрипты, счётчики)' },
-    },
+    { name: 'headCode', type: 'textarea', label: 'Код в HEAD (для шапки)', admin: { position: 'sidebar', description: 'Дополнительный код в <head> для шапки' } },
+    { name: 'bodyCode', type: 'textarea', label: 'Код в BODY (для шапки)', admin: { position: 'sidebar', description: 'Дополнительный код для шапки' } },
   ],
 }
