@@ -12,6 +12,16 @@ export const Header: GlobalConfig = {
   },
   fields: [
     {
+      name: 'replaceDefaults',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Заменить стандартное меню',
+      admin: {
+        position: 'sidebar',
+        description: 'Если ВКЛ — пункты из CMS полностью заменят стандартное меню. Если ВЫКЛ — пункты из CMS добавятся к стандартным.',
+      },
+    },
+    {
       name: 'menuItems',
       type: 'array',
       label: 'Пункты горизонтального меню',

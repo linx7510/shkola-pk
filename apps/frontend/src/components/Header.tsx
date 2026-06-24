@@ -49,14 +49,21 @@ export default function Header() {
         if (!data) return;
         setHeaderData(data);
         if (Array.isArray(data.menuItems) && data.menuItems.length > 0) {
-          setNavItems(data.menuItems.map((item: any) => ({
+          const cmsItems: typeof defaultNavItems = data.menuItems.map((item: any) => ({
             label: item.label,
             href: item.href,
             openInNewTab: item.openInNewTab,
             dropdown: item.hasDropdown && Array.isArray(item.dropdownItems)
               ? item.dropdownItems.map((d: any) => ({ label: d.label, href: d.href }))
               : undefined,
-          })));
+          }));
+          // По умолчанию добавляем CMS-пункты К существующим (а не заменяем)
+          // Если в админке включён replaceDefaults — заменяем весь список
+          if (data.replaceDefaults === true) {
+            setNavItems(cmsItems);
+          } else {
+            setNavItems([...defaultNavItems, ...cmsItems]);
+          }
         }
       })
       .catch(() => {});
