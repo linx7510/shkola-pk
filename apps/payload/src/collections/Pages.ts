@@ -30,8 +30,12 @@ export const Pages: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'isPublished', 'updatedAt'],
     group: 'Контент',
     listSearchableFields: ['title', 'slug'],
+    
   },
   access: { read: () => true },
+  hooks: {
+    ...createAuditHooks('page'),
+  },
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг', admin: { position: 'sidebar' } },
@@ -52,8 +56,8 @@ export const Pages: CollectionConfig = {
       ],
     },
     { name: 'content', type: 'richText', label: 'Содержание (SEO)' },
-  { name: 'headCode', type: 'textarea', label: 'Код в HEAD', admin: { position: 'sidebar', description: 'Код для head' } },
-  { name: 'bodyCode', type: 'textarea', label: 'Код в BODY', admin: { position: 'sidebar', description: 'Код для body' } },
+    { name: 'headCode', type: 'textarea', label: 'Код в HEAD', admin: { position: 'sidebar', description: 'Код для head' } },
+    { name: 'bodyCode', type: 'textarea', label: 'Код в BODY', admin: { position: 'sidebar', description: 'Код для body' } },
     {
       name: 'blocks',
       type: 'blocks',
@@ -67,6 +71,5 @@ export const Pages: CollectionConfig = {
       ],
     },
   ],
-    hooks: createAuditHooks('page'),
   timestamps: true,
 }

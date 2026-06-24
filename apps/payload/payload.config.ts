@@ -24,6 +24,8 @@ import { Services } from './src/collections/Services'
 import { Enrollments } from './src/collections/Enrollments'
 import { LessonProgress } from './src/collections/LessonProgress'
 import { Settings } from './src/collections/Settings'
+import { Header } from './src/collections/Header'
+import { Footer } from './src/collections/Footer'
 
 // === Стандартные 9 блоков ===
 import { HeroBlock } from './src/blocks/HeroBlock'
@@ -89,7 +91,7 @@ export default buildConfig({
   },
   editor: lexicalEditor(),
   collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects],
-  globals: [Settings],
+  globals: [Settings, Header, Footer],
   // === 20 BLOCKS ===
   blocks: [
     HeroBlock, FeaturesBlock, CtaBlock, ContentBlock, FaqBlock,
