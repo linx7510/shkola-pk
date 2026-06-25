@@ -3,22 +3,23 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const serviceLinks = [
-  { label: "Аудит устава ПК", href: "/uslugi/audit-ustava" },
-  { label: "Пакет документов для ПК", href: "/uslugi#expertise" },
-  { label: "Разработка Положений", href: "/uslugi#expertise" },
-  { label: "Целевые программы", href: "/uslugi#target-programs" },
-  { label: "Налоговая и судебная практика", href: "/uslugi#tax-practice" },
-  { label: "Сопровождение при проверках", href: "/uslugi#tax-practice" },
-  { label: "Готовый ПК «под ключ»", href: "/uslugi#turnkey" },
-  { label: "Бухгалтерское сопровождение", href: "/uslugi#accounting" },
-  { label: "Обучение председателей", href: "/uslugi#education" },
-  { label: "Сайт для кооператива", href: "/uslugi#website" },
-  { label: "Полный прайс-лист", href: "/uslugi#pricing" },
+  { label: "Кооператив под ключ", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
+  { label: "Аудит устава ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" },
+  { label: "Пакет документов для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
+  { label: "Разработка Положений", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
+  { label: "Целевые программы", href: "/uslugi-dlya-potrebitelskih-kooperativov#target-programs" },
+  { label: "Налоговая и судебная практика", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
+  { label: "Сопровождение при проверках", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
+  { label: "Готовый ПК «под ключ»", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
+  { label: "Бухгалтерское сопровождение", href: "/uslugi-dlya-potrebitelskih-kooperativov#accounting" },
+  { label: "Обучение председателей", href: "/uslugi-dlya-potrebitelskih-kooperativov#education" },
+  { label: "Сайт для кооператива", href: "/uslugi-dlya-potrebitelskih-kooperativov#website" },
+  { label: "Полный прайс-лист", href: "/uslugi-dlya-potrebitelskih-kooperativov#pricing" },
 ];
 
 const defaultNavItems = [
   { label: "Курсы", href: "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" },
-  { label: "Услуги для ПК", href: "/uslugi", dropdown: serviceLinks },
+  { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov", dropdown: serviceLinks },
   { label: "Бесплатно", href: "/besplatno" },
   { label: "Консультации", href: "/potrebitelskiy-kooperativ-konsultatsii" },
   { label: "Блог", href: "/blog" },
