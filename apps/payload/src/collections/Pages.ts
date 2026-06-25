@@ -43,21 +43,6 @@ export const Pages: CollectionConfig = {
         }
       },
     ],
-    afterChange: [
-      async ({ doc, operation, req }: any) => {
-        // After any page change, bump home page's updatedAt so it stays on top
-        if (operation === 'update' || operation === 'create') {
-          // Don't bump if we're already updating home
-          if (doc.slug !== 'home') {
-            try {
-              const { pool } = await import('../lib/db')
-              await pool.query("UPDATE pages SET updated_at = NOW() + INTERVAL '1 second' WHERE slug = 'home'")
-            } catch (e) { /* silent */ }
-          }
-        }
-        return doc
-      },
-    ],
   },
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
