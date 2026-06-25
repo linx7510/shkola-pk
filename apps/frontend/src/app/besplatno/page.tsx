@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import { BlockRenderer } from "@/components/BlockRenderer";
-import AIConsultant
-import Breadcrumbs from "@/components/Breadcrumbs" from "@/components/AIConsultant";
+import AIConsultant from "@/components/AIConsultant";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
