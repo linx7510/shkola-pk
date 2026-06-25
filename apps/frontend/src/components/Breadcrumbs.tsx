@@ -26,14 +26,10 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
         {items.map((item, i) => (
           <li key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             {item.href && i < items.length - 1 ? (
-              <Link href={item.href} style={{
+              <Link href={item.href} className="breadcrumb-link" style={{
                 color: "rgba(184,149,106,0.7)",
                 textDecoration: "none",
-                transition: "color 0.15s",
-              }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "#B8956A"}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(184,149,106,0.7)"}
-              >
+              }}>
                 {item.label}
               </Link>
             ) : (
@@ -45,13 +41,11 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
           </li>
         ))}
       </ol>
+      <style>{`.breadcrumb-link:hover{color:#B8956A !important}`}</style>
     </nav>
   );
 }
 
-/**
- * Generate BreadcrumbList JSON-LD schema
- */
 export function breadcrumbJsonLd(items: Crumb[], baseUrl: string) {
   return {
     "@context": "https://schema.org",
