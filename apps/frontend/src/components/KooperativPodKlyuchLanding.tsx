@@ -18,11 +18,11 @@ const faqItems: FAQItem[] = [
 ];
 
 const benefits = [
-  { icon: "\u{1F4B0}", title: "НДС \u2014 0%", desc: "Ст. 149 НК РФ. Кооперативная цена = себестоимость. Налоговая база равна нулю." },
-  { icon: "\u{1F4CA}", title: "Налог на прибыль \u2014 0%", desc: "Ст. 251 НК РФ. Паевые взносы и кооперативные выплаты не являются доходом." },
-  { icon: "\u{1F9FE}", title: "НДФЛ с паёв \u2014 0%", desc: "Ст. 22 Закона \u2116 3085-1. Кооперативные выплаты \u2014 это не дивиденды." },
-  { icon: "\u{1F6E1}\uFE0F", title: "Защита активов", desc: "ПК не отвечает по долгам пайщиков. Неделимый фонд не подлежит разделу." },
-  { icon: "\u{1F4CB}", title: "31 документ", desc: "Устав, 13 Положений, 2 ЦПП, 10 образцов. Полный пакет за 25 дней." },
+  { icon: "💰", title: "НДС \u2014 0%", desc: "Ст. 149 НК РФ. Кооперативная цена = себестоимость. Налоговая база равна нулю." },
+  { icon: "📊", title: "Налог на прибыль \u2014 0%", desc: "Ст. 251 НК РФ. Паевые взносы и кооперативные выплаты не являются доходом." },
+  { icon: "🧾", title: "НДФЛ с паёв \u2014 0%", desc: "Ст. 22 Закона \u2116 3085-1. Кооперативные выплаты \u2014 это не дивиденды." },
+  { icon: "🛡\uFE0F", title: "Защита активов", desc: "ПК не отвечает по долгам пайщиков. Неделимый фонд не подлежит разделу." },
+  { icon: "📋", title: "31 документ", desc: "Устав, 13 Положений, 2 ЦПП, 10 образцов. Полный пакет за 25 дней." },
   { icon: "\u2705", title: "120+ ПК создано", desc: "Ни один не ликвидирован ФНС. Ни один не получил доначислений." },
 ];
 
@@ -43,7 +43,7 @@ const objections = [
   { q: "\u00abМожно сначала самому?\u00bb", a: "Можно. Но через год, когда ФНС придёт с проверкой \u2014 стоимость будет 300 000+ вместо 125 000 \u20bd." },
 ];
 
-const seoText = \`<h2>Кооператив под ключ \u2014 что это и зачем нужно</h2>
+const seoText = `<h2>Кооператив под ключ \u2014 что это и зачем нужно</h2>
 <p>\u00abКооператив под ключ\u00bb \u2014 это услуга, при которой вы получаете полностью готовый к регистрации потребительский кооператив: Устав, все Положения, Целевые потребительские программы, образцы документов и сопровождение до момента внесения записи в ЕГРЮЛ. Вам не нужно разбираться в юридических терминах, читать Закон \u2116 3085-1 или искать шаблоны в интернете.</p>
 <p>Зачем это нужно? Потребительский кооператив \u2014 это некоммерческая организация, которая освобождена от НДС (ст. 149 НК РФ), налога на прибыль (ст. 251 НК РФ) и НДФЛ с паевых взносов (ст. 217 НК РФ). Кооперативная цена равна себестоимости \u2014 налоговая база равна нулю. Но чтобы эта конструкция работала законно, каждый документ должен быть составлен безупречно.</p>
 
@@ -66,7 +66,7 @@ const seoText = \`<h2>Кооператив под ключ \u2014 что это 
 
 <h2>Сколько стоит кооператив под ключ</h2>
 <p>Тариф \u00abБазовый\u00bb (90 000 \u20bd) \u2014 25 документов, Устав по шаблону, 15 рабочих дней. Тариф \u00abПерсонифицированный\u00bb (125 000 \u20bd) \u2014 31 документ, индивидуальный Устав, 2 ЦПП, 2 месяца консалтинга, 25 рабочих дней. Для сравнения: налоговая экономия кооператива с оборотом 10 млн \u20bd/мес составляет около 2 млн \u20bd/мес. Стоимость пакета окупается за первую неделю работы кооператива.</p>
-\`;
+`;
 
 export default function KooperativPodKlyuchLanding() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -77,7 +77,7 @@ export default function KooperativPodKlyuchLanding() {
       {/* HERO */}
       <section style={{ padding: "4rem 1.5rem 3rem", textAlign: "center", maxWidth: 900, margin: "0 auto" }}>
         <div style={{ display: "inline-block", padding: "0.4rem 1rem", background: "rgba(184,149,106,0.15)", border: "1px solid rgba(184,149,106,0.3)", borderRadius: 100, fontSize: "0.8rem", color: "#B8956A", fontWeight: 600, marginBottom: "1.5rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-          \u{1F511} Услуга · Регистрация ПК
+          🔑 Услуга · Регистрация ПК
         </div>
         <h1 className="heading-sweep" data-text="Кооператив под ключ" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, color: "#E7DCCF", marginBottom: "1rem", lineHeight: 1.2 }}>
           Кооператив под ключ \u2014<br /><span style={{ color: "#B8956A" }}>законно, без рисков, за 25 дней</span>
@@ -235,8 +235,8 @@ export default function KooperativPodKlyuchLanding() {
           <h2 className="heading-sweep" data-text="Готовы начать?" style={{ color: "#E7DCCF", fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.75rem" }}>Готовы начать?</h2>
           <p style={{ color: "rgba(214,198,178,0.7)", fontSize: "1rem", marginBottom: "1.5rem" }}>Запишитесь на бесплатную консультацию \u2014 отвечу на все вопросы и помогу определить, подходит ли вам кооператив.</p>
           <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-            <a href="tel:+79024720738" className="btn-primary" style={{ display: "inline-block", padding: "0.85rem 2rem", fontSize: "1rem", textDecoration: "none" }}>\u{1F4DE} +7 (902) 472-07-38</a>
-            <a href="https://t.me/Veles_ST" target="_blank" rel="noopener" style={{ display: "inline-block", padding: "0.85rem 2rem", fontSize: "1rem", border: "1px solid rgba(214,198,178,0.2)", borderRadius: 8, color: "#D6C6B2", textDecoration: "none" }}>\u{1F4AC} Telegram @Veles_ST</a>
+            <a href="tel:+79024720738" className="btn-primary" style={{ display: "inline-block", padding: "0.85rem 2rem", fontSize: "1rem", textDecoration: "none" }}>📞 +7 (902) 472-07-38</a>
+            <a href="https://t.me/Veles_ST" target="_blank" rel="noopener" style={{ display: "inline-block", padding: "0.85rem 2rem", fontSize: "1rem", border: "1px solid rgba(214,198,178,0.2)", borderRadius: 8, color: "#D6C6B2", textDecoration: "none" }}>💬 Telegram @Veles_ST</a>
           </div>
           <p style={{ color: "rgba(214,198,178,0.4)", fontSize: "0.8rem", marginTop: "1.5rem" }}>Велеслав Старков · 120+ ПК с 2015 года · Закон РФ \u2116 3085-1</p>
         </div>
