@@ -12,7 +12,7 @@ const PAYLOAD_API = process.env.PAYLOAD_API_URL
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://2980738.ru'
 
-export const revalidate = 300 // ISR: revalidate every 5 minutes
+export const revalidate = 300
 
 async function fetchPage(slug: string) {
   try {
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
-    keywords: 'потребительский кооператив, кооперация, онлайн-обучение, защита активов, налоговая оптимизация, Велеслав Старков, регистрация ПК, обнуление НДС',
+    keywords: 'потребительский кооператив, кооперация, онлайн-обучение, защита активов, налоговая оптимизация, Велеслав Старков, регистрация ПК, обнуление НДС, паевой взнос',
     openGraph: {
       title,
       description,
@@ -90,6 +90,8 @@ export default async function SlugPage({ params }: Props) {
 
   const blocks = (page as any).blocks || (page as any).layout || []
   const hasBlocks = Array.isArray(blocks) && blocks.length > 0
+  const pageContent = (page as any).content
+  const hasContent = typeof pageContent === 'string' && pageContent.length > 0
 
   return (
     <>
@@ -99,9 +101,16 @@ export default async function SlugPage({ params }: Props) {
         { label: 'Главная', href: '/' },
         { label: (page as any).title || '' }
       ]} />
-      <main style={{ paddingTop: '5rem', minHeight: '60vh' }}>
+      <main style={{ paddingTop: '1rem', minHeight: '60vh' }}>
         {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
+        ) : hasContent ? (
+          <section style={{ padding: '4rem 1.5rem', maxWidth: 900, margin: '0 auto' }}>
+            <h1 className="heading-sweep" data-text={(page as any).title || ''} style={{ color: '#D6C6B2', marginBottom: '1.5rem', fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', fontWeight: 800 }}>
+              {(page as any).title}
+            </h1>
+            <div className="article-content" style={{ color: '#D6C6B2', lineHeight: 1.8, fontSize: '1.05rem' }} dangerouslySetInnerHTML={{ __html: pageContent }} />
+          </section>
         ) : (
           <section style={{ padding: '4rem 1.5rem', maxWidth: 800, margin: '0 auto' }}>
             <h1 className="heading-sweep" data-text={(page as any).title || ''} style={{ color: '#D6C6B2', marginBottom: '1rem' }}>
@@ -112,7 +121,6 @@ export default async function SlugPage({ params }: Props) {
             </p>
           </section>
         )}
-        {/* AI-консультант — точная копия блока с главной страницы */}
       </main>
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
         { label: 'Главная', href: '/' },
@@ -121,4 +129,3 @@ export default async function SlugPage({ params }: Props) {
     </>
   )
 }
-
