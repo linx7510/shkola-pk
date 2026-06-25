@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import dynamic from "next/dynamic";
 
 const FloatingChatButton = dynamic(() => import("@/components/FloatingChatButton"), { loading: () => null });
+const CookieConsent = dynamic(() => import("@/components/CookieConsent"), { loading: () => null });
 const GlobalParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
 
 export const metadata: Metadata = {
@@ -131,6 +132,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </div>
         </noscript>
         {/* /Yandex.Metrika counter */}
+        <CookieConsent />
       </body>
     </html>
   );

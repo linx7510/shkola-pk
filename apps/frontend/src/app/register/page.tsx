@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", passwordConfirm: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   const update = (field: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -20,6 +21,10 @@ export default function RegisterPage() {
 
     if (form.password.length < 6) {
       setError("Пароль минимум 6 символов");
+      return;
+    }
+    if (!consent) {
+      setError("Необходимо согласие на обработку персональных данных");
       return;
     }
     if (form.password !== form.passwordConfirm) {
@@ -174,6 +179,31 @@ export default function RegisterPage() {
               />
             </div>
 
+            <label
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.5rem",
+                fontSize: "0.8rem",
+                color: "var(--color-text-muted)",
+                marginBottom: "0.75rem",
+                cursor: "pointer",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                style={{ marginTop: "0.15rem", cursor: "pointer" }}
+              />
+              <span>
+                Я согласен на обработку персональных данных в соответствии с{" "}
+                <Link href="/politika-konfidentsialnosti" style={{ color: "#B8956A", textDecoration: "underline" }}>
+                  Политикой конфиденциальности
+                </Link>{" "}
+                (152-ФЗ)
+              </span>
+            </label>
             <button
               type="submit"
               className="btn-primary"
