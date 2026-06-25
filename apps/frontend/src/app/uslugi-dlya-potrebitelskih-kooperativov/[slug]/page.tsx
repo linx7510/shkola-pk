@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { BlockRenderer } from "@/components/BlockRenderer"
 import Header from "@/components/Header"
+import KooperativPodKlyuchLanding from "@/components/KooperativPodKlyuchLanding"
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL || "http://localhost:3001"
 
@@ -26,6 +27,17 @@ export default async function UslugiPodSlugPage({ params }: Props) {
   const page = await fetchPage(fullSlug)
   if (!page) notFound()
 
+  // Special landing page for kooperativ-pod-klyuch
+  if (slug === "kooperativ-pod-klyuch") {
+    return (
+      <>
+        <Header />
+        <KooperativPodKlyuchLanding />
+      </>
+    )
+  }
+
+  // Default rendering for other service pages
   const blocks = (page as any).blocks || (page as any).layout || []
   const hasBlocks = Array.isArray(blocks) && blocks.length > 0
   const pageContent = (page as any).content
