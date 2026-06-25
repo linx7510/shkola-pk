@@ -4,6 +4,8 @@ import Header from "@/components/Header";
 const CursorLight = dynamic(() => import("@/components/CursorLight"));
 const BlogParticles = dynamic(() => import("@/components/BlogParticles"));
 import Link from "next/link";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import dynamic from "next/dynamic";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
