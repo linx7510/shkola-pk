@@ -113,13 +113,23 @@
       "permanent": true
     },
     {
-      "source": "/uslugi/audit-ustava",
-      "destination": "/uslugi/audit-ustava-pk",
+      "source": "/konsultacii",
+      "destination": "/potrebitelskiy-kooperativ-konsultatsii",
       "permanent": true
     },
     {
-      "source": "/konsultacii",
-      "destination": "/potrebitelskiy-kooperativ-konsultatsii",
+      "source": "/uslugi/audit-ustava-pk",
+      "destination": "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
+      "permanent": true
+    },
+    {
+      "source": "/uslugi/audit-ustava",
+      "destination": "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
+      "permanent": true
+    },
+    {
+      "source": "/uslugi/kooperativ-pod-klyuch",
+      "destination": "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch",
       "permanent": true
     }
   ]
