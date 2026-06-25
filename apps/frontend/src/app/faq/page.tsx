@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs"
 import Header from "@/components/Header";
 import FaqListClient from "./FaqListClient";
 
@@ -47,6 +48,10 @@ export default async function FaqPage() {
   return (
     <>
       <Header />
+      <Breadcrumbs items={[
+        { label: "Главная", href: "/" },
+        { label: "FAQ" }
+      ]} />
       <FaqListClient items={items} />
     </>
   );

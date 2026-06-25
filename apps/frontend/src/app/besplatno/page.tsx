@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import { BlockRenderer } from "@/components/BlockRenderer";
-import AIConsultant from "@/components/AIConsultant";
+import AIConsultant
+import Breadcrumbs from "@/components/Breadcrumbs" from "@/components/AIConsultant";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -53,6 +54,10 @@ export default async function BesplatnoPage() {
   return (
     <>
       <Header />
+      <Breadcrumbs items={[
+        { label: "Главная", href: "/" },
+        { label: "Бесплатно" }
+      ]} />
       <main style={{ paddingTop: "5rem", minHeight: "60vh" }}>
         {Array.isArray(blocks) && blocks.length > 0 ? (
           <BlockRenderer blocks={blocks} />

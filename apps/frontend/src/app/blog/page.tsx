@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs"
 import Header from "@/components/Header";
 import BlogListClient from "./BlogListClient";
 import AIConsultant from "@/components/AIConsultant";
@@ -37,6 +38,10 @@ export default async function BlogPage() {
   return (
     <>
       <Header />
+      <Breadcrumbs items={[
+        { label: "Главная", href: "/" },
+        { label: "Блог" }
+      ]} />
       <BlogListClient posts={posts} />
       <AIConsultant />
     </>

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Breadcrumbs from "@/components/Breadcrumbs"
 import Header from "@/components/Header";
 import GlossaryListClient from "./GlossaryListClient";
 
@@ -32,6 +33,10 @@ export default async function GlossaryPage() {
   return (
     <>
       <Header />
+      <Breadcrumbs items={[
+        { label: "Главная", href: "/" },
+        { label: "Глоссарий" }
+      ]} />
       <GlossaryListClient terms={terms} />
     </>
   );
