@@ -3,8 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const serviceLinks = [
-  { label: "Кооператив под ключ", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
   { label: "Аудит устава ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" },
+  { label: "Кооператив под ключ", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
   { label: "Пакет документов для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
   { label: "Разработка Положений", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
   { label: "Целевые программы", href: "/uslugi-dlya-potrebitelskih-kooperativov#target-programs" },
