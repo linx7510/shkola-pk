@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import { BlockRenderer } from "@/components/BlockRenderer"
 import Header from "@/components/Header"
 import KooperativPodKlyuchLanding from "@/components/KooperativPodKlyuchLanding"
+import Breadcrumbs from "@/components/Breadcrumbs"
+import { breadcrumbJsonLd } from "@/components/Breadcrumbs"
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL || "http://localhost:3001"
 
@@ -46,7 +48,12 @@ export default async function UslugiPodSlugPage({ params }: Props) {
   return (
     <>
       <Header />
-      <main style={{ paddingTop: "5rem", minHeight: "60vh" }}>
+      <Breadcrumbs items={[
+        { label: "Главная", href: "/" },
+        { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
+        { label: (page as any).title || "" }
+      ]} />
+      <main style={{ paddingTop: "1rem", minHeight: "60vh" }}>
         {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
         ) : hasContent ? (
@@ -62,6 +69,11 @@ export default async function UslugiPodSlugPage({ params }: Props) {
           </section>
         )}
       </main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
+        { label: "Главная", href: "/" },
+        { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
+        { label: (page as any).title || "" }
+      ], "https://2980738.ru")) }} />
     </>
   )
 }

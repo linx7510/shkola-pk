@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 interface FAQItem { q: string; a: string; }
 
@@ -74,6 +75,12 @@ export default function KooperativPodKlyuchLanding() {
 
   return (
     <main style={{ paddingTop: "5rem", minHeight: "60vh", background: "var(--color-bg-950, #0D0C0A)" }}>
+      <Breadcrumbs items={[
+        { label: "Главная", href: "/" },
+        { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
+        { label: "Кооператив под ключ" }
+      ]} />
+
       {/* HERO */}
       <section style={{ padding: "4rem 1.5rem 3rem", textAlign: "center", maxWidth: 900, margin: "0 auto" }}>
         <div style={{ display: "inline-block", padding: "0.4rem 1rem", background: "rgba(184,149,106,0.15)", border: "1px solid rgba(184,149,106,0.3)", borderRadius: 100, fontSize: "0.8rem", color: "#B8956A", fontWeight: 600, marginBottom: "1.5rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>

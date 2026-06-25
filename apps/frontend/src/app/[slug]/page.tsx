@@ -3,6 +3,8 @@ import { Metadata } from 'next'
 import { BlockRenderer } from '@/components/BlockRenderer'
 import Header from '@/components/Header'
 import CursorLight from '@/components/CursorLight'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import { breadcrumbJsonLd } from '@/components/Breadcrumbs'
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL
                || process.env.NEXT_PUBLIC_PAYLOAD_URL
@@ -93,6 +95,10 @@ export default async function SlugPage({ params }: Props) {
     <>
       <Header />
       <CursorLight />
+      <Breadcrumbs items={[
+        { label: 'Главная', href: '/' },
+        { label: (page as any).title || '' }
+      ]} />
       <main style={{ paddingTop: '5rem', minHeight: '60vh' }}>
         {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
@@ -108,6 +114,10 @@ export default async function SlugPage({ params }: Props) {
         )}
         {/* AI-консультант — точная копия блока с главной страницы */}
       </main>
+      <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
+        { label: 'Главная', href: '/' },
+        { label: (page as any).title || '' }
+      ], 'https://2980738.ru')) }} />
     </>
   )
 }

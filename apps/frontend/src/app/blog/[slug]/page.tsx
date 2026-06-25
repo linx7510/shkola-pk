@@ -114,6 +114,11 @@ export default async function BlogPostPage({ params }: Props) {
     <>
       <Header />
         <CursorLight />
+        <Breadcrumbs items={[
+          { label: "Главная", href: "/" },
+          { label: "Блог", href: "/blog" },
+          { label: (post as any).title || "" }
+        ]} />
         <BlogParticles />
       <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
         <article style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--container-px)" }}>
