@@ -22,24 +22,37 @@ interface Props { params: Promise<{ slug: string }> }
 
 export default async function UslugiSlugPage({ params }: Props) {
   const { slug } = await params
-  // Construct full slug: uslugi/audit-ustava-pk
   const fullSlug = `uslugi/${slug}`
   const page = await fetchPage(fullSlug)
   if (!page) notFound()
 
   const blocks = (page as any).blocks || (page as any).layout || []
+  const hasBlocks = Array.isArray(blocks) && blocks.length > 0
+  const pageContent = (page as any).content
+  const hasContent = typeof pageContent === 'string' && pageContent.length > 0
+
   return (
     <>
       <Header />
       <main style={{ paddingTop: "5rem", minHeight: "60vh" }}>
-        {Array.isArray(blocks) && blocks.length > 0 ? (
+        {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
+        ) : hasContent ? (
+          <section style={{ padding: "4rem 1.5rem", maxWidth: 900, margin: "0 auto" }}>
+            <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2", marginBottom: "1.5rem", fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800 }}>
+              {(page as any).title}
+            </h1>
+            <div
+              className="article-content"
+              style={{ color: "#D6C6B2", lineHeight: 1.8, fontSize: "1.05rem" }}
+              dangerouslySetInnerHTML={{ __html: pageContent }}
+            />
+          </section>
         ) : (
           <section style={{ padding: "4rem 1.5rem", maxWidth: 800, margin: "0 auto" }}>
-            <h1 className="heading-sweep" data-text={(page as any).title || ''} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
+            <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
           </section>
         )}
-        {/* AI-консультант — точная копия блока с главной страницы */}
       </main>
     </>
   )
