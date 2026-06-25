@@ -33,11 +33,6 @@
       "permanent": true
     },
     {
-      "source": "/pomosch-proektu",
-      "destination": "/",
-      "permanent": true
-    },
-    {
       "source": "/paket-bazovyy",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
       "permanent": true
