@@ -191,7 +191,7 @@ export const Pages: CollectionConfig = {
         { name: 'legal', type: 'textarea', label: 'Юридическая информация' },
       ],
     },
-    { name: 'content', type: 'richText', label: 'Содержание (SEO)' },
+    { name: 'content', type: 'textarea', label: 'Содержание (HTML)', admin: { description: 'Вставьте HTML-код страницы. Используйте теги: h2, p, ul, li, table, img, a' } },
     { name: 'headCode', type: 'textarea', label: 'Код в HEAD', admin: { position: 'sidebar', description: 'Код для head' } },
     { name: 'bodyCode', type: 'textarea', label: 'Код в BODY', admin: { position: 'sidebar', description: 'Код для body' } },
     {
