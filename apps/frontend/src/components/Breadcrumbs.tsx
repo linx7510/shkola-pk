@@ -11,8 +11,10 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
       padding: "1rem 1.5rem",
       maxWidth: 1200,
       margin: "0 auto",
-      fontSize: "0.85rem",
-      color: "rgba(214,198,178,0.5)",
+      fontSize: "0.9rem",
+      color: "rgba(214,198,178,0.8)",
+      background: "rgba(214,198,178,0.03)",
+      borderBottom: "1px solid rgba(214,198,178,0.06)",
     }}>
       <ol style={{
         listStyle: "none",
@@ -27,13 +29,13 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
           <li key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             {item.href && i < items.length - 1 ? (
               <Link href={item.href} className="breadcrumb-link" style={{
-                color: "rgba(184,149,106,0.7)",
+                color: "#B8956A",
                 textDecoration: "none",
               }}>
                 {item.label}
               </Link>
             ) : (
-              <span style={{ color: "rgba(214,198,178,0.6)" }}>{item.label}</span>
+              <span style={{ color: "#E7DCCF", fontWeight: 600 }}>{item.label}</span>
             )}
             {i < items.length - 1 && (
               <span style={{ color: "rgba(214,198,178,0.3)" }}>›</span>
