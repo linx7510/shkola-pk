@@ -13,6 +13,7 @@ export const StepsBlock: Block = {
       fields: [
         { name: 'title', type: 'text', required: true, label: 'Название шага' },
         { name: 'description', type: 'textarea', required: true, label: 'Описание' },
+        { name: 'videoUrl', type: 'text', label: 'Ссылка на видео (VK, YouTube, Rutube)' },
       ],
     },
   ],
