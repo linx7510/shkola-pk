@@ -14,6 +14,7 @@ export const StepsBlock: Block = {
         { name: 'title', type: 'text', required: true, label: 'Название шага' },
         { name: 'description', type: 'textarea', required: true, label: 'Описание' },
         { name: 'videoUrl', type: 'text', label: 'Ссылка на видео (VK, YouTube, Rutube)' },
+        { name: 'thumbnailUrl', type: 'text', label: 'URL картинки-превью', admin: { description: 'Ссылка на картинку-заставку для видео' } },
       ],
     },
   ],

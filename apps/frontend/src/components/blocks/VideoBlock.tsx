@@ -6,6 +6,7 @@ export interface VideoBlockData {
   title?: string
   videoUrl: string
   description?: string
+  thumbnailUrl?: string
 }
 
 /**

@@ -2,10 +2,10 @@ import Reveal from "@/components/Reveal"
 
 export interface StepsBlockData {
   title?: string
-  steps: Array<{ title: string; description: string; videoUrl?: string }>
+  steps: Array<{ title: string; description: string; videoUrl?: string; thumbnailUrl?: string }>
 }
 
-function VideoEmbed({ url }: { url: string }) {
+function VideoEmbed({ url, thumbnail }: { url: string; thumbnail?: string }) {
   if (!url) return null
 
   // VK embed: vk.com/video_ext.php?oid=X&id=Y
@@ -137,7 +137,7 @@ export function StepsBlock({ data }: { data: StepsBlockData }) {
                 <p style={{ fontSize: "0.95rem", color: "rgba(214,198,178,0.9)", lineHeight: 1.7, margin: "0.5rem 0 0 0", whiteSpace: "pre-wrap" }}>
                   {s.description}
                 </p>
-                {s.videoUrl && <VideoEmbed url={s.videoUrl} />}
+                {s.videoUrl && <VideoEmbed url={s.videoUrl} thumbnail={s.thumbnailUrl} />}
               </div>
             </Reveal>
           ))}
