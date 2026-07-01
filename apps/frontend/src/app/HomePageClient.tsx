@@ -4,6 +4,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
 const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
+const CursorLight = dynamic(() => import("@/components/CursorLight"), { ssr: false });
 
 // Lazy-load тяжёлых виджетов (AI чат + блог-превью)
 // Они не нужны для LCP — загружаются после idle
@@ -247,6 +248,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
   return (
     <>
       <BlogParticles />
+      <CursorLight />
       <Header />
 
       {/* ===== HERO ===== */}
