@@ -90,6 +90,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <link rel="preload" as="image" href="/images/hero-logo.webp" fetchPriority="high" />
         {/* Preconnect to Yandex Metrika origin (saves DNS+TLS on tag.js fetch) */}
         {/* Yandex Metrika preconnect убран — скрипт грузится через requestIdleCallback */}
+        <Script src="https://captcha-api.yandex.ru/captcha.js" strategy="beforeInteractive" />
         {/* Preconnect только к Yandex Metrika — единственный 3rd party JS */}
 
 
