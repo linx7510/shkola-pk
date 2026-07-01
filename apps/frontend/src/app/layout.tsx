@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { headers } from "next/headers";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-// Фирменный шрифт Inter — скачивается при сборке, отдаётся с нашего домена
-// 0 внешних запросов в рантайме, font-display: swap (нет FOUT)
-const inter = Inter({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-  variable: "--font-inter",
-});
+// System fonts — 0 KB download (was 214 KB with Inter)
+const inter = { variable: "" };
 import "./styles/tokens.css";
 import "./styles/layout.css";
 import "./styles/blocks.css";
@@ -101,7 +94,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
 
       </head>
-      <body className={`antialiased ${inter.variable}`} style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}>
+      <body className={`antialiased ${inter.variable}`} style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" }}>
         <script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} nonce={nonce} />
         <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{__html: JSON.stringify({
           "@context": "https://schema.org",

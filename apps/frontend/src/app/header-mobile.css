@@ -152,7 +152,7 @@
 .about-accordion-chevron { font-size:1.2rem;transition:transform .2s;color:rgba(214,198,178,.3); }
 .about-accordion-chevron.open { transform:rotate(45deg);color:#E68863; }
 .about-accordion-panel { max-height:0;overflow:hidden;transition:max-height .35s ease; }
-.about-accordion-panel.open { max-height:200px; }
+.about-accordion-panel.open { max-height:none; }
 .about-accordion-inner { padding:1rem 1.25rem;background:rgba(214,198,178,.03);border:1px solid rgba(214,198,178,.08);border-top:none;border-radius:0 0 10px 10px;color:rgba(214,198,178,0.9);font-size:.9rem;line-height:1.7; }
 
 /* =============================================
