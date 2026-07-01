@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import DownloadButton from '../components/DownloadButton'
 
 /**
  * Media collection — хранит изображения с автоматической конвертацией в WebP.
@@ -71,6 +72,15 @@ export const Media: CollectionConfig = {
   },
   access: { read: () => true },
   fields: [
+    {
+      name: 'downloadLink',
+      type: 'ui',
+      admin: {
+        components: {
+          Field: { path: '../components/DownloadButton', serverProps: {} },
+        },
+      },
+    },
     { name: 'alt', type: 'text', label: 'Альтернативный текст (обязательно для SEO)' },
     { name: 'caption', type: 'text', label: 'Подпись' },
   ],
