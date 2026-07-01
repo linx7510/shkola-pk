@@ -42,6 +42,11 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
     if (vk) {
       return `https://vk.com/video_ext.php?oid=${vk[1]}&id=${vk[2]}&hd=2`
     }
+    // VK Video новый формат: vkvideo.ru/videoOID_ID
+    const vkv = url.match(/vkvideo\.ru\/video(-?\d+)_(\d+)/)
+    if (vkv) {
+      return `https://vk.com/video_ext.php?oid=${vkv[1]}&id=${vkv[2]}&hd=2`
+    }
     // Vimeo
     const vm = url.match(/vimeo\.com\/(\d+)/)
     if (vm) return `https://player.vimeo.com/video/${vm[1]}`

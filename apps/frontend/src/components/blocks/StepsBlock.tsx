@@ -25,8 +25,8 @@ function VideoEmbed({ url }: { url: string }) {
     )
   }
 
-  // VK обычная ссылка: vk.com/videoOWNER_VIDEO
-  const vk = url.match(/vk\.com\/video(-?\d+)_(\d+)/)
+  // VK обычная ссылка: vk.com/videoOWNER_VIDEO или vkvideo.ru/videoOID_ID
+  const vk = url.match(/(?:vk\.com\/video|vkvideo\.ru\/video)(-?\d+)_(\d+)/)
   if (vk) {
     const ownerId = vk[1]
     const videoId = vk[2]
