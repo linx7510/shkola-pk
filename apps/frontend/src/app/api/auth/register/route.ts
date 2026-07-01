@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const captchaServerKey = process.env.SMARTCAPTCHA_SERVER_KEY
     if (captchaServerKey) {
       try {
-        const captchaRes = await fetch('https://smartcaptcha.yandexcloud.com/validate', {
+        const captchaRes = await fetch('https://captcha-api.yandex.ru/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
