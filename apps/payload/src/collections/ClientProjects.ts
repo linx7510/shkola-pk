@@ -1,4 +1,5 @@
 import type { CollectionConfig, Field } from 'payload'
+import StageDocumentsView from '../components/StageDocumentsView'
 
 /**
  * ClientProjects — проекты клиентов.
@@ -237,6 +238,16 @@ export const ClientProjects: CollectionConfig = {
       label: 'Процент выполнения',
       defaultValue: 0,
       admin: { readOnly: true },
+    },    // ─── КАСТОМНЫЙ ВИД: Документы по этапам ──────────────────────────────────
+    {
+      name: 'stageDocumentsView',
+      type: 'ui',
+      label: 'Документы по этапам',
+      admin: {
+        components: {
+          Field: { path: '../components/StageDocumentsView', serverProps: {} },
+        },
+      },
     },
 
     // ─── Документы (snapshot из template) ────────────────────────────────
