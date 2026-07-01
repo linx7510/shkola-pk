@@ -3,8 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
-// BlogParticles disabled
-// const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
+const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
 
 // Lazy-load тяжёлых виджетов (AI чат + блог-превью)
 // Они не нужны для LCP — загружаются после idle
@@ -247,7 +246,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
   return (
     <>
-      {/* <BlogParticles /> — отключено */}
+      <BlogParticles />
       <Header />
 
       {/* ===== HERO ===== */}

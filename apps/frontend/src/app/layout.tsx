@@ -16,8 +16,7 @@ import dynamic from "next/dynamic";
 
 const FloatingChatButton = dynamic(() => import("@/components/FloatingChatButton"), { loading: () => null });
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"), { loading: () => null });
-// GlobalParticles disabled — вызывает пустой экран (canvas перекрывает контент)
-// const GlobalParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
+const GlobalParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
 
 export const metadata: Metadata = {
   title: {
@@ -137,7 +136,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {children}
 
         <Footer />
-        {/* <GlobalParticles /> — отключено */}
+        <GlobalParticles />
         <FloatingChatButton />
 
         {/* Yandex.Metrika counter — strategy="lazyOnload" loads during browser idle time,
