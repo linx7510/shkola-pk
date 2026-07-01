@@ -88,8 +88,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {/* Preload LCP image — hero logo (35KB webp) */}
         <link rel="preload" as="image" href="/images/hero-logo.webp" fetchPriority="high" />
         {/* Preconnect to Yandex Metrika origin (saves DNS+TLS on tag.js fetch) */}
-        <link rel="preconnect" href="https://mc.yandex.ru" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://mc.yandex.ru" />
+        {/* Yandex Metrika preconnect убран — скрипт грузится через requestIdleCallback */}
         {/* Preconnect только к Yandex Metrika — единственный 3rd party JS */}
 
 
@@ -144,7 +143,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             does NOT block main thread during initial render.
             Initial pageview still tracked via inline ym() call below. */}
         <Script id="yandex-metrika-init" strategy="lazyOnload" nonce={nonce}>
-          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {trackLinks:true,accurateTrackBounce:true,defer:true});`}
+          {`window.addEventListener('load', function() {
+            requestIdleCallback(function() {
+              (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {trackLinks:true,accurateTrackBounce:true,defer:true});
+            }, {timeout: 5000});
+          });`}
         </Script>
         <noscript>
           <div>
