@@ -584,6 +584,18 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                 <span style={{padding:"0.5rem 0.9rem",background:"rgba(91,141,170,0.1)",border:"1px solid rgba(91,141,170,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#5B8DAA",cursor:"pointer"}}>💬 Сколько стоит?</span>
                 <span style={{padding:"0.5rem 0.9rem",background:"rgba(201,177,154,0.1)",border:"1px solid rgba(201,177,154,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#CAB19A",cursor:"pointer"}}>📝 Как зарегистрировать ПК?</span>
               </div>
+              <div style={{marginTop:"1rem",display:"flex",gap:"0.5rem"}}>
+                <input
+                  type="text"
+                  placeholder="Ваш вопрос..."
+                  style={{flex:1,padding:"0.75rem 1rem",background:"rgba(214,198,178,0.05)",border:"1px solid rgba(214,198,178,0.15)",borderRadius:10,color:"#E7DCCF",fontSize:"0.9rem",outline:"none"}}
+                />
+                <button
+                  style={{padding:"0.75rem 1.5rem",background:"linear-gradient(135deg, #C96E4D, #E68863)",border:"none",borderRadius:10,color:"#0D0C0A",fontWeight:600,cursor:"pointer",fontSize:"0.9rem"}}
+                >
+                  Отправить →
+                </button>
+              </div>
             </div>
           </Reveal>
         </div>
