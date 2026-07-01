@@ -45,7 +45,7 @@ export function middleware(request: NextRequest) {
   // === 1. Enforced CSP — blocks violations, reports them ===
   const cspEnforced = [
     `default-src 'self'`,
-    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
@@ -65,7 +65,7 @@ export function middleware(request: NextRequest) {
   // This tells us what would break if we removed unsafe-eval entirely
   const cspReportOnly = [
     `default-src 'self'`,
-    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `script-src 'nonce-${nonce}' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
