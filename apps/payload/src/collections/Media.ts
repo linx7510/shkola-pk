@@ -23,7 +23,7 @@ export const Media: CollectionConfig = {
   labels: { singular: 'Медиафайл', plural: 'Медиафайлы' },
   upload: {
     // Разрешённые типы — изображения + документы
-    mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml', 'application/pdf'],
+    mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/svg+xml', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     // Автоматические размеры с конвертацией в WebP
     imageSizes: [
       {
