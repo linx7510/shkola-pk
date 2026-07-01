@@ -1,12 +1,11 @@
 import type { Block } from 'payload'
-import { richTextEditor } from '../lexicalFeatures'
 
 export const TextBlock: Block = {
   slug: 'text',
   labels: { singular: 'Текст', plural: 'Текст' },
   fields: [
     { name: 'title', type: 'text', label: 'Заголовок' },
-    { name: 'body', type: 'richText', label: 'Текст', required: true, editor: richTextEditor },
+    { name: 'body', type: 'richText', label: 'Текст', required: true },
     { name: 'backgroundColor', type: 'select', label: 'Фон', options: [
       { label: 'Тёмный', value: 'dark' },
       { label: 'Светлый акцент', value: 'accent' },

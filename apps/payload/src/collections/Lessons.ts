@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { richTextEditor } from '../lexicalFeatures'
 
 export const Lessons: CollectionConfig = {
   slug: 'lessons',
@@ -12,7 +11,7 @@ export const Lessons: CollectionConfig = {
   access: { read: () => true },
   fields: [
     { name: 'title', type: 'text', required: true, label: 'Название урока' },
-    { name: 'content', type: 'richText', label: 'Содержание', editor: richTextEditor },
+    { name: 'content', type: 'richText', label: 'Содержание' },
     { name: 'videoUrl', type: 'text', label: 'URL видео' },
     { name: 'duration', type: 'number', defaultValue: 0, label: 'Длительность (мин)' },
     { name: 'module', type: 'relationship', relationTo: 'modules', required: true, label: 'Модуль' },

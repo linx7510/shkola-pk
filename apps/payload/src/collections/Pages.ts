@@ -1,6 +1,5 @@
 import type { CollectionConfig } from 'payload'
 import { createAuditHooks } from '../lib/audit'
-import { richTextEditor } from '../lexicalFeatures'
 
 import { HeroBlock } from '../blocks/HeroBlock'
 import { FeaturesBlock } from '../blocks/FeaturesBlock'
