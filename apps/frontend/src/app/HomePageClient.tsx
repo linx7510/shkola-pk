@@ -7,8 +7,9 @@ const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { load
 
 // Lazy-load тяжёлых виджетов (AI чат + блог-превью)
 // Они не нужны для LCP — загружаются после idle
-const AIChatWidget = dynamic(() => import("./home/AIChatWidget").then(m => m.AIChatWidget), { ssr: false, loading: () => null });
 const LatestBlogPosts = dynamic(() => import("./home/LatestBlogPosts").then(m => m.LatestBlogPosts), { loading: () => null });
+import { FAQAccordion } from "./home/FAQAccordion";
+import { LeadForm } from "./home/LeadForm";
 import Reveal from "@/components/Reveal";
 import { BlockRenderer } from "@/components/BlockRenderer";
 
@@ -79,54 +80,58 @@ const PAYLOAD_PUBLIC_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || "";
 
 
 
-export default function HomePageClient({ homeData }: { homeData: HomePageData | null }) {
-  const [faqOpen, setFaqOpen] = useState<number | null>(null);
-  const [aboutOpen, setAboutOpen] = useState<number | null>(null);
-  const [leadForm, setLeadForm] = useState({ name: '', phone: '', message: '', consentAccepted: false });
-  const [leadFormStatus, setLeadFormStatus] = useState<{type: 'idle' | 'loading' | 'success' | 'error', message?: string}>({ type: 'idle' });
+// Lazy AI Chat Button — загружает AIChatWidget только при клике
+function LazyAIChatButton() {
+  const [open, setOpen] = useState(false);
+  const [AIChatWidget, setAIChatWidget] = useState<any>(null);
 
-  const submitLead = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!leadForm.name.trim() || !leadForm.phone.trim()) {
-      setLeadFormStatus({ type: 'error', message: 'Заполните имя и телефон' });
-      return;
+  const handleClick = async () => {
+    if (!AIChatWidget) {
+      // Lazy load AIChatWidget только при первом клике
+      const mod = await import("./home/AIChatWidget");
+      setAIChatWidget(() => mod.AIChatWidget);
     }
-    if (!leadForm.consentAccepted) {
-      setLeadFormStatus({ type: 'error', message: 'Требуется согласие на обработку ПДн (152-ФЗ)' });
-      return;
-    }
-    setLeadFormStatus({ type: 'loading' });
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: leadForm.name,
-          phone: leadForm.phone,
-          message: leadForm.message,
-          source: 'homepage',
-          consentAccepted: leadForm.consentAccepted,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setLeadFormStatus({ type: 'success', message: 'Заявка принята! Мы свяжемся с вами в ближайшее время.' });
-        setLeadForm({ name: '', phone: '', message: '', consentAccepted: false });
-      } else {
-        setLeadFormStatus({ type: 'error', message: data.error || 'Ошибка отправки' });
-      }
-    } catch (err) {
-      setLeadFormStatus({ type: 'error', message: 'Ошибка сети. Позвоните +7 (902) 472-07-38' });
-    }
+    setOpen(!open);
   };
+
+  return (
+    <>
+      <button
+        onClick={handleClick}
+        aria-label="Открыть чат с AI-консультантом"
+        style={{
+          position: "fixed",
+          bottom: "1.5rem",
+          right: "1.5rem",
+          zIndex: 9999,
+          width: 56,
+          height: 56,
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #C96E4D, #E68863)",
+          border: "none",
+          cursor: "pointer",
+          boxShadow: "0 4px 20px rgba(201,110,77,0.4), 0 0 30px rgba(230,136,99,0.2)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "1.5rem",
+          color: "#0D0C0A",
+          transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+      >
+        {open ? "✕" : "💬"}
+      </button>
+      {open && AIChatWidget && <AIChatWidget />}
+    </>
+  );
+}
+
+export default function HomePageClient({ homeData }: { homeData: HomePageData | null }) {
+  const [aboutOpen, setAboutOpen] = useState<number | null>(null);
+
   
-  const [aiMessages, setAiMessages] = useState<{role:string;text:string}[]>([
-    {role:"bot", text:"Привет! 👋 Я AI-ассистент Школы Кооперативов. Помогу разобраться с потребительской кооперацией — просто и понятно. Спрашивай! 😊"}
-  ]);
-  const [aiInput, setAiInput] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [contactForm, setContactForm] = useState({name:"",email:"",phone:"",message:""});
-  const [contactSent, setContactSent] = useState(false);
   const headerRef = useRef<HTMLElement|null>(null);
 
   useEffect(() => {
@@ -234,49 +239,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
   const aboutVeleslavData = homeData?.aboutVeleslav || null;
   
 
-  const sendAi = async () => {
-    if (!aiInput.trim() || aiLoading) return;
-    const msg = aiInput.trim();
-    setAiInput("");
-    setAiMessages(prev => [...prev, {role:"user", text:msg}]);
-    setAiLoading(true);
-    try {
-      // Use Payload API to create a lead with the question
-      // The AI chat feature will show a placeholder response
-      setAiMessages(prev => [...prev, {role:"bot", text:"Спасибо за ваш вопрос! Наш консультант свяжется с вами в ближайшее время. Также вы можете задать вопрос через форму ниже или по телефону +7 (902) 472-07-38."}]);
-    } catch { setAiMessages(prev => [...prev, {role:"bot", text:"Ошибка соединения"}]); }
-    finally { setAiLoading(false); }
-  };
 
-  const submitContact = async (e:React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Submit contact form as a lead via Payload API
-      const res = await fetch(`${PAYLOAD_PUBLIC_URL}/api/leads`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: contactForm.name,
-          email: contactForm.email,
-          phone: contactForm.phone,
-          message: contactForm.message,
-          source: "contact-form",
-        }),
-      });
-      if (res.ok) {
-        setContactSent(true);
-        setContactForm({name:"",email:"",phone:"",message:""});
-      } else {
-        // Fallback: still show success to user
-        setContactSent(true);
-        setContactForm({name:"",email:"",phone:"",message:""});
-      }
-    } catch {
-      // Even if API fails, show success to user
-      setContactSent(true);
-      setContactForm({name:"",email:"",phone:"",message:""});
-    }
-  };
 
   const S:React.CSSProperties = {padding:"4rem 0"};
   const I:React.CSSProperties = {maxWidth:"var(--container-max,1600px)",margin:"0 auto",padding:"0 var(--container-px,clamp(1rem,4vw,4rem))"};
@@ -588,87 +551,14 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
           </Reveal>
         </div>
       </section>
-
-
-
-
-      
-
-
-
-      
-      {/* ===== AI CONSULTANT ===== */}
-      <section id="ai-consultant" style={{...S, background:"rgba(214,198,178,0.02)"}}>
-        <div style={I}>
-          <Reveal>
-            <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
-              <div className="section-label">AI-АССИСТЕНТ</div>
-              <h2 className="section-title heading-sweep" data-text="Задайте вопрос AI-ассистенту">🤖 Задайте вопрос AI-ассистенту</h2>
-              <p className="section-subtitle">Наш AI-помощник специально натренирован на потребительскую кооперацию и законодательство РФ</p>
-            </div>
-          </Reveal>
-          <Reveal delay={2}>
-            <div style={{maxWidth:640, margin:"0 auto", padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:16}}>
-              {/* Header без фото */}
-              <div style={{display:"flex", alignItems:"center", gap:"0.75rem", padding:"0.75rem 0", borderBottom:"1px solid rgba(214,198,178,0.08)", marginBottom:"1rem"}}>
-                <div style={{width:40, height:40, borderRadius:"50%", background:"linear-gradient(135deg, #C96E4D, #E68863)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.2rem", flexShrink:0}}>🤖</div>
-                <div>
-                  <div style={{fontWeight:600, color:"#E7DCCF", fontSize:"0.92rem"}}>Ассистент Школы Кооперативов</div>
-                  <div style={{fontSize:"0.75rem", color:"#6DB89A", display:"flex", alignItems:"center", gap:"0.3rem"}}><span style={{width:8, height:8, borderRadius:"50%", background:"#6DB89A", display:"inline-block"}} /> Онлайн</div>
-                </div>
-              </div>
-              {/* Messages */}
-              <div style={{maxHeight:320, overflowY:"auto", marginBottom:"1rem", display:"flex", flexDirection:"column", gap:"0.5rem"}}>
-                {aiMessages.map((m,i) => (
-                  <div key={i} style={{
-                    alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-                    maxWidth:"85%", padding:"0.6rem 0.9rem", borderRadius:12,
-                    fontSize:"0.88rem", lineHeight:1.5,
-                    background: m.role === "user" ? "rgba(201,110,77,0.15)" : "rgba(214,198,178,0.06)",
-                    color: m.role === "user" ? "#E68863" : "rgba(214,198,178,0.97)",
-                  }}>{m.text}</div>
-                ))}
-                {aiLoading && <div style={{alignSelf:"flex-start", fontSize:"0.85rem", color:"rgba(214,198,178,0.78)"}}>Печатаю...</div>}
-              </div>
-              {/* Quick buttons */}
-              <div style={{display:"flex", flexWrap:"wrap", gap:"0.5rem", marginBottom:"1rem"}}>
-                {["Как обнулить НДС? 💰","Что такое ПК? 🤔","Сколько стоит? 💬","Как зарегистрировать ПК? 📝"].map((q,i) => (
-                  <button key={i} onClick={() => setAiInput(q.replace(/[💰🤔💬📝]/g,"").trim())} style={{padding:"0.4rem 0.85rem", background:"rgba(214,198,178,0.05)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:999, color:"#BCA891", fontSize:"0.8rem", cursor:"pointer", transition:"all 0.2s"}} onMouseEnter={e => {e.currentTarget.style.borderColor="rgba(230,136,99,0.3)"; e.currentTarget.style.color="#E68863"}} onMouseLeave={e => {e.currentTarget.style.borderColor="rgba(214,198,178,0.12)"; e.currentTarget.style.color="#BCA891"}}>{q}</button>
-                ))}
-              </div>
-              {/* Input */}
-              <form onSubmit={e => {e.preventDefault(); sendAi();}} style={{display:"flex", gap:"0.5rem"}}>
-                <input value={aiInput} onChange={e => setAiInput(e.target.value)} placeholder="Спросите о кооперации..." style={{flex:1, padding:"0.75rem 1rem", background:"rgba(214,198,178,0.05)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:10, color:"#D6C6B2", fontSize:"0.9rem", outline:"none"}} />
-                <button type="submit" disabled={aiLoading} style={{padding:"0.75rem 1.25rem", background:"#C96E4D", color:"#0D0C0A", border:"none", borderRadius:10, fontSize:"0.9rem", fontWeight:600, cursor:aiLoading?"not-allowed":"pointer"}}>→</button>
-              </form>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
 {/* ===== CTA ===== */}
-      <section className="cta reveal" id="cta-form">
-        <div style={I}>
-          <div style={{maxWidth:600, margin:"0 auto"}}>
-            <div style={{textAlign:"center", marginBottom:"2rem"}}>
-              <h3 className="heading-sweep" data-text="Готовы начать?" style={{fontSize:"clamp(1.5rem,4vw,2.2rem)",fontWeight:700,color:"#D6C6B2",marginBottom:"1rem"}}>Готовы начать?</h3>
-              <p style={{color:"rgba(214,198,178,0.88)",lineHeight:1.7}}>Запишитесь на бесплатную консультацию — разберём вашу ситуацию и подберём оптимальный формат</p>
-            </div>
-            <div style={{padding: "2rem", background: "rgba(214,198,178,0.04)", border: "1px solid rgba(214,198,178,0.12)", borderRadius: 16}}>
-              <form onSubmit={submitLead} style={{display: "flex", flexDirection: "column", gap: "0.85rem"}}>
-                <input type="text" placeholder="Ваше имя *" value={leadForm.name} onChange={e => setLeadForm({...leadForm, name: e.target.value})} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.05rem", outline: "none"}} required />
-                <input type="tel" placeholder="Телефон *" value={leadForm.phone} onChange={e => setLeadForm({...leadForm, phone: e.target.value})} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.05rem", outline: "none"}} required />
-                <textarea placeholder="Сообщение (необязательно)" value={leadForm.message} onChange={e => setLeadForm({...leadForm, message: e.target.value})} rows={3} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.05rem", outline: "none", resize: "vertical"}} />
-                <label style={{display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.82rem", color: "rgba(214,198,178,0.9)", cursor: "pointer", lineHeight: 1.5}}>
-                  <input type="checkbox" checked={leadForm.consentAccepted} onChange={e => setLeadForm({...leadForm, consentAccepted: e.target.checked})} style={{marginTop: "0.2rem", accentColor: "#E68863"}} required />
-                  <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности (152-ФЗ)</span>
-                </label>
-                {leadFormStatus.type === 'error' && (<div style={{padding: "0.75rem 1rem", background: "rgba(201,77,77,0.1)", border: "1px solid rgba(201,77,77,0.3)", borderRadius: 8, color: "#E68888", fontSize: "0.88rem"}}>{'\u26A0'} {leadFormStatus.message}</div>)}
-                {leadFormStatus.type === 'success' && (<div style={{padding: "0.75rem 1rem", background: "rgba(90,154,110,0.1)", border: "1px solid rgba(90,154,110,0.3)", borderRadius: 8, color: "#6DB89A", fontSize: "0.88rem"}}>{'\u2713'} {leadFormStatus.message}</div>)}
-                <button type="submit" disabled={leadFormStatus.type === 'loading'} style={{padding: "1rem 1.5rem", background: leadFormStatus.type === 'loading' ? "rgba(230,136,99,0.5)" : "#E68863", color: "#fff", border: "none", borderRadius: 10, fontSize: "1rem", fontWeight: 600, cursor: leadFormStatus.type === 'loading' ? 'not-allowed' : 'pointer', transition: "all 0.25s"}}>{leadFormStatus.type === 'loading' ? 'Отправка...' : 'Отправить заявку'}</button>
-              </form>
-            </div>
+            <section className="cta reveal" id="cta-form" style={{...S}}>
+        <div style={{...I, maxWidth:1000, display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2rem", alignItems:"center"}}>
+          <div>
+            <h3 style={{fontSize:"clamp(1.5rem,4vw,2.2rem)", fontWeight:700, color:"#D6C6B2", marginBottom:"1rem"}}>Готовы начать?</h3>
+            <p style={{color:"rgba(214,198,178,0.88)", lineHeight:1.7}}>Запишитесь на бесплатную консультацию — разберём вашу ситуацию и подберём оптимальный формат</p>
           </div>
+          <LeadForm />
         </div>
       </section>
 
@@ -682,7 +572,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
         </div>
       </section>
 
-      {/* ===== CONTACTS ===== */}
+            {/* ===== FAQ ===== */}
       <section id="seo-text" style={{...S, background:"rgba(214,198,178,0.02)"}}>
         <div style={{...I, maxWidth:900}}>
           <Reveal>
@@ -691,72 +581,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
               <h2 className="section-title heading-sweep" data-text="Частые вопросы">Частые вопросы</h2>
             </div>
           </Reveal>
-          <div style={{display:"flex", flexDirection:"column", gap:"1.25rem"}}>
-            
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Что такое потребительский кооператив и чем он отличается от ООО?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  Потребительский кооператив (ПК) — это некоммерческая организация, созданная путём объединения граждан и юридических лиц для удовлетворения материальных и иных потребностей участников. Главное отличие от ООО заключается в правовой природе: общество с ограниченной ответственностью — коммерческая организация, целью которой является извлечение прибыли, тогда как потребительское общество функционирует для удовлетворения потребностей пайщиков. Практически это означает, что ПК освобождён от НДС, налога на прибыль, НДФЛ и страховых взносов с паевых взносов в соответствии с Законом РФ № 3085-1. Кроме того, ПК не отвечает по долгам пайщиков, а пайщики несут ограниченную ответственность в размере внесённых паёв. В отличие от ООО, ПК не подлежит проверкам Роспотребнадзора, пожарной инспекции и большинства других контролирующих органов.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Сколько времени занимает создание ПК под ключ?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  Полный цикл создания потребительского общества «под ключ» занимает от трёх до семи рабочих дней при условии, что все необходимые данные от заказчика получены в полном объёме. Процесс включает разработку индивидуального устава с учётом конкретного ОКВЭД и бизнес-модели, подготовку протокола учредительного собрания, составление заявления о государственной регистрации, а также разработку целевой потребительской программы. После подачи документов в ФНС регистрация занимает ещё 3–5 рабочих дней. Таким образом, с момента обращения до получения готового ЕГРЮЛ-записи проходит в среднем 10–14 дней. Школа Потребительской кооперации берёт на себя все этапы — заказчику не нужно лично посещать налоговую или другие ведомства.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Какие налоги платит потребительский кооператив?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  ПК, зарегистрированный в соответствии с Законом РФ № 3085-1 и ведущий деятельность по утверждённой целевой потребительской программе, освобождён от большинства налогов. К числу освобождений относятся: НДС (статья 149 НК РФ), налог на прибыль организаций, НДФЛ с доходов от паевых взносов, страховые взносы на обязательное пенсионное и медицинское страхование в части паевых операций. ПК обязан уплачивать лишь государственную пошлину при регистрации, налог на имущество (при наличии недвижимости), а также земельный налог и транспортный налог в общем порядке. Важно отметить, что возврат паевого взноса при выходе пайщика не признаётся доходом и не облагается налогом. Однако для сохранения налоговых льгот необходимо документально подтверждать целевой характер деятельности — именно для этого Школа разрабатывает индивидуальные потребительские программы.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Кто может стать пайщиком потребительского кооператива?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  Закон РФ № 3085-1 устанавливает, что пайщиком потребительского общества может стать любое физическое лицо, достигшее 16-летнего возраста, а также любое юридическое лицо. Количество пайщиков не ограничено — минимальное число составляет пять человек (физических или юридических лиц в любом сочетании). Иностранные граждане и иностранные юридические лица также вправе вступить в Кооператив на территории Российской Федерации. Каждый пайщик вносит паевой взнос, размер которого определяется уставом, и получает один голос при голосовании на общих собраниях независимо от размера внесённого пая. Это принципиальное отличие от ООО, где количество голосов пропорционально доле в уставном капитале. Для вступления в ПК необходимо подать заявление в Правление кооператива и оплатить паевой взнос в установленные уставом сроки.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Как защитить имущество через паевую модель?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  Защита активов через Кооператив основана на нескольких ключевых механизмах. Во-первых, ПК является самостоятельным юридическим лицом и не отвечает по обязательствам своих пайщиков. Это означает, что долги, судебные иски или исполнительные производства, направленные против пайщика, не распространяются на имущество объединения. Во-вторых, паевые взносы пайщиков не признаются доходом и не подлежат взысканию по личным обязательствам пайщика — они находятся в собственности потребительского общества. В-третьих, закон предусматривает, что взыскание может быть обращено лишь на сам паевой взнос, а не на имущество, приобретённое за его счёт. На практике это означает, что недвижимость, транспортные средства и другие активы, оформленные на ПК, недоступны для взыскания со стороны кредиторов пайщика — банков, судебных приставов или иных третьих лиц. Школа Потребительской кооперации уделяет особое внимание правильному оформлению передачи активов в ПК, чтобы исключить любые юридические риски.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>В чём заключается модель С500 и почему она эффективна?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  Модель С500 — это авторская методика Велеслава Старкова, структурирующая процесс создания и ведения потребительского общества в пять последовательных этапов. Этап первый — анализ бизнес-модели предпринимателя и оценка применимости паевой формы. Этап второй — разработка устава и учредительных документов с учётом конкретных целей. Этап третий — создание целевой потребительской программы, определяющей направление расходов. Этап четвёртый — регистрация, внесение в ЕГРЮЛ и запуск деятельности. Этап пятый — сопровождение и поддержка в первые двенадцать месяцев работы. Модель проверена на более чем 120 реализованных проектах и учитывает все изменения законодательства за 2015–2026 годы. Её эффективность подтверждается тем, что ни один Кооператив, созданный по модели С500, не был ликвидирован по решению налоговых органов. Все документы, скрипты и инструкции входят в стоимость курса обучения — ученик получает полностью готовый инструментарий.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal>
-              <div className="seo-faq-item" style={{padding:"1.5rem", background:"rgba(214,198,178,0.04)", border:"1px solid rgba(214,198,178,0.12)", borderRadius:12}} onClick={(e) => e.currentTarget.classList.toggle('open')}>
-                <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0"}}>Как проходит обучение в Школе и что получает ученик по итогу?</h3>
-                <p style={{fontSize:"0.92rem", color:"rgba(214,198,178,0.9)", lineHeight:1.8}}>
-                  Обучение в Школе Потребительской кооперации состоит из трёх форматов. Первый — тринадцать бесплатных видео-уроков, доступных после регистрации: они покрывают базовые темы и позволяют оценить подход проекта. Второй — полный курс «Потребительский кооператив по модели С500», включающий восемь модулей живых онлайн-занятий, документальный конструктор с готовыми шаблонами и двенадцать месяцев поддержки. Третий — индивидуальные и групповые консультации для решения конкретных задач. По итогам полного обучения ученик получает: индивидуальный устав, разработанный под его бизнес-модель; протокол учредительного собрания; целевую потребительскую программу; полный пакет документов для регистрации; скрипты для общения с банками и налоговой; доступ к закрытому сообществу единомышленников; и двенадцатимесячную поддержку по всем вопросам ведения деятельности. Все материалы обновляются в соответствии с текущим законодательством, поэтому ученик всегда располагает актуальными документами.
-                </p>
-              </div>
-            </Reveal>
-
-          </div>
+          <FAQAccordion items={faqData} />
         </div>
       </section>
 
@@ -827,26 +652,16 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 
       {/* ===== LEAD FORM ===== */}
-      <section id="lead-form" style={{...S, background:"rgba(214,198,178,0.02)"}}>
+            <section id="lead-form" style={{...S, background:"rgba(214,198,178,0.02)"}}>
         <div style={{...I, maxWidth:600}}>
           <Reveal>
-            <div style={{padding: "2rem", background: "rgba(214,198,178,0.04)", border: "1px solid rgba(214,198,178,0.12)", borderRadius: 16, margin: "0 auto"}}>
-              <h3 style={{fontSize: "1.3rem", fontWeight: 600, color: "#E7DCCF", marginBottom: "0.5rem", textAlign: "center"}}>Оставьте заявку</h3>
-              <p style={{fontSize: "0.88rem", color: "rgba(214,198,178,0.9)", textAlign: "center", marginBottom: "1.5rem"}}>Заполните форму — перезвоним в течение рабочего дня</p>
-              <form onSubmit={submitLead} style={{display: "flex", flexDirection: "column", gap: "0.85rem"}}>
-                <input type="text" placeholder="Ваше имя *" value={leadForm.name} onChange={e => setLeadForm({...leadForm, name: e.target.value})} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.05rem", outline: "none"}} required />
-                <input type="tel" placeholder="Телефон *" value={leadForm.phone} onChange={e => setLeadForm({...leadForm, phone: e.target.value})} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.05rem", outline: "none"}} required />
-                <textarea placeholder="Сообщение (необязательно)" value={leadForm.message} onChange={e => setLeadForm({...leadForm, message: e.target.value})} rows={3} style={{padding: "0.85rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.05rem", outline: "none", resize: "vertical"}} />
-                <label style={{display: "flex", alignItems: "flex-start", gap: "0.5rem", fontSize: "0.82rem", color: "rgba(214,198,178,0.9)", cursor: "pointer", lineHeight: 1.5}}>
-                  <input type="checkbox" checked={leadForm.consentAccepted} onChange={e => setLeadForm({...leadForm, consentAccepted: e.target.checked})} style={{marginTop: "0.2rem", accentColor: "#E68863"}} required />
-                  <span>Я согласен на обработку персональных данных в соответствии с политикой конфиденциальности (152-ФЗ)</span>
-                </label>
-                {leadFormStatus.type === 'error' && (<div style={{padding: "0.75rem 1rem", background: "rgba(201,77,77,0.1)", border: "1px solid rgba(201,77,77,0.3)", borderRadius: 8, color: "#E68888", fontSize: "0.88rem"}}>⚠ {leadFormStatus.message}</div>)}
-                {leadFormStatus.type === 'success' && (<div style={{padding: "0.75rem 1rem", background: "rgba(90,154,110,0.1)", border: "1px solid rgba(90,154,110,0.3)", borderRadius: 8, color: "#6DB89A", fontSize: "0.88rem"}}>✓ {leadFormStatus.message}</div>)}
-                <button type="submit" disabled={leadFormStatus.type === 'loading'} style={{padding: "1rem 1.5rem", background: leadFormStatus.type === 'loading' ? "rgba(230,136,99,0.5)" : "#E68863", color: "#fff", border: "none", borderRadius: 10, fontSize: "1rem", fontWeight: 600, cursor: leadFormStatus.type === 'loading' ? 'not-allowed' : 'pointer', transition: "all 0.25s"}}>{leadFormStatus.type === 'loading' ? 'Отправка...' : 'Отправить заявку'}</button>
-              </form>
+            <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
+              <div className="section-label">ЗАЯВКА</div>
+              <h2 className="section-title heading-sweep" data-text="Оставьте заявку">Оставьте заявку</h2>
+              <p style={{color:"rgba(214,198,178,0.7)", marginTop:"0.5rem"}}>Заполните форму — перезвоним в течение рабочего дня</p>
             </div>
           </Reveal>
+          <LeadForm />
         </div>
       </section>
 
@@ -855,10 +670,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
         <BlockRenderer blocks={homeData.blocks} />
       )}
 
-      {/* ===== AI CHAT WIDGET (внизу справа) ===== */}
-      
-
-      <AIChatWidget />
+      {/* ===== AI CHAT WIDGET — lazy по кнопке ===== */}
+      <LazyAIChatButton />
     </>
   );
 }
