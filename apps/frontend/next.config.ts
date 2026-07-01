@@ -21,12 +21,7 @@ const nextConfig: NextConfig = {
       'react-dom',
     ],
     optimizeCss: true,
-    // Отключаем polyfills для старых браузеров — экономит ~70 KB JS
-    // Современные браузеры (Chrome 120+, Safari 17+) уже поддерживают ES2022+
-    swcJsTransform: {
-      // Не транспилировать ES2022+ фичи (Array.at, Object.hasOwn, etc.)
-      // для современных браузеров
-    },
+
   },
   // Production optimizations
   poweredByHeader: false,
