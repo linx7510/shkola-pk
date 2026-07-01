@@ -870,8 +870,24 @@ export default function ClientDashboard() {
                 ) : (
                   <>
                     <h4 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#E7DCCF', marginBottom: '0.75rem' }}>📤 Загрузить заполненные анкеты</h4>
-                    <p style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.7)', marginBottom: '1rem' }}>Заполните скачанные анкеты и загрузите их здесь. Исполнитель получит уведомление и приступит к разработке Устава.</p>
-                    <UploadForm projectId={project.id} documentCode="anketa_filled" stage={0} token={token} onSubmitted={() => { refreshProject(); }} />
+                    <p style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.7)', marginBottom: '1rem' }}>Загрузите каждую анкету отдельно. За каждую загруженную анкету вы получаете XP.</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {project.documents.filter((d: any) => d.stage === 0 && d.code.startsWith('brief_')).map((doc: any) => (
+                        <div key={doc.code} style={{ padding: '1rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <strong style={{ color: '#E7DCCF', fontSize: '0.95rem' }}>{doc.name}</strong>
+                            <span style={{ fontSize: '0.75rem', color: '#E68863', fontWeight: 700 }}>+{doc.xp} XP</span>
+                          </div>
+                          {doc.status === 'review' ? (
+                            <div style={{ fontSize: '0.85rem', color: '#D4A856', fontWeight: 600 }}>✅ Загружено — на проверке у исполнителя</div>
+                          ) : doc.file ? (
+                            <div style={{ fontSize: '0.85rem', color: '#6DB89A' }}>✅ Загружено</div>
+                          ) : (
+                            <UploadForm projectId={project.id} documentCode={doc.code} stage={0} token={token} onSubmitted={() => { refreshProject(); }} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </>
                 )}
               </div>
