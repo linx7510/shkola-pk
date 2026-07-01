@@ -119,7 +119,45 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
               gap: "1rem",
             }}
           >
+                      {data.thumbnailUrl && (
+            <img
+              src={data.thumbnailUrl}
+              alt={data.title || "Видео"}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                zIndex: 1,
+              }}
+            />
+          )}
+          {data.thumbnailUrl && (
             <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 70,
+                height: 70,
+                borderRadius: "50%",
+                background: "rgba(201,110,77,0.9)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.8rem",
+                color: "#fff",
+                boxShadow: "0 0 30px rgba(0,0,0,0.5)",
+                zIndex: 3,
+              }}
+            >
+              ▶
+            </div>
+          )}
+          <div
               style={{
                 width: 80,
                 height: 80,
