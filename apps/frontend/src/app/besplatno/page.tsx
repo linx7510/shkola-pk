@@ -58,7 +58,7 @@ export default async function BesplatnoPage() {
         { label: "Главная", href: "/" },
         { label: "Бесплатно" }
       ]} />
-      <main style={{ paddingTop: "5rem", minHeight: "60vh" }}>
+      <main style={{ paddingTop: "0", minHeight: "60vh" }}>
         {Array.isArray(blocks) && blocks.length > 0 ? (
           <BlockRenderer blocks={blocks} />
         ) : (

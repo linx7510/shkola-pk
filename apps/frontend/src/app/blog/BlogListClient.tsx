@@ -68,7 +68,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
 
   return (
     <>
-    <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
+    <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "0", paddingBottom: "4rem" }}>
       <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "0 var(--container-px)" }}>
         {/* Заголовок */}
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
@@ -84,14 +84,14 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
         {categories.length > 0 && (
           <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", marginBottom: "2rem", flexWrap: "wrap" }}>
             <button onClick={() => handleCategoryChange(null)} style={{
-              padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "0.85rem",
+              padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "1.05rem",
               border: !activeCategory ? "1px solid rgba(230,136,99,0.5)" : "1px solid rgba(214,198,178,0.15)",
               background: !activeCategory ? "rgba(230,136,99,0.1)" : "transparent",
               color: !activeCategory ? "#E68863" : "rgba(214,198,178,0.75)",
             }}>Все</button>
             {categories.map((cat) => (
               <button key={cat} onClick={() => handleCategoryChange(cat)} style={{
-                padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "0.85rem",
+                padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "1.05rem",
                 border: activeCategory === cat ? "1px solid rgba(230,136,99,0.5)" : "1px solid rgba(214,198,178,0.15)",
                 background: activeCategory === cat ? "rgba(230,136,99,0.1)" : "transparent",
                 color: activeCategory === cat ? "#E68863" : "rgba(214,198,178,0.75)",
@@ -113,13 +113,13 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
               </div>
               <div className="blog-featured__content">
                 {featuredPost.category && (
-                  <span style={{ fontSize: "0.75rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{featuredPost.category}</span>
+                  <span style={{ fontSize: "1rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{featuredPost.category}</span>
                 )}
                 <h2 className="blog-featured__title heading-sweep" data-text={featuredPost.title}>{featuredPost.title}</h2>
                 {featuredPost.excerpt && <p className="blog-featured__excerpt">{featuredPost.excerpt}</p>}
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                   <span className="blog-featured__link">Читать статью →</span>
-                  <span style={{ fontSize: "0.8rem", color: "rgba(214,198,178,0.5)" }}>
+                  <span style={{ fontSize: "1rem", color: "rgba(214,198,178,0.8)" }}>
                     {new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString("ru-RU")}
                   </span>
                 </div>
@@ -129,7 +129,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
 
           {/* Список статей */}
           {paginatedPosts.length === 0 ? (
-            <div style={{ textAlign: "center", color: "rgba(214,198,178,0.6)", padding: "4rem 0" }}>
+            <div style={{ textAlign: "center", color: "rgba(214,198,178,0.75)", padding: "4rem 0" }}>
               Пока нет публикаций в этой категории.
             </div>
           ) : (
@@ -145,13 +145,13 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
                   </div>
                   <div style={{ padding: "1.25rem" }}>
                     {post.category && (
-                      <span style={{ fontSize: "0.75rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{post.category}</span>
+                      <span style={{ fontSize: "1rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{post.category}</span>
                     )}
                     <h3 style={{ fontSize: "1.1rem", fontWeight: 600, color: "#E7DCCF", margin: "0.5rem 0 0.75rem", lineHeight: 1.4 }}>{post.title}</h3>
                     {post.excerpt && (
-                      <p style={{ fontSize: "0.9rem", color: "rgba(214,198,178,0.7)", lineHeight: 1.6, margin: 0 }}>{post.excerpt}</p>
+                      <p style={{ fontSize: "1rem", color: "rgba(214,198,178,0.8)", lineHeight: 1.6, margin: 0 }}>{post.excerpt}</p>
                     )}
-                    <div style={{ marginTop: "0.75rem", fontSize: "0.8rem", color: "rgba(214,198,178,0.5)" }}>
+                    <div style={{ marginTop: "0.75rem", fontSize: "1rem", color: "rgba(214,198,178,0.8)" }}>
                       {new Date(post.publishedAt || post.createdAt).toLocaleDateString("ru-RU")}
                     </div>
                   </div>

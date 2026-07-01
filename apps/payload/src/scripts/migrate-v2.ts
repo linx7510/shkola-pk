@@ -9,10 +9,10 @@ import { Pool } from 'pg'
 
 const PAYLOAD_URL = process.env.PAYLOAD_URL || 'http://localhost:3001'
 const ADMIN_EMAIL = 'admin@shkola-pk.ru'
-const ADMIN_PASSWORD = 'Admin123!'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ChangeMe123!'
 
 const prismaPool = new Pool({
-  connectionString: 'postgresql://shkola_pk:Shk0laPK2026!Db@localhost:5432/shkola_pk'
+  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/shkola_pk'
 })
 
 let authToken = ''

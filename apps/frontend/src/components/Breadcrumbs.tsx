@@ -10,8 +10,8 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
     <nav aria-label="breadcrumb" style={{
       padding: "1rem 1.5rem",
       maxWidth: 1200,
-      margin: "0 auto",
-      fontSize: "0.9rem",
+      margin: "calc(var(--header-h, 72px) + 20px) auto 20px",
+      fontSize: "1rem",
       color: "rgba(214,198,178,0.8)",
       background: "rgba(214,198,178,0.03)",
       borderBottom: "1px solid rgba(214,198,178,0.06)",
@@ -38,7 +38,7 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
               <span style={{ color: "#E7DCCF", fontWeight: 600 }}>{item.label}</span>
             )}
             {i < items.length - 1 && (
-              <span style={{ color: "rgba(214,198,178,0.3)" }}>›</span>
+              <span style={{ color: "rgba(214,198,178,0.75)" }}>›</span>
             )}
           </li>
         ))}

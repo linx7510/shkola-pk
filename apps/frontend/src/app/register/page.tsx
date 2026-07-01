@@ -79,7 +79,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -100,7 +100,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -121,7 +121,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -141,7 +141,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -162,7 +162,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -184,7 +184,7 @@ export default function RegisterPage() {
                 display: "flex",
                 alignItems: "flex-start",
                 gap: "0.5rem",
-                fontSize: "0.8rem",
+                fontSize: "1rem",
                 color: "var(--color-text-muted)",
                 marginBottom: "0.75rem",
                 cursor: "pointer",
@@ -220,7 +220,7 @@ export default function RegisterPage() {
 
           <div className="auth-divider">или</div>
 
-          <p style={{ textAlign: "center", fontSize: "0.9rem" }}>
+          <p style={{ textAlign: "center", fontSize: "1rem" }}>
             Уже есть аккаунт?{" "}
             <Link href="/login" className="auth-link">
               Войти

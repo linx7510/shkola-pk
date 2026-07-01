@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload'
+import { richTextEditor } from '../lexicalFeatures'
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
@@ -11,7 +12,7 @@ export const Settings: GlobalConfig = {
     { name: 'headerPhone', type: 'text', label: 'Телефон в шапке' },
     { name: 'headerEmail', type: 'email', label: 'Email в шапке' },
     { name: 'headerTelegram', type: 'text', label: 'Telegram' },
-    { name: 'footerText', type: 'richText', label: 'Текст в подвале' },
+    { name: 'footerText', type: 'richText', label: 'Текст в подвале', editor: richTextEditor },
     { name: 'yookassaShopId', type: 'text', label: 'YooKassa Shop ID', admin: { position: 'sidebar' } },
     { name: 'yookassaSecretKey', type: 'text', label: 'YooKassa Secret Key', admin: { position: 'sidebar' } },
     { name: 'smtpHost', type: 'text', label: 'SMTP Host', admin: { position: 'sidebar' } },

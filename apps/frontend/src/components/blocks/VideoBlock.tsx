@@ -130,7 +130,7 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
             >
               ▶
             </div>
-            <div style={{ color: "rgba(214,198,178,0.6)", fontSize: "0.9rem" }}>
+            <div style={{ color: "rgba(214,198,178,0.75)", fontSize: "1rem" }}>
               {embedUrl ? "Нажмите, чтобы посмотреть видео" : "Видео скоро будет добавлено"}
             </div>
           </div>
@@ -142,7 +142,7 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
               color: "rgba(214,198,178,0.8)",
               marginTop: "1rem",
               lineHeight: 1.6,
-              fontSize: "0.95rem",
+              fontSize: "1.05rem",
               textAlign: "center",
             }}
           >
@@ -273,7 +273,7 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
                 style={{
                   padding: "1rem 1.5rem",
                   color: "rgba(214,198,178,0.8)",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                   lineHeight: 1.6,
                   borderTop: "1px solid rgba(214,198,178,0.08)",
                 }}

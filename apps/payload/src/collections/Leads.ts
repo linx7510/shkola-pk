@@ -16,6 +16,8 @@ export const Leads: CollectionConfig = {
       return false
     },
     create: () => true,
+    update: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'manager',
+    delete: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'manager',
   },
   fields: [
     { name: 'name', type: 'text', required: true, label: 'Имя' },
@@ -75,6 +77,12 @@ export const Leads: CollectionConfig = {
       type: 'text',
       admin: { position: 'sidebar', readOnly: true },
       label: 'IP адрес (псевдонимизированный)',
+    },
+    {
+      name: 'ipHash',
+      type: 'text',
+      admin: { position: 'sidebar', readOnly: true, description: 'SHA-256 хеш IP (152-ФЗ, для анонимной аналитики)' },
+      label: 'IP хеш (SHA-256)',
     },
     {
       name: 'userAgent',

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { richTextEditor } from '../lexicalFeatures'
 
 export const Services: CollectionConfig = {
   slug: 'services',
@@ -14,7 +15,7 @@ export const Services: CollectionConfig = {
     { name: 'title', type: 'text', required: true, label: 'Название услуги' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг' },
     { name: 'shortDesc', type: 'textarea', maxLength: 200, label: 'Краткое описание' },
-    { name: 'content', type: 'richText', required: true, label: 'Подробное описание' },
+    { name: 'content', type: 'richText', required: true, label: 'Подробное описание', editor: richTextEditor },
     { name: 'icon', type: 'text', label: 'Иконка' },
     { name: 'price', type: 'number', label: 'Цена (руб)', min: 0 },
     { name: 'priceNote', type: 'text', label: 'Примечание к цене' },

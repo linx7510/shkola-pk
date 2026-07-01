@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server'
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
+// This page verifies email tokens — must be dynamic (token is unique per request)
+export const dynamic = 'force-dynamic' // CORRECT: token-based page, not a CMS page
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 

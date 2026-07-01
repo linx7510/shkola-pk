@@ -10,7 +10,7 @@ async function migrate() {
   
   const { Pool } = await import('pg')
   const prismaPool = new Pool({
-    connectionString: 'postgresql://shkola_pk:Shk0laPK2026!Db@localhost:5432/shkola_pk'
+    connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/shkola_pk'
   })
 
   const payload = await getPayload({ config })

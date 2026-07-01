@@ -22,7 +22,7 @@ export function GalleryBlock({ data }: { data: GalleryBlockData }) {
           <figure key={i} style={{ margin: 0 }}>
             <img src={img.url} alt={img.alt || ""} style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 10, display: "block" }} />
             {img.caption && (
-              <figcaption style={{ color: "rgba(214,198,178,0.7)", fontSize: "0.82rem", textAlign: "center", marginTop: "0.5rem" }}>
+              <figcaption style={{ color: "rgba(214,198,178,0.8)", fontSize: "0.82rem", textAlign: "center", marginTop: "0.5rem" }}>
                 {img.caption}
               </figcaption>
             )}

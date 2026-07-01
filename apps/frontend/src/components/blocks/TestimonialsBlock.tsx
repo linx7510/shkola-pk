@@ -27,7 +27,7 @@ export function TestimonialsBlock({ data }: { data: TestimonialsBlockData }) {
               {t.avatar?.url && (
                 <img src={t.avatar.url} alt={t.name} style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover", marginBottom: "0.75rem" }} />
               )}
-              <p style={{ color: "rgba(214,198,178,0.85)", fontSize: "0.95rem", lineHeight: 1.7, marginBottom: "0.75rem", fontStyle: "italic" }}>&ldquo;{t.text}&rdquo;</p>
+              <p style={{ color: "rgba(214,198,178,0.9)", fontSize: "1.05rem", lineHeight: 1.7, marginBottom: "0.75rem", fontStyle: "italic" }}>&ldquo;{t.text}&rdquo;</p>
               <div style={{ color: "#E68863", fontSize: "0.88rem", fontWeight: 600 }}>
                 {t.name}{t.role ? `, ${t.role}` : ""}
               </div>

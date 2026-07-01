@@ -20,7 +20,18 @@ export const BlogPosts: CollectionConfig = {
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг', admin: { position: 'sidebar' } },
     { name: 'excerpt', type: 'textarea', maxLength: 300, label: 'Анонс' },
-    { name: 'content', type: 'textarea', required: true, label: 'Содержание статьи (HTML)', admin: { description: 'Редактируйте текст в HTML. Заголовки: <h2>текст</h2>, абзацы: <p>текст</p>, списки: <ul><li>пункт</li></ul>, цитаты: <blockquote>текст</blockquote>' } },
+    {
+      name: 'content',
+      type: 'textarea',
+      required: true,
+      label: 'Содержание статьи (HTML)',
+      admin: {
+        description: '📝 Редактируйте текст в HTML. Теги: <h2>заголовок</h2>, <p>абзац</p>, <ul><li>пункт</li></ul>, <blockquote>цитата</blockquote>, <a href="...">ссылка</a>, <strong>жирный</strong>, <em>курсив</em>.\n\n🖼 Для вставки изображения с настройками размера и обтекания используйте кнопку «Вставить изображение» над полем. Изображения вставляются с inline-стилями: <img src="..." style="width:400px;float:left;margin:0 1.5rem 1rem 0;"> — где width=ширина, float=обтекание (left/right/none), margin=отступы.',
+        components: {
+          beforeInput: ['@/components/ImageInsertButton#ImageInsertButton'],
+        },
+      },
+    },
     { name: 'coverImage', type: 'upload', relationTo: 'media', label: 'Обложка' },
     { name: 'category', type: 'relationship', relationTo: 'categories', label: 'Категория', filterOptions: { type: { equals: 'blog' } } },
     { name: 'tags', type: 'text', label: 'Теги (через запятую)', admin: { position: 'sidebar' } },

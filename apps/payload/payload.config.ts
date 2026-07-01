@@ -1,8 +1,11 @@
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { ru } from '@payloadcms/translations/languages/ru'
+import { en } from '@payloadcms/translations/languages/en'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { s3Storage } from '@payloadcms/storage-s3'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -26,6 +29,11 @@ import { LessonProgress } from './src/collections/LessonProgress'
 import { Settings } from './src/collections/Settings'
 import { Header } from './src/collections/Header'
 import { Footer } from './src/collections/Footer'
+import { AuditLogs } from './src/collections/AuditLogs'
+
+// === Custom endpoints ===
+import { updateProjectProgressEndpoint } from './src/endpoints/update-project-progress'
+import { sendTestEmailEndpoint } from './src/endpoints/send-test-email'
 
 // === Стандартные 9 блоков ===
 import { HeroBlock } from './src/blocks/HeroBlock'
@@ -78,7 +86,8 @@ const plugins: any[] = [
 
 /* SEO plugin — restored P1-4
   seoPlugin({
-    collections: ['blog-posts', 'courses', 'glossary-terms', 'pages'],
+    collections: ['blog-posts', 'courses', 'glossary-terms', 'pages',
+  ],
     uploadsCollection: 'media',
   }), */
 ]
@@ -89,8 +98,12 @@ export default buildConfig({
     meta: { titleSuffix: ' — Школа ПК', description: 'Панель управления платформой Школа ПК' },
     dateFormat: 'dd.MM.yyyy',
   },
+  i18n: {
+    supportedLanguages: { ru, en },
+    fallbackLanguage: 'ru',
+  },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects],
+  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects, AuditLogs],
   globals: [Settings, Header, Footer],
   // === 20 BLOCKS ===
   blocks: [
@@ -118,4 +131,31 @@ export default buildConfig({
   graphQL: { disable: false },
   cors: ['http://2980738.ru', 'https://2980738.ru', 'http://localhost:3000', 'http://frontend:3000'],
   csrf: ['http://2980738.ru', 'https://2980738.ru', 'http://localhost:3000', 'http://frontend:3000'],
+  endpoints: [
+    updateProjectProgressEndpoint,
+    sendTestEmailEndpoint,
+  ],
+  // === Email (SMTP через mail.ru) ===
+  // Используется для отправки verification emails при регистрации,
+  // уведомлений о загрузке документов, и других транзакционных писем.
+  // Требует SMTP_PASS = app-password от mail.ru (не основной пароль!)
+  // Создать app password: https://mail.ru/?authid=kv_sessionid&helpId=mail-security-protection-external
+  // Если SMTP_PASS не задан (placeholder) — email transport не активируется,
+  // но Payload работает нормально (письма только логируются).
+  ...(process.env.SMTP_PASS && process.env.SMTP_PASS !== 'email_password_change_me' ? {
+    email: nodemailerAdapter({
+      defaultFromName: 'Школа ПК',
+      defaultFromAddress: process.env.SMTP_USER || 'boss@2980738.ru',
+      transportOptions: {
+        host: process.env.SMTP_HOST || 'smtp.mail.ru',
+        port: Number(process.env.SMTP_PORT) || 587,
+        auth: {
+          user: process.env.SMTP_USER || '',
+          pass: process.env.SMTP_PASS,
+        },
+        secure: false,
+        requireTLS: true,
+      },
+    }),
+  } : {}),
 })

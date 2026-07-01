@@ -80,7 +80,7 @@ export function FaqBlock({ data }: { data: FaqBlockData }) {
               <div
                 style={{
                   padding: "0 1.25rem 1rem",
-                  color: "rgba(214,198,178,0.85)",
+                  color: "rgba(214,198,178,0.9)",
                   fontSize: "0.92rem",
                   lineHeight: 1.7,
                 }}

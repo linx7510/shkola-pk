@@ -1,8 +1,8 @@
 import { Pool } from 'pg'
 
-// Подключение к shkola_pk БД (где audit_logs)
+// Подключение к shkola_pk_payload БД (где public.audit_logs)
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL  // Теперь одна БД — shkola_pk_payload
+  connectionString: process.env.DATABASE_URL
 })
 
 export interface AuditLogInput {
@@ -16,25 +16,21 @@ export interface AuditLogInput {
 }
 
 /**
- * Записать audit log
+ * Записать audit log в public.audit_logs
  */
 export async function logAudit(input: AuditLogInput): Promise<void> {
   try {
-    const { randomBytes } = await import('crypto')
-    const id = randomBytes(12).toString('hex')
-    
     await pool.query(
-      `INSERT INTO audit.audit_logs ("id", "userId", "action", "entity", "entityId", "details", "ip", "userAgent")
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      `INSERT INTO public.audit_logs (user_id, action, entity, entity_id, details, ip, user_agent, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())`,
       [
-        id,
-        input.userId?.toString() || null,
+        input.userId ? parseInt(String(input.userId), 10) || null : null,
         input.action,
         input.entity,
         input.entityId?.toString() || null,
         input.details ? (typeof input.details === 'string' ? input.details : JSON.stringify(input.details)) : null,
         input.ip || null,
-        input.userAgent || null,
+        input.userAgent ? input.userAgent.slice(0, 500) : null,
       ]
     )
   } catch (error) {

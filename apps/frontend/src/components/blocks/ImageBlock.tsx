@@ -14,7 +14,7 @@ export function ImageBlock({ data }: { data: ImageBlockData }) {
         {data.image?.url && (
           <figure style={{ margin: 0 }}>
             <img src={data.image.url} alt={data.image.alt || ''} style={{ width: "100%", borderRadius: 12, display: "block" }} />
-            {data.caption && <figcaption style={{ color: "rgba(214,198,178,0.6)", fontSize: "0.85rem", marginTop: "0.5rem" }}>{data.caption}</figcaption>}
+            {data.caption && <figcaption style={{ color: "rgba(214,198,178,0.75)", fontSize: "1.05rem", marginTop: "0.5rem" }}>{data.caption}</figcaption>}
           </figure>
         )}
       </div>

@@ -1,18 +1,22 @@
 import { notFound } from "next/navigation";
+export const revalidate = 300; // ISR: revalidate every 5 minutes
 import { Metadata } from "next";
+
 import Header from "@/components/Header";
 const CursorLight = dynamic(() => import("@/components/CursorLight"));
 const BlogParticles = dynamic(() => import("@/components/BlogParticles"));
 import Link from "next/link";
+
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import dynamic from "next/dynamic";
+
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
 async function payloadApi(path: string) {
   try {
-    const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, { cache: 'no-store' })
+    const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, { next: { revalidate: 300 } })
     if (!res.ok) return null
     return res.json()
   } catch {
@@ -110,7 +114,41 @@ export default async function BlogPostPage({ params }: Props) {
   const post = data?.docs?.[0]
   if (!post || !post.isPublished) notFound();
 
-  const contentHtml = lexicalToHtml(post.content);
+  let contentHtml = lexicalToHtml(post.content);
+
+  // Replace {{img:N}} placeholders with styled <img> tags from post.images array
+  const images = (post as any).images || [];
+  if (images.length > 0) {
+    contentHtml = contentHtml.replace(/{{img:(\d+)}}/g, (match: string, num: string) => {
+      const idx = parseInt(num, 10) - 1;
+      const img = images[idx];
+      if (!img || !img.image) return match;
+      const imgUrl = typeof img.image === 'object' ? img.image.url : img.image;
+      if (!imgUrl) return match;
+      const w = img.width ? `width:${img.width}px;` : '';
+      const alt = img.alt || '';
+      const align = img.align || 'none';
+      const margin = img.margin || '0 1.5rem 1rem 0';
+      let style = '';
+      let wrapperStyle = '';
+      if (align === 'left') {
+        style = `float:left;${w}margin:${margin};border-radius:8px;`;
+      } else if (align === 'right') {
+        style = `float:right;${w}margin:${margin};border-radius:8px;`;
+      } else if (align === 'center') {
+        wrapperStyle = `text-align:center;margin:1.5rem 0;`;
+        style = `${w}max-width:100%;border-radius:8px;`;
+      } else {
+        style = `${w}display:block;margin:1.5rem auto;border-radius:8px;`;
+      }
+      const imgTag = `<img src="${imgUrl}" alt="${alt.replace(/"/g, '&quot;')}" style="${style}" />`;
+      const captionHtml = img.caption ? `<figcaption style="font-size:1.05rem;color:rgba(214,198,178,0.8);margin-top:0.5rem;text-align:center;">${img.caption}</figcaption>` : '';
+      if (align === 'center' || align === 'none') {
+        return `<figure style="${wrapperStyle}">${imgTag}${captionHtml}</figure>`;
+      }
+      return `<figure style="margin:0;${align === 'left' ? 'float:left;' : 'float:right;'}">${imgTag}${captionHtml}</figure>`;
+    });
+  }
 
   return (
     <>
@@ -122,16 +160,16 @@ export default async function BlogPostPage({ params }: Props) {
           { label: (post as any).title || "" }
         ]} />
         <BlogParticles />
-      <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
-        <article style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--container-px)" }}>
+      <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "0", paddingBottom: "4rem" }}>
+        <article style={{ maxWidth: 1400, margin: "0 auto", padding: "0 var(--container-px)" }}>
           <Link
             href="/blog"
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: "0.4rem",
-              color: "rgba(214,198,178,0.5)",
-              fontSize: "0.85rem",
+              color: "rgba(214,198,178,0.8)",
+              fontSize: "1.05rem",
               textDecoration: "none",
               marginBottom: "2rem",
             }}
@@ -140,7 +178,7 @@ export default async function BlogPostPage({ params }: Props) {
           </Link>
 
           {post.category && (
-            <div style={{ fontSize: "0.8rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>
+            <div style={{ fontSize: "1rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>
               {post.category}
             </div>
           )}
@@ -149,15 +187,11 @@ export default async function BlogPostPage({ params }: Props) {
             {post.title}
           </h1>
 
-          <div style={{ fontSize: "0.85rem", color: "rgba(214,198,178,0.4)", marginBottom: "2rem" }}>
+          <div style={{ fontSize: "1.05rem", color: "rgba(214,198,178,0.65)", marginBottom: "2rem" }}>
             {new Date(post.publishedAt || post.createdAt).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
           </div>
 
-          {post.coverImage && (
-            <div style={{ width: "100%", borderRadius: 12, overflow: "hidden", marginBottom: "2rem" }}>
-              <img src={typeof post.coverImage === "object" ? post.coverImage.url : post.coverImage} alt="" style={{ width: "100%", display: "block" }} />
-            </div>
-          )}
+          {/* Cover image убран — дублирует фото из статьи */}
 
           {contentHtml && (
             <div
@@ -172,11 +206,11 @@ export default async function BlogPostPage({ params }: Props) {
                 <span
                   key={i}
                   style={{
-                    fontSize: "0.75rem",
+                    fontSize: "1rem",
                     padding: "0.3rem 0.7rem",
                     borderRadius: 999,
                     border: "1px solid rgba(214,198,178,0.1)",
-                    color: "rgba(214,198,178,0.4)",
+                    color: "rgba(214,198,178,0.65)",
                   }}
                 >
                   {tag.trim()}
@@ -190,7 +224,7 @@ export default async function BlogPostPage({ params }: Props) {
             <h3 className="heading-sweep" data-text="Хотите узнать больше?" style={{ fontSize: "1.2rem", fontWeight: 600, color: "#D6C6B2", marginBottom: "0.5rem" }}>
               Хотите узнать больше?
             </h3>
-            <p style={{ color: "rgba(214,198,178,0.5)", fontSize: "0.9rem", marginBottom: "1rem" }}>
+            <p style={{ color: "rgba(214,198,178,0.8)", fontSize: "1rem", marginBottom: "1rem" }}>
               Запишитесь на консультацию или бесплатный пробный урок
             </p>
             <Link

@@ -28,13 +28,13 @@ export default function GlossaryListClient({ terms }: { terms: GlossaryTerm[] })
   }, {} as Record<string, GlossaryTerm[]>);
 
   return (
-    <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "calc(var(--header-h) + 2rem)", paddingBottom: "4rem" }}>
+    <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "0", paddingBottom: "4rem" }}>
       <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "0 var(--container-px)" }}>
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
           <h1 className="heading-sweep" data-text="Глоссарий ПК" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 800, color: "#D6C6B2", marginBottom: "1rem" }}>
             Глоссарий ПК
           </h1>
-          <p style={{ color: "rgba(214,198,178,0.6)", fontSize: "1.1rem", maxWidth: 600, margin: "0 auto" }}>
+          <p style={{ color: "rgba(214,198,178,0.75)", fontSize: "1.1rem", maxWidth: 600, margin: "0 auto" }}>
             Ключевые термины и понятия потребительской кооперации
           </p>
         </div>
@@ -61,19 +61,19 @@ export default function GlossaryListClient({ terms }: { terms: GlossaryTerm[] })
         {categories.length > 0 && (
           <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", marginBottom: "2rem", flexWrap: "wrap" }}>
             <button onClick={() => setActiveCategory(null)} style={{
-              padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "0.85rem",
+              padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "1.05rem",
               border: `1px solid ${!activeCategory ? "rgba(230,136,99,0.5)" : "rgba(214,198,178,0.15)"}`,
               background: !activeCategory ? "rgba(230,136,99,0.1)" : "transparent",
-              color: !activeCategory ? "#E68863" : "rgba(214,198,178,0.6)",
+              color: !activeCategory ? "#E68863" : "rgba(214,198,178,0.75)",
             }}>
               Все
             </button>
             {categories.map((cat) => (
               <button key={cat} onClick={() => setActiveCategory(cat)} style={{
-                padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "0.85rem",
+                padding: "0.4rem 1rem", borderRadius: 999, cursor: "pointer", fontSize: "1.05rem",
                 border: `1px solid ${activeCategory === cat ? "rgba(230,136,99,0.5)" : "rgba(214,198,178,0.15)"}`,
                 background: activeCategory === cat ? "rgba(230,136,99,0.1)" : "transparent",
-                color: activeCategory === cat ? "#E68863" : "rgba(214,198,178,0.6)",
+                color: activeCategory === cat ? "#E68863" : "rgba(214,198,178,0.75)",
               }}>
                 {cat}
               </button>
@@ -97,13 +97,13 @@ export default function GlossaryListClient({ terms }: { terms: GlossaryTerm[] })
                   }}
                 >
                   <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "#D6C6B2", marginBottom: "0.4rem" }}>{term.term}</h3>
-                  <p style={{ fontSize: "0.9rem", color: "rgba(214,198,178,0.6)", lineHeight: 1.6, margin: 0 }}>{term.definition}</p>
+                  <p style={{ fontSize: "1rem", color: "rgba(214,198,178,0.75)", lineHeight: 1.6, margin: 0 }}>{term.definition}</p>
                 </div>
               ))}
             </div>
           ))}
           {Object.keys(grouped).length === 0 && (
-            <div style={{ textAlign: "center", color: "rgba(214,198,178,0.4)", padding: "4rem 0" }}>
+            <div style={{ textAlign: "center", color: "rgba(214,198,178,0.65)", padding: "4rem 0" }}>
               Термины не найдены
             </div>
           )}

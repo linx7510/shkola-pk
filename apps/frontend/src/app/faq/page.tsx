@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+export const revalidate = 300; // ISR: revalidate every 5 minutes
 import Breadcrumbs from "@/components/Breadcrumbs"
 import Header from "@/components/Header";
 import FaqListClient from "./FaqListClient";
@@ -7,7 +8,7 @@ const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
 async function payloadApi(path: string) {
   try {
-    const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, { cache: 'no-store' });
+    const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, { next: { revalidate: 300 } });
     if (!res.ok) return { docs: [] };
     return res.json();
   } catch {

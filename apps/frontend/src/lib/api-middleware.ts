@@ -28,7 +28,11 @@ export function getTokenFromRequest(request: NextRequest): string | null {
     if (authHeader.startsWith('Bearer ')) return authHeader.substring(7)
   }
 
-  // 2. Try httpOnly cookie (preferred for browsers — XSS-safe)
+  // 2. Try x-auth-token header (forwarded by middleware/proxy)
+  const proxyToken = request.headers.get('x-auth-token')
+  if (proxyToken) return proxyToken
+
+  // 3. Try httpOnly cookie (preferred for browsers — XSS-safe)
   const cookieToken = request.cookies.get('auth_token')?.value
   if (cookieToken) return cookieToken
 
@@ -41,7 +45,10 @@ export function getTokenFromRequest(request: NextRequest): string | null {
 export function getUserFromRequest(request: NextRequest): AuthUser | null {
   try {
     const token = getTokenFromRequest(request)
-    if (!token) return null
+    if (!token) {
+      console.log('[auth] No token found in request')
+      return null
+    }
 
     const decoded = jwt.verify(token, getPayloadSecret()) as any
     return {
@@ -51,7 +58,8 @@ export function getUserFromRequest(request: NextRequest): AuthUser | null {
       role: decoded.role || 'student',
       collection: decoded.collection,
     }
-  } catch {
+  } catch (e: any) {
+    console.log('[auth] JWT verify error:', e.message, '| token:', getTokenFromRequest(request)?.slice(0, 30))
     return null
   }
 }

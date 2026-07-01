@@ -1,42 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserFromRequest } from '@/lib/api-middleware'
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
 export async function GET(request: NextRequest) {
   try {
-    const authUser = getUserFromRequest(request)
-    if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    // Fetch user details from Payload API
+    // Get token from Authorization header or cookie
     const authHeader = request.headers.get('authorization') || ''
     let token = ''
     if (authHeader.startsWith('JWT ')) token = authHeader.substring(4)
     else if (authHeader.startsWith('Bearer ')) token = authHeader.substring(7)
+    
+    // Also check x-auth-token header (forwarded by middleware)
+    if (!token) {
+      token = request.headers.get('x-auth-token') || ''
+    }
+    
+    // Also check cookie
+    if (!token) {
+      token = request.cookies.get('auth_token')?.value || ''
+    }
+    
+    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const res = await fetch(`${PAYLOAD_API_URL}/api/users/${authUser.userId}?depth=1`, {
+    // Verify token via Payload API
+    const res = await fetch(`${PAYLOAD_API_URL}/api/users/me`, {
       headers: { 'Authorization': `JWT ${token}` },
       cache: 'no-store',
     })
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 404 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await res.json()
+    const data = await res.json()
+    // Payload returns { user: { id, email, name, ... } }
+    const u = data.user || data
 
     return NextResponse.json({
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        avatar: user.avatar,
-        bio: user.bio,
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        enrollments: user.enrollments || [],
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        phone: u.phone,
+        role: u.role,
+        avatar: u.avatar,
+        bio: u.bio,
+        isActive: u.isActive,
+        createdAt: u.createdAt,
+        enrollments: u.enrollments || [],
       },
     })
   } catch (error) {

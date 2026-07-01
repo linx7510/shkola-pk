@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { createAuditHooks } from '../lib/audit'
+import { richTextEditor } from '../lexicalFeatures'
 
 import { HeroBlock } from '../blocks/HeroBlock'
 import { FeaturesBlock } from '../blocks/FeaturesBlock'
@@ -36,11 +37,78 @@ export const Pages: CollectionConfig = {
     ...createAuditHooks('page'),
     beforeRead: [
       ({ req }: any) => {
-        // Default sort: most recently updated first
+        // Default sort: home page first (sortOrder=0), then most recently updated
         if (!req.query || !req.query.sort) {
           if (!req.query) req.query = {}
-          req.query.sort = '-updatedAt'
+          req.query.sort = 'sortOrder'
         }
+      },
+    ],
+    afterRead: [
+      ({ docs, req }: any) => {
+        // Если это запрос списка (не отдельный документ) — пересортировать
+        if (!docs || !Array.isArray(docs) || docs.length <= 1) return docs
+        // Сортируем: home (sortOrder=0) первым, потом по -updatedAt
+        return docs.sort((a: any, b: any) => {
+          const sa = a.sortOrder ?? 1
+          const sb = b.sortOrder ?? 1
+          if (sa !== sb) return sa - sb
+          // При одинаковом sortOrder — новее первым
+          const da = new Date(a.updatedAt || 0).getTime()
+          const db = new Date(b.updatedAt || 0).getTime()
+          return db - da
+        })
+      },
+    ],
+    afterChange: [
+      async ({ doc, req, operation }: any) => {
+        // Skip non-mutation operations and recursion guard
+        if (operation !== 'create' && operation !== 'update') return doc
+        if (req.context?.bumpingHome) return doc
+
+        const editedSlug = (doc as any)?.slug
+
+        // Если редактируется главная — убедиться что sortOrder = 0
+        if (editedSlug === 'home' || editedSlug === '') {
+          if ((doc as any).sortOrder !== 0) {
+            try {
+              await req.payload.update({
+                collection: 'pages',
+                id: (doc as any).id,
+                data: { sortOrder: 0 },
+                context: { bumpingHome: true },
+              })
+            } catch (e) {
+              console.error('[Pages] Failed to set sortOrder for home:', e)
+            }
+          }
+          return doc
+        }
+
+        // Bump home updatedAt чтобы она была выше других (кроме sortOrder)
+        try {
+          // Find the home page
+          const homePages = await req.payload.find({
+            collection: 'pages',
+            where: { slug: { equals: 'home' } },
+            limit: 1,
+            depth: 0,
+            context: { bumpingHome: true },
+          })
+          if (homePages.docs && homePages.docs.length > 0) {
+            const home = homePages.docs[0] as any
+            // Re-set the same title to trigger updatedAt bump (no actual content change)
+            await req.payload.update({
+              collection: 'pages',
+              id: home.id,
+              data: { title: home.title },
+              context: { bumpingHome: true },
+            })
+          }
+        } catch (e) {
+          console.error('[Pages afterChange] Failed to bump home updatedAt:', e)
+        }
+        return doc
       },
     ],
   },
@@ -48,6 +116,8 @@ export const Pages: CollectionConfig = {
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг', admin: { position: 'sidebar' } },
     { name: 'isPublished', type: 'checkbox', defaultValue: false, label: 'Опубликована', admin: { position: 'sidebar' } },
+    // sortOrder: 0 = главная (всегда первая), 1 = остальные. Сортировка: sortOrder, -updatedAt
+    { name: 'sortOrder', type: 'number', defaultValue: 1, label: 'Порядок сортировки', admin: { position: 'sidebar', description: '0 = всегда первой (для главной), 1 = обычная' } },
     {
       name: 'hero',
       type: 'group',
@@ -117,7 +187,7 @@ export const Pages: CollectionConfig = {
       fields: [
         { name: 'icon', type: 'text', label: 'Иконка (emoji)' },
         { name: 'title', type: 'text', required: true, label: 'Заголовок' },
-        { name: 'desc', type: 'richText', label: 'Описание' },
+        { name: 'desc', type: 'richText', label: 'Описание', editor: richTextEditor },
       ],
     },
     {

@@ -1,7 +1,17 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { headers } from "next/headers";
+import { Inter } from "next/font/google";
 import "./globals.css";
+
+// Фирменный шрифт Inter — скачивается при сборке, отдаётся с нашего домена
+// 0 внешних запросов в рантайме, font-display: swap (нет FOUT)
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-inter",
+});
 import "./styles/tokens.css";
 import "./styles/layout.css";
 import "./styles/blocks.css";
@@ -24,6 +34,13 @@ export const metadata: Metadata = {
     "Потребительский кооператив — защита активов и ставка 0%. Обучение, услуги по закону РФ № 3085-1. Аудит устава ПК, регистрация под ключ, сопровождение при проверках ФНС.",
   keywords:
     "потребительский кооператив, кооперация, школа кооперативов, Велеслав Старков, регистрация кооператива, аудит устава, Закон 3085-1, обнуление НДС, паевой взнос",
+  authors: [{ name: "Велеслав Старков", url: "https://2980738.ru/about-us" }],
+  creator: "Велеслав Старков",
+  publisher: "Школа ПК — Первая онлайн Школа Потребительской Кооперации",
+  applicationName: "Школа ПК",
+  category: "education",
+  formatDetection: { telephone: true, email: true, address: true },
+  manifest: "/manifest.json",
   openGraph: {
     title: "Потребительский кооператив — защита активов и ставка 0%",
     description: "Первая онлайн Школа потребительской кооперации с 2015 года. Более 120 предпринимателей открыли свои ПК.",
@@ -48,9 +65,26 @@ export const metadata: Metadata = {
     },
   },
   robots: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.webp", type: "image/webp" },
+      { url: "/images/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/images/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: ["/favicon.ico"],
+  },
 };
 
 const METRIKA_ID = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID || "53164504";
+
+export const viewport = {
+  themeColor: "#0D0C0A",
+  width: "device-width",
+  initialScale: 1,
+};
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const nonce = (await headers()).get("x-nonce") || "";
@@ -63,13 +97,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {/* Preconnect to Yandex Metrika origin (saves DNS+TLS on tag.js fetch) */}
         <link rel="preconnect" href="https://mc.yandex.ru" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://mc.yandex.ru" />
+        {/* Preconnect только к Yandex Metrika — единственный 3rd party JS */}
 
-        <meta name="twitter:label1" content="Телефон" />
-        <meta name="twitter:data1" content="+7 (902) 472-07-38" />
-        <meta name="twitter:label2" content="Telegram" />
-        <meta name="twitter:data2" content="@Veles_ST" />
+
       </head>
-      <body className="antialiased">
+      <body className={`antialiased ${inter.variable}`} style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}>
         <script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} nonce={nonce} />
         <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{__html: JSON.stringify({
           "@context": "https://schema.org",
@@ -119,7 +151,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             does NOT block main thread during initial render.
             Initial pageview still tracked via inline ym() call below. */}
         <Script id="yandex-metrika-init" strategy="lazyOnload" nonce={nonce}>
-          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true,trackHash:true,ecommerce:"dataLayer",defer:true});`}
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(${METRIKA_ID}, "init", {trackLinks:true,accurateTrackBounce:true,defer:true});`}
         </Script>
         <noscript>
           <div>

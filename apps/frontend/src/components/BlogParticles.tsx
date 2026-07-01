@@ -1,18 +1,42 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * BlogParticles — оптимизированные световые частицы
- * Desktop only (mobile — выключено для экономии GPU).
+ * Desktop only (mobile ≤768px — выключено для экономии GPU).
+ * Также отключается при prefers-reduced-motion (пункт 17 плана).
  * 
- * v2: 25 particles max, visibility API pause, reduced math per frame
+ * v4: canvas element НЕ рендерится на мобильных (раньше только анимация
+ *     останавливалась, но сам canvas оставался в DOM)
  */
 export default function BlogParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.matchMedia("(max-width: 768px)").matches) return;
+    
+    // === Mobile detection (max-width: 768px) — не рендерим canvas на телефонах ===
+    const mqMobile = window.matchMedia("(max-width: 768px)");
+    const mqReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    
+    const checkEnabled = () => {
+      setEnabled(!mqMobile.matches && !mqReducedMotion.matches);
+    };
+    
+    checkEnabled();
+    mqMobile.addEventListener("change", checkEnabled);
+    mqReducedMotion.addEventListener("change", checkEnabled);
+    
+    return () => {
+      mqMobile.removeEventListener("change", checkEnabled);
+      mqReducedMotion.removeEventListener("change", checkEnabled);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+    if (typeof window === "undefined") return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -67,17 +91,14 @@ export default function BlogParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (const p of particles) {
-        // Дрейф
         p.x += p.vx;
         p.y += p.vy;
 
-        // Отражение от краёв
         if (p.x < 0) p.x = canvas.width;
         if (p.x > canvas.width) p.x = 0;
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
-        // Отталкивание от курсора (упрощённая математика)
         const dx = p.x - mouseX;
         const dy = p.y - mouseY;
         const distSq = dx * dx + dy * dy;
@@ -89,14 +110,11 @@ export default function BlogParticles() {
           p.vy += (dy / dist) * force;
         }
 
-        // Затухание скорости
         p.vx *= 0.98;
         p.vy *= 0.98;
 
-        // Плавное появление
         p.alpha += (p.baseAlpha - p.alpha) * 0.03;
 
-        // Мягкое свечение вокруг точки (лёгкий 3D-эффект)
         const glowR = Math.max(0.1, p.r * 2.2);
         const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
         glow.addColorStop(0, "hsla(" + p.hue + ", 80%, 65%, " + (p.alpha * 0.5) + ")");
@@ -106,7 +124,6 @@ export default function BlogParticles() {
         ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
         ctx.fill();
 
-        // Сама точка
         ctx.beginPath();
         ctx.arc(p.x, p.y, Math.max(0.1, p.r), 0, Math.PI * 2);
         ctx.fillStyle = "hsla(" + p.hue + ", 85%, 72%, " + Math.min(1, p.alpha * 1.2) + ")";
@@ -116,7 +133,6 @@ export default function BlogParticles() {
       raf = requestAnimationFrame(draw);
     }
 
-    // Visibility API — пауза когда вкладка не видна
     const handleVisibility = () => {
       paused = document.hidden;
       if (!paused && !raf) {
@@ -125,11 +141,9 @@ export default function BlogParticles() {
     };
     document.addEventListener("visibilitychange", handleVisibility);
 
-    // Обработка мыши
     const handleMouse = (e: MouseEvent) => { mouseX = e.clientX; mouseY = e.clientY; };
     window.addEventListener("mousemove", handleMouse, { passive: true });
 
-    // Обработка ресайза
     let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
       clearTimeout(resizeTimer);
@@ -147,7 +161,10 @@ export default function BlogParticles() {
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimer);
     };
-  }, []);
+  }, [enabled]);
+
+  // Don't render canvas on mobile or when reduced-motion is preferred
+  if (!enabled) return null;
 
   return (
     <canvas
@@ -158,4 +175,3 @@ export default function BlogParticles() {
     />
   );
 }
-

@@ -103,9 +103,20 @@ export function CardsBlock({ data }: { data: CardsBlockData }) {
             return (
               <Reveal key={i} delay={i + 1}>
                 {c.link ? (
-                  <Link href={c.link} style={{ textDecoration: "none", color: "inherit" }}>
-                    {cardInner}
-                  </Link>
+                  /^https?:\/\//.test(c.link) ? (
+                    <a
+                      href={c.link}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
+                      {cardInner}
+                    </a>
+                  ) : (
+                    <Link href={c.link} style={{ textDecoration: "none", color: "inherit" }}>
+                      {cardInner}
+                    </Link>
+                  )
                 ) : (
                   cardInner
                 )}

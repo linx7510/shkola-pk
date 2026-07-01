@@ -168,10 +168,11 @@ a:hover { color: var(--color-orange-400); }
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;
+  left: 0;
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: translateX(-100%);
   transition: none;
 }
 
@@ -180,8 +181,8 @@ a:hover { color: var(--color-orange-400); }
 }
 
 @keyframes btnShine {
-  0% { left: -100%; }
-  100% { left: 100%; }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .btn-secondary {
@@ -804,7 +805,6 @@ a:hover { color: var(--color-orange-400); }
 
 .heading-sweep:hover::after {
   width: 100%;
-  left: 0;
 }
 
 .heading-sweep::before {
@@ -864,6 +864,7 @@ a:hover { color: var(--color-orange-400); }
   background: linear-gradient(90deg, transparent, #E68863 30%, #F5F0E8 50%, #E68863 70%, transparent);
   box-shadow: 0 0 10px rgba(230, 136, 99, 0.5);
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: width;
 }
 
 .heading-sweep:not([data-text]):hover::after {
@@ -1112,3 +1113,12 @@ a:hover { color: var(--color-orange-400); }
   color: rgba(214,198,178,0.7);
   font-style: italic;
 }
+
+/* FIX: heading-sweep эффект не должен перекрывать картинку в featured карточке */
+.blog-featured__content .heading-sweep {
+  overflow: hidden !important;
+}
+.blog-featured__content .heading-sweep::after {
+  bottom: 0 !important;
+}
+

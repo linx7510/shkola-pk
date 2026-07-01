@@ -35,20 +35,25 @@ function generateNonce(): string {
 }
 
 export function middleware(request: NextRequest) {
+  // Skip middleware for API routes — let Set-Cookie headers pass through
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
   const nonce = generateNonce()
   const reportUri = '/api/csp-report'
 
   // === 1. Enforced CSP — blocks violations, reports them ===
   const cspEnforced = [
     `default-src 'self'`,
-    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
-    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru`,
+    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com`,
+    `frame-src 'self' https://challenges.cloudflare.com`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
-    `form-action 'self'`,
+    `form-action 'self' https://challenges.cloudflare.com`,
     `object-src 'none'`,
     `worker-src 'self' blob:`,
     `report-uri ${reportUri}`,
@@ -60,11 +65,12 @@ export function middleware(request: NextRequest) {
   // This tells us what would break if we removed unsafe-eval entirely
   const cspReportOnly = [
     `default-src 'self'`,
-    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+    `script-src 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
-    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru`,
+    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com`,
+    `frame-src 'self' https://challenges.cloudflare.com`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
     `form-action 'self'`,
@@ -78,6 +84,12 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-nonce', nonce)
   requestHeaders.set('Content-Security-Policy', cspEnforced)
+  
+  // Forward auth_token cookie as header (workaround for Next.js 16 proxy cookie stripping)
+  const authToken = request.cookies.get('auth_token')?.value
+  if (authToken) {
+    requestHeaders.set('x-auth-token', authToken)
+  }
 
   const response = NextResponse.next({
     request: {

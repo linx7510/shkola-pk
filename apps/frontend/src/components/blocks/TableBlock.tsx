@@ -27,7 +27,7 @@ export function TableBlock({ data }: { data: TableBlockData }) {
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   {row.cells.map((cell, ci) => (
-                    <td key={ci} style={{ padding: "1rem 1.25rem", color: ci === 0 ? "#E7DCCF" : "rgba(214,198,178,0.85)", fontSize: "0.92rem", lineHeight: 1.6, borderBottom: "1px solid rgba(214,198,178,0.06)", fontWeight: ci === 0 ? 600 : 400 }}>{cell.value}</td>
+                    <td key={ci} style={{ padding: "1rem 1.25rem", color: ci === 0 ? "#E7DCCF" : "rgba(214,198,178,0.9)", fontSize: "0.92rem", lineHeight: 1.6, borderBottom: "1px solid rgba(214,198,178,0.06)", fontWeight: ci === 0 ? 600 : 400 }}>{cell.value}</td>
                   ))}
                 </tr>
               ))}

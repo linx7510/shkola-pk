@@ -40,11 +40,11 @@ export default async function UslugiSlugPage({ params }: Props) {
         { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
         { label: (page as any).title || "" }
       ]} />
-      <main style={{ paddingTop: "5rem", minHeight: "60vh" }}>
+      <main style={{ paddingTop: "0", minHeight: "60vh" }}>
         {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
         ) : hasContent ? (
-          <section style={{ padding: "4rem 1.5rem", maxWidth: 900, margin: "0 auto" }}>
+          <section style={{ padding: "0 1.5rem 4rem", maxWidth: 900, margin: "0 auto" }}>
             <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2", marginBottom: "1.5rem", fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800 }}>
               {(page as any).title}
             </h1>
@@ -55,7 +55,7 @@ export default async function UslugiSlugPage({ params }: Props) {
             />
           </section>
         ) : (
-          <section style={{ padding: "4rem 1.5rem", maxWidth: 800, margin: "0 auto" }}>
+          <section style={{ padding: "0 1.5rem 4rem", maxWidth: 800, margin: "0 auto" }}>
             <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
           </section>
         )}

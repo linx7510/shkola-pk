@@ -96,7 +96,7 @@ export default function FloatingChatButton() {
               background: "rgba(201,110,77,0.08)",
             }}
           >
-            <div style={{fontWeight: 600, color: "#E7DCCF", fontSize: "0.9rem"}}>
+            <div style={{fontWeight: 600, color: "#E7DCCF", fontSize: "1rem"}}>
               🤖 AI-консультант
             </div>
             <div style={{fontSize: "0.7rem", color: "rgba(214,198,178,0.97)"}}>
@@ -123,7 +123,7 @@ export default function FloatingChatButton() {
                   maxWidth: "85%",
                   padding: "0.6rem 0.9rem",
                   borderRadius: 12,
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   lineHeight: 1.5,
                   background:
                     m.role === "user"
@@ -140,7 +140,7 @@ export default function FloatingChatButton() {
               <div
                 style={{
                   alignSelf: "flex-start",
-                  fontSize: "0.8rem",
+                  fontSize: "1rem",
                   color: "rgba(214,198,178,0.78)",
                 }}
               >
@@ -172,7 +172,7 @@ export default function FloatingChatButton() {
                     border: "1px solid rgba(214,198,178,0.12)",
                     borderRadius: 999,
                     color: "#BCA891",
-                    fontSize: "0.75rem",
+                    fontSize: "1rem",
                     cursor: "pointer",
                     transition: "all 0.2s",
                   }}
@@ -212,7 +212,7 @@ export default function FloatingChatButton() {
                 background: "rgba(214,198,178,0.05)",
                 border: "1px solid rgba(214,198,178,0.1)",
                 color: "#D6C6B2",
-                fontSize: "0.85rem",
+                fontSize: "1.05rem",
                 outline: "none",
               }}
             />
@@ -227,7 +227,7 @@ export default function FloatingChatButton() {
                 background: loading ? "rgba(201,110,77,0.4)" : "#C96E4D",
                 color: "#0D0C0A",
                 fontWeight: 600,
-                fontSize: "0.85rem",
+                fontSize: "1.05rem",
               }}
             >
               →

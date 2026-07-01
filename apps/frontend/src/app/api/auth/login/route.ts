@@ -94,8 +94,17 @@ export async function POST(request: NextRequest) {
     }, {
       headers: {
         'X-RateLimit-Remaining': String(rateLimit.remaining),
-        'Set-Cookie': buildAuthCookieHeader(data.token),
       }
+    })
+    
+    // Set httpOnly cookie properly via response.cookies.set()
+    const isProduction = process.env.NODE_ENV === 'production'
+    response.cookies.set('auth_token', data.token, {
+      httpOnly: true,
+      secure: false,  // Temporarily disabled Secure for testing
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
     })
 
     return response

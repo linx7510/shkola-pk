@@ -5,13 +5,39 @@ import { useEffect, useState } from "react";
  * CursorLight — BEIGE NEON «фонарик в темноте»
  * Мягкое бежевое свечение (300px, rgba(214,198,178,0.07)),
  * следующее за курсором мыши.
- * Активируется при движении, исчезает при уходе со страницы.
+ * 
+ * ОТКЛЮЧЕНО на мобильных (max-width: 768px) и при prefers-reduced-motion
+ * для экономии GPU и предотвращения зависания браузера (пункт 17 плана).
  */
 export default function CursorLight() {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [visible, setVisible] = useState(false);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
+    // === Mobile detection (max-width: 768px) — отключаем на телефонах ===
+    if (typeof window === "undefined") return;
+    
+    const mqMobile = window.matchMedia("(max-width: 768px)");
+    const mqReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    
+    const checkEnabled = () => {
+      setEnabled(!mqMobile.matches && !mqReducedMotion.matches);
+    };
+    
+    checkEnabled();
+    
+    // Слушаем изменения media query (например, при повороте экрана)
+    mqMobile.addEventListener("change", checkEnabled);
+    mqReducedMotion.addEventListener("change", checkEnabled);
+    
+    if (!enabled) {
+      return () => {
+        mqMobile.removeEventListener("change", checkEnabled);
+        mqReducedMotion.removeEventListener("change", checkEnabled);
+      };
+    }
+
     let rafId: number;
     let lastX = 0;
     let lastY = 0;
@@ -42,11 +68,14 @@ export default function CursorLight() {
       document.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("mouseenter", onEnter);
       if (rafId) cancelAnimationFrame(rafId);
+      mqMobile.removeEventListener("change", checkEnabled);
+      mqReducedMotion.removeEventListener("change", checkEnabled);
     };
-  }, [visible]);
+  }, [visible, enabled]);
 
-  // Don't render on server / touch devices
+  // Don't render on server / mobile / reduced-motion
   if (typeof window === "undefined") return null;
+  if (!enabled) return null;
 
   return (
     <div

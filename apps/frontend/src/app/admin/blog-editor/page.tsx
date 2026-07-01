@@ -49,14 +49,14 @@ export default function BlogEditorList() {
         <h1 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#E7DCCF' }}>
           📝 Редактор статей блога
         </h1>
-        <a href='/admin' style={{ color: 'rgba(214,198,178,0.6)', textDecoration: 'none', fontSize: '0.9rem' }}>
+        <a href='/admin' style={{ color: 'rgba(214,198,178,0.75)', textDecoration: 'none', fontSize: '0.9rem' }}>
           ← В админку
         </a>
       </div>
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <span style={{ color: 'rgba(214,198,178,0.6)', fontSize: '0.9rem' }}>
+          <span style={{ color: 'rgba(214,198,178,0.75)', fontSize: '0.9rem' }}>
             Всего статей: {posts.length}
           </span>
         </div>
@@ -91,7 +91,7 @@ export default function BlogEditorList() {
                 }}>
                   {post.title}
                 </div>
-                <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.5)' }}>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.8)' }}>
                   /blog/{post.slug}
                   {post.isPublished ? ' · ✅ Опубликована' : ' · 📝 Черновик'}
                   {post.publishedAt && ' · ' + new Date(post.publishedAt).toLocaleDateString('ru-RU')}

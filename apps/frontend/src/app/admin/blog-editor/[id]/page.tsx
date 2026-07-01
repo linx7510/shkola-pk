@@ -91,28 +91,28 @@ export default function BlogEditor({ params }: { params: Promise<{ id: string }>
     <div style={{ minHeight: "100vh", background: "#0D0C0A", color: "#D6C6B2" }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(13,12,10,0.95)", borderBottom: "1px solid rgba(214,198,178,0.12)", padding: "0.75rem 1.5rem", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <a href="/admin/blog-editor" style={{ color: "rgba(214,198,178,0.6)", textDecoration: "none", fontSize: "0.9rem" }}>← Все статьи</a>
-          <span style={{ color: "#E7DCCF", fontWeight: 600, fontSize: "0.95rem" }}>{showPreview ? "Предпросмотр" : "Редактор"}</span>
+          <a href="/admin/blog-editor" style={{ color: "rgba(214,198,178,0.75)", textDecoration: "none", fontSize: "1rem" }}>← Все статьи</a>
+          <span style={{ color: "#E7DCCF", fontWeight: 600, fontSize: "1.05rem" }}>{showPreview ? "Предпросмотр" : "Редактор"}</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          {saved && <span style={{ color: "#6DB89A", fontSize: "0.85rem" }}>✓ Сохранено</span>}
-          <button onClick={() => setShowPreview(!showPreview)} style={{ padding: "0.5rem 1rem", borderRadius: 8, background: "rgba(214,198,178,0.08)", border: "1px solid rgba(214,198,178,0.15)", color: "#D6C6B2", cursor: "pointer", fontSize: "0.85rem" }}>{showPreview ? "✏️ Редактировать" : "👁 Предпросмотр"}</button>
-          <button onClick={handleSave} disabled={saving} style={{ padding: "0.5rem 1.5rem", borderRadius: 8, background: saving ? "rgba(201,110,77,0.4)" : "#C96E4D", border: "none", color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontSize: "0.9rem", fontWeight: 600 }}>{saving ? "Сохранение..." : "💾 Сохранить"}</button>
+          {saved && <span style={{ color: "#6DB89A", fontSize: "1.05rem" }}>✓ Сохранено</span>}
+          <button onClick={() => setShowPreview(!showPreview)} style={{ padding: "0.5rem 1rem", borderRadius: 8, background: "rgba(214,198,178,0.08)", border: "1px solid rgba(214,198,178,0.15)", color: "#D6C6B2", cursor: "pointer", fontSize: "1.05rem" }}>{showPreview ? "✏️ Редактировать" : "👁 Предпросмотр"}</button>
+          <button onClick={handleSave} disabled={saving} style={{ padding: "0.5rem 1.5rem", borderRadius: 8, background: saving ? "rgba(201,110,77,0.4)" : "#C96E4D", border: "none", color: "#fff", cursor: saving ? "not-allowed" : "pointer", fontSize: "1rem", fontWeight: 600 }}>{saving ? "Сохранение..." : "💾 Сохранить"}</button>
         </div>
       </div>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1.5rem" }}>
         <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", fontSize: "0.8rem", color: "rgba(214,198,178,0.5)", marginBottom: "0.4rem" }}>Заголовок</label>
+          <label style={{ display: "block", fontSize: "1rem", color: "rgba(214,198,178,0.8)", marginBottom: "0.4rem" }}>Заголовок</label>
           <input type="text" value={post.title || ""} onChange={(e) => setPost({ ...post, title: e.target.value })} style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#E7DCCF", fontSize: "1.3rem", fontWeight: 700, outline: "none" }} />
         </div>
         <div style={{ marginBottom: "1.5rem" }}>
-          <label style={{ display: "block", fontSize: "0.8rem", color: "rgba(214,198,178,0.5)", marginBottom: "0.4rem" }}>Анонс</label>
-          <textarea value={post.excerpt || ""} onChange={(e) => setPost({ ...post, excerpt: e.target.value })} rows={2} style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#D6C6B2", fontSize: "0.95rem", outline: "none", resize: "vertical" }} />
+          <label style={{ display: "block", fontSize: "1rem", color: "rgba(214,198,178,0.8)", marginBottom: "0.4rem" }}>Анонс</label>
+          <textarea value={post.excerpt || ""} onChange={(e) => setPost({ ...post, excerpt: e.target.value })} rows={2} style={{ width: "100%", padding: "0.75rem 1rem", background: "rgba(214,198,178,0.05)", border: "1px solid rgba(214,198,178,0.15)", borderRadius: 10, color: "#D6C6B2", fontSize: "1.05rem", outline: "none", resize: "vertical" }} />
         </div>
         <div style={{ marginBottom: "1.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <input type="checkbox" checked={post.isPublished || false} onChange={(e) => setPost({ ...post, isPublished: e.target.checked })} style={{ width: 18, height: 18, accentColor: "#C96E4D" }} />
-          <label style={{ color: "#D6C6B2", fontSize: "0.9rem", cursor: "pointer" }}>Статья опубликована</label>
+          <label style={{ color: "#D6C6B2", fontSize: "1rem", cursor: "pointer" }}>Статья опубликована</label>
         </div>
       </div>
 
@@ -149,16 +149,16 @@ export default function BlogEditor({ params }: { params: Promise<{ id: string }>
       {showPreview && (
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 1.5rem 4rem" }}>
           <h1 style={{ fontSize: "2rem", fontWeight: 800, color: "#E7DCCF", marginBottom: "1rem" }}>{post.title}</h1>
-          {post.excerpt && <p style={{ fontSize: "1.1rem", color: "rgba(214,198,178,0.7)", marginBottom: "2rem", fontStyle: "italic" }}>{post.excerpt}</p>}
+          {post.excerpt && <p style={{ fontSize: "1.1rem", color: "rgba(214,198,178,0.8)", marginBottom: "2rem", fontStyle: "italic" }}>{post.excerpt}</p>}
           <div style={{ color: "#D6C6B2", lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: editorRef.current?.innerHTML || post.content || "" }} />
         </div>
       )}
 
-      <style dangerouslySetInnerHTML={{ __html: '[data-editor="content"] h2{font-size:1.5rem;font-weight:700;color:#E7DCCF;margin:2rem 0 1rem;padding-bottom:0.5rem;border-bottom:2px solid rgba(230,136,99,0.3)}[data-editor="content"] h3{font-size:1.2rem;font-weight:600;color:#E68863;margin:1.5rem 0 0.75rem}[data-editor="content"] p{margin:0 0 1rem}[data-editor="content"] ul,[data-editor="content"] ol{margin:0 0 1rem 1.5rem}[data-editor="content"] li{margin-bottom:0.5rem}[data-editor="content"] blockquote{border-left:3px solid rgba(230,136,99,0.4);padding:0.5rem 0 0.5rem 1.5rem;margin:1.5rem 0;color:rgba(214,198,178,0.8);font-style:italic;background:rgba(230,136,99,0.05);border-radius:0 8px 8px 0}[data-editor="content"] a{color:#E68863;text-decoration:underline}[data-editor="content"] img{max-width:100%;border-radius:12px;margin:1rem 0}[data-editor="content"]:focus{border-color:rgba(230,136,99,0.3)!important}[data-editor="content"]:empty:before{content:"Начните печатать...";color:rgba(214,198,178,0.3)}' }} />
+      <style dangerouslySetInnerHTML={{ __html: '[data-editor="content"] h2{font-size:1.5rem;font-weight:700;color:#E7DCCF;margin:2rem 0 1rem;padding-bottom:0.5rem;border-bottom:2px solid rgba(230,136,99,0.3)}[data-editor="content"] h3{font-size:1.2rem;font-weight:600;color:#E68863;margin:1.5rem 0 0.75rem}[data-editor="content"] p{margin:0 0 1rem}[data-editor="content"] ul,[data-editor="content"] ol{margin:0 0 1rem 1.5rem}[data-editor="content"] li{margin-bottom:0.5rem}[data-editor="content"] blockquote{border-left:3px solid rgba(230,136,99,0.4);padding:0.5rem 0 0.5rem 1.5rem;margin:1.5rem 0;color:rgba(214,198,178,0.8);font-style:italic;background:rgba(230,136,99,0.05);border-radius:0 8px 8px 0}[data-editor="content"] a{color:#E68863;text-decoration:underline}[data-editor="content"] img{max-width:100%;border-radius:12px;margin:1rem 0}[data-editor="content"]:focus{border-color:rgba(230,136,99,0.3)!important}[data-editor="content"]:empty:before{content:"Начните печатать...";color:rgba(214,198,178,0.75)}' }} />
     </div>
   );
 }
 
 function ToolBtn({ children, onClick, title }: { children: React.ReactNode; onClick: () => void; title: string }) {
-  return <button onClick={onClick} title={title} style={{ padding: "0.4rem 0.7rem", borderRadius: 6, background: "rgba(214,198,178,0.05)", border: "1px solid transparent", color: "#D6C6B2", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600, minWidth: 36, textAlign: "center" }}>{children}</button>;
+  return <button onClick={onClick} title={title} style={{ padding: "0.4rem 0.7rem", borderRadius: 6, background: "rgba(214,198,178,0.05)", border: "1px solid transparent", color: "#D6C6B2", cursor: "pointer", fontSize: "1.05rem", fontWeight: 600, minWidth: 36, textAlign: "center" }}>{children}</button>;
 }

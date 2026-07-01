@@ -105,7 +105,7 @@ export function PricingBlock({ data }: { data: PricingBlockData }) {
                 {description && (
                   <p
                     style={{
-                      color: "rgba(214,198,178,0.7)",
+                      color: "rgba(214,198,178,0.8)",
                       fontSize: "0.88rem",
                       marginBottom: "1rem",
                       lineHeight: 1.5,
@@ -129,8 +129,8 @@ export function PricingBlock({ data }: { data: PricingBlockData }) {
                       <li
                         key={j}
                         style={{
-                          color: "rgba(214,198,178,0.85)",
-                          fontSize: "0.9rem",
+                          color: "rgba(214,198,178,0.9)",
+                          fontSize: "1rem",
                           padding: "0.3rem 0",
                           paddingLeft: "1.5rem",
                           position: "relative",

@@ -134,7 +134,7 @@ export default function AIConsultant() {
                 </div>
                 <div
                   style={{
-                    fontSize: "0.75rem",
+                    fontSize: "1rem",
                     color: "#6DB89A",
                     display: "flex",
                     alignItems: "center",
@@ -183,7 +183,7 @@ export default function AIConsultant() {
                 </div>
               ))}
               {aiLoading && (
-                <div style={{ alignSelf: "flex-start", fontSize: "0.85rem", color: "rgba(214,198,178,0.78)" }}>
+                <div style={{ alignSelf: "flex-start", fontSize: "1.05rem", color: "rgba(214,198,178,0.78)" }}>
                   Печатаю...
                 </div>
               )}
@@ -205,7 +205,7 @@ export default function AIConsultant() {
                     border: "1px solid rgba(214,198,178,0.12)",
                     borderRadius: 999,
                     color: "#BCA891",
-                    fontSize: "0.8rem",
+                    fontSize: "1rem",
                     cursor: "pointer",
                     transition: "all 0.2s",
                   }}
@@ -241,7 +241,7 @@ export default function AIConsultant() {
                   border: "1px solid rgba(214,198,178,0.12)",
                   borderRadius: 10,
                   color: "#D6C6B2",
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                   outline: "none",
                 }}
               />
@@ -254,7 +254,7 @@ export default function AIConsultant() {
                   color: "#0D0C0A",
                   border: "none",
                   borderRadius: 10,
-                  fontSize: "0.9rem",
+                  fontSize: "1rem",
                   fontWeight: 600,
                   cursor: aiLoading ? "not-allowed" : "pointer",
                 }}

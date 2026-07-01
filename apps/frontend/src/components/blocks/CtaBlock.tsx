@@ -61,7 +61,7 @@ export function CtaBlock({ data }: { data: CtaBlockData }) {
           <Reveal delay={1}>
             <p
               style={{
-                color: "rgba(214,198,178,0.85)",
+                color: "rgba(214,198,178,0.9)",
                 fontSize: "1.05rem",
                 marginBottom: "1.5rem",
                 lineHeight: 1.6,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
@@ -25,6 +26,13 @@ function anonymizeIp(ip: string | null): string | null {
   return ip
 }
 
+// SHA-256 хеш IP с солью (152-ФЗ — для анонимной аналитики без возможности деанонимизации)
+function hashIp(ip: string | null): string | null {
+  if (!ip) return null
+  const salt = process.env.IP_HASH_SALT || 'shkola-pk-salt-2026'
+  return crypto.createHash('sha256').update(ip + salt).digest('hex')
+}
+
 // POST /api/leads — приём заявки с формы
 export async function POST(request: NextRequest) {
   try {
@@ -49,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     // Извлекаем IP и User-Agent
     const forwarded = request.headers.get('x-forwarded-for')
-    const ip = forwarded ? forwarded.split(',')[0].trim() : (request.headers.get('x-real-ip') || null)
+    const rawIp = forwarded ? forwarded.split(',')[0].trim() : (request.headers.get('x-real-ip') || null)
     const userAgent = request.headers.get('user-agent') || ''
 
     // Создаём лид в Payload
@@ -65,12 +73,27 @@ export async function POST(request: NextRequest) {
         status: 'new',
         consentAccepted: true,
         consentAt: new Date().toISOString(),
-        ipAddress: anonymizeIp(ip),
-        userAgent: userAgent.slice(0, 500), // ограничиваем длину
+        ipAddress: anonymizeIp(rawIp),
+        ipHash: hashIp(rawIp),  // 152-ФЗ: SHA-256 хеш для анонимной аналитики
+        userAgent: userAgent.slice(0, 500),
       }),
     })
 
-    console.log(`[Lead] New lead created: ${name} from ${source || 'homepage'}`)
+    console.log(`[Lead] New lead created: ${name} from ${source || 'homepage'}, ip_hash=${hashIp(rawIp)?.slice(0, 16)}...`)
+
+    // Telegram-уведомление
+    try {
+      const { notifyNewLead } = await import('@/lib/telegram-notify')
+      await notifyNewLead({
+        name,
+        email: email || '',
+        phone: phone || '',
+        message: message || '',
+        source: source || 'homepage',
+      })
+    } catch (e) {
+      console.warn('[leads] Telegram notify failed:', e)
+    }
 
     return NextResponse.json({
       ok: true,
@@ -89,7 +112,6 @@ export async function POST(request: NextRequest) {
 // GET /api/leads — список заявок (только для админа)
 export async function GET(request: NextRequest) {
   try {
-    // Простая проверка токена через Payload
     const auth = request.headers.get('authorization')
     if (!auth) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })

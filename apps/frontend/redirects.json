@@ -1,136 +1,136 @@
 {
-  "description": "301 редиректы со старого сайта velaslav.rus → 2980738.ru. SEO-команда может править без деплоя.",
-  "lastUpdated": "2026-06-21",
+  "description": "301 редиректы (Permanent Redirect) со старого сайта велеслав.рус → 2980738.ru. SEO-команда может править без деплоя.",
+  "lastUpdated": "2026-06-26",
   "redirects": [
     {
       "source": "/onlayn-shkola-potrebitelskoy-kooperatsii",
       "destination": "/",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/obuchenie-na-onlayn-kursah-potrebitelskoy-kooperatsii",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/kursy",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/potrebitelskiy-kooperativ-vse-vygody",
       "destination": "/",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/kak-otkryt-kooperativ-potrebitelskiy-obschestvo-sdelat-poshagovaya-instruktsiya",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/uslugi",
       "destination": "/uslugi-dlya-potrebitelskih-kooperativov",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/paket-bazovyy",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/paket-bazovyy-kursy-obucheniya-potrebkooperatsii-onlayn",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/paket-optimalnyy",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/paket-vip",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/spetspredlozhenie-start",
       "destination": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/video-answers",
       "destination": "/faq",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/video-answers/what-is-a-consumer-cooperative",
       "destination": "/faq",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/test",
       "destination": "/",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/test-donat",
       "destination": "/",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/2323",
       "destination": "/",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/blog/yuridicheskaya-baza",
       "destination": "/blog",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/blog/nalogi-i-uchet",
       "destination": "/blog",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/blog/kejsy-istorii-uspekha",
       "destination": "/blog",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/blog/dokumenty-shablony",
       "destination": "/blog",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/blog/poleznaya-informatsiya",
       "destination": "/blog",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/about",
       "destination": "/about-us",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/konsultacii",
       "destination": "/potrebitelskiy-kooperativ-konsultatsii",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/uslugi/audit-ustava-pk",
       "destination": "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/uslugi/audit-ustava",
       "destination": "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/uslugi/kooperativ-pod-klyuch",
       "destination": "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch",
-      "permanent": true
+      "statusCode": 301
     }
   ]
 }

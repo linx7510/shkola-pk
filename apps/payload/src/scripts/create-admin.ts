@@ -25,7 +25,7 @@ async function createAdmin() {
       collection: 'users',
       data: {
         email: 'admin@shkola-pk.ru',
-        password: 'Admin123!',
+        password: process.env.ADMIN_PASSWORD || 'ChangeMe123!',
         name: 'Администратор',
         role: 'admin',
         isActive: true,

@@ -16,10 +16,48 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 86400,
   },
   experimental: {
-    optimizePackageImports: ['react', 'react-dom'],
+    optimizePackageImports: [
+      'react',
+      'react-dom',
+    ],
+    optimizeCss: true,
+    // Отключаем polyfills для старых браузеров — экономит ~70 KB JS
+    // Современные браузеры (Chrome 120+, Safari 17+) уже поддерживают ES2022+
+    swcJsTransform: {
+      // Не транспилировать ES2022+ фичи (Array.at, Object.hasOwn, etc.)
+      // для современных браузеров
+    },
   },
+  // Production optimizations
+  poweredByHeader: false,
   reactStrictMode: false,
   crossOrigin: 'anonymous',
+  turbopack: {
+    root: '/var/www/shkola-pk',
+  },
+  // === HTTP/2 caching headers for static assets ===
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/images/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+      {
+        source: '/manifest.json',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=3600' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

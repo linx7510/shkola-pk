@@ -33,6 +33,7 @@ export default function LoginPage() {
 
       
       
+      localStorage.setItem("auth_token", data.token);
       router.push("/dashboard");
     } catch {
       setError("Ошибка подключения к серверу");
@@ -58,7 +59,7 @@ export default function LoginPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -79,7 +80,7 @@ export default function LoginPage() {
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.85rem",
+                  fontSize: "1.05rem",
                   color: "var(--color-text-muted)",
                   marginBottom: "0.35rem",
                 }}
@@ -112,7 +113,7 @@ export default function LoginPage() {
 
           <div className="auth-divider">или</div>
 
-          <p style={{ textAlign: "center", fontSize: "0.9rem" }}>
+          <p style={{ textAlign: "center", fontSize: "1rem" }}>
             Нет аккаунта?{" "}
             <Link href="/register" className="auth-link">
               Зарегистрироваться

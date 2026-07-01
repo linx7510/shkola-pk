@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { richTextEditor } from '../lexicalFeatures'
 
 export const GlossaryTerms: CollectionConfig = {
   slug: 'glossary-terms',
@@ -14,7 +15,7 @@ export const GlossaryTerms: CollectionConfig = {
     { name: 'term', type: 'text', required: true, unique: true, label: 'Термин' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг' },
     { name: 'definition', type: 'textarea', required: true, label: 'Определение' },
-    { name: 'extendedContent', type: 'richText', label: 'Расширенное описание' },
+    { name: 'extendedContent', type: 'richText', label: 'Расширенное описание', editor: richTextEditor },
     { name: 'category', type: 'relationship', relationTo: 'categories', label: 'Категория', filterOptions: { type: { equals: 'glossary' } } },
     { name: 'order', type: 'number', defaultValue: 0, label: 'Порядок', admin: { position: 'sidebar' } },
     { name: 'isPublished', type: 'checkbox', defaultValue: true, label: 'Опубликован', admin: { position: 'sidebar' } },

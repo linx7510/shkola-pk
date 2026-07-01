@@ -66,6 +66,7 @@ const documentStatusFields: Field[] = [
     options: [
       { label: '📝 В очереди', value: 'pending' },
       { label: '⏳ В разработке', value: 'in_progress' },
+      { label: '📥 Доступен к скачиванию', value: 'available' },
       { label: '✅ Готов', value: 'ready' },
       { label: '👁 На согласовании', value: 'review' },
       { label: '⏸ Согласован', value: 'approved' },
@@ -127,7 +128,7 @@ export const ClientProjects: CollectionConfig = {
       return { client: { equals: user?.id } }
     },
     create: ({ req: { user } }) => user?.role === 'admin',
-    update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'client',
+    update: ({ req: { user } }) => user?.role === 'admin' || user?.role === 'client' || user?.role === 'student',
     delete: ({ req: { user } }) => user?.role === 'admin',
   },
   fields: [
@@ -328,6 +329,7 @@ export const ClientProjects: CollectionConfig = {
             { label: 'Email', value: 'email' },
             { label: 'Telegram', value: 'telegram' },
             { label: 'В ЛК', value: 'dashboard' },
+            { label: 'Админ', value: 'admin' },
           ],
         },
       ],
@@ -408,67 +410,12 @@ export const ClientProjects: CollectionConfig = {
     ],
 
     // ─── После изменения: авто-расчёт XP + проверка бейджей ──────────────
-    afterChange: [
-      async ({ doc, operation, req }) => {
-        if (operation !== 'create' && operation !== 'update') return
-
-        const documents = doc.documents || []
-        const achievements = doc.achievements || []
-
-        // 1. Считаем XP за готовые документы
-        const readyStatuses = ['ready', 'approved', 'submitted', 'registered']
-        const docXP = documents
-          .filter((d: any) => readyStatuses.includes(d.status))
-          .reduce((sum: number, d: any) => sum + (d.xp || 0), 0)
-
-        // 2. Проверяем условия бейджей и считаем bonus XP
-        let achXP = 0
-        const updatedAchievements = achievements.map((a: any) => {
-          if (a.unlocked) {
-            achXP += a.xp || 0
-            return a
-          }
-
-          let shouldUnlock = false
-          if (a.unlockCondition === 'stage_done' && a.unlockStage !== undefined) {
-            const stageDocs = documents.filter((d: any) => d.stage === a.unlockStage)
-            shouldUnlock = stageDocs.length > 0 && stageDocs.every((d: any) => readyStatuses.includes(d.status))
-          } else if (a.unlockCondition === 'xp_threshold' && a.unlockXPThreshold !== undefined) {
-            shouldUnlock = docXP >= a.unlockXPThreshold
-          } else if (a.unlockCondition === 'docs_done' && a.unlockDocCodes) {
-            const codes = a.unlockDocCodes.split(',').map((s: string) => s.trim())
-            shouldUnlock = codes.every((code: string) => {
-              const doc = documents.find((d: any) => d.code === code)
-              return doc && readyStatuses.includes(doc.status)
-            })
-          }
-
-          if (shouldUnlock) {
-            achXP += a.xp || 0
-            return { ...a, unlocked: true, unlockedAt: new Date().toISOString() }
-          }
-          return a
-        })
-
-        // 3. Считаем итоговый XP и процент
-        const templateXP = doc.templateSnapshot?.totalXP || 100
-        const totalXP = Math.min(templateXP, docXP + achXP)
-        const percent = Math.round((totalXP / templateXP) * 100)
-
-        // 4. Обновляем, если изменилось
-        if (totalXP !== doc.totalXP || percent !== doc.percent ||
-            JSON.stringify(updatedAchievements) !== JSON.stringify(achievements)) {
-          await req.payload.update({
-            collection: 'client-projects',
-            id: doc.id,
-            data: {
-              totalXP,
-              percent,
-              achievements: updatedAchievements,
-            },
-          })
-        }
-      },
-    ],
+    // ВНИМАНИЕ: afterChange хук отключён, потому что вызов req.payload.update
+    // внутри afterChange приводит к бесконечной рекурсии.
+    // Расчёт XP и процентов выполняется:
+    //   - при создании проекта: в /api/client-projects/order route
+    //   - при загрузке документов: в /api/client-projects/upload route
+    //   - при обновлении через админку: вручную или через /api/custom/update-progress
+    afterChange: [],
   },
 }
