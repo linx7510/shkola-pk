@@ -552,7 +552,42 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
         </div>
       </section>
 {/* ===== CTA ===== */}
-            <section className="cta reveal" id="cta-form" style={{...S}}>
+            {/* ===== AI CONSULTANT ===== */}
+      <section id="ai-consultant" style={{padding:"4rem 0",background:"rgba(214,198,178,0.02)"}}>
+        <div style={{maxWidth:900,margin:"0 auto",padding:"0 var(--container-px,clamp(1rem,4vw,4rem))",textAlign:"center"}}>
+          <Reveal>
+            <div style={{marginBottom:"2.5rem"}}>
+              <div className="section-label">AI-АССИСТЕНТ</div>
+              <h2 className="section-title heading-sweep" data-text="Задайте вопрос AI-ассистенту">🤖 Задайте вопрос AI-ассистенту</h2>
+              <p style={{fontSize:"1rem",color:"rgba(214,198,178,0.7)",maxWidth:600,margin:"1rem auto 0"}}>
+                Наш AI-помощник специально натренирован на потребительскую кооперацию и законодательство РФ
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={1}>
+            <div style={{padding:"1.5rem",background:"rgba(214,198,178,0.04)",border:"1px solid rgba(230,136,99,0.2)",borderRadius:16,maxWidth:600,margin:"0 auto"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1rem"}}>
+                <div style={{width:48,height:48,borderRadius:"50%",background:"linear-gradient(135deg, #C96E4D, #E68863)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.5rem"}}>🤖</div>
+                <div style={{textAlign:"left"}}>
+                  <div style={{fontWeight:600,color:"#E7DCCF"}}>Ассистент Школы Кооперативов</div>
+                  <div style={{fontSize:"0.8rem",color:"#6DB89A"}}>● Онлайн</div>
+                </div>
+              </div>
+              <p style={{color:"rgba(214,198,178,0.9)",fontSize:"0.95rem",lineHeight:1.6,marginBottom:"1.5rem",textAlign:"left"}}>
+                Привет! Я AI-ассистент Школы Кооперативов. Помогу разобраться с потребительской кооперацией — просто и понятно. Спрашивай!
+              </p>
+              <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap",justifyContent:"center"}}>
+                <span style={{padding:"0.5rem 0.9rem",background:"rgba(230,136,99,0.1)",border:"1px solid rgba(230,136,99,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#E68863",cursor:"pointer"}}>💰 Как обнулить НДС?</span>
+                <span style={{padding:"0.5rem 0.9rem",background:"rgba(109,184,154,0.1)",border:"1px solid rgba(109,184,154,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#6DB89A",cursor:"pointer"}}>🤔 Что такое ПК?</span>
+                <span style={{padding:"0.5rem 0.9rem",background:"rgba(91,141,170,0.1)",border:"1px solid rgba(91,141,170,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#5B8DAA",cursor:"pointer"}}>💬 Сколько стоит?</span>
+                <span style={{padding:"0.5rem 0.9rem",background:"rgba(201,177,154,0.1)",border:"1px solid rgba(201,177,154,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#CAB19A",cursor:"pointer"}}>📝 Как зарегистрировать ПК?</span>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="cta reveal" id="cta-form" style={{...S}}>
         <div style={{...I, maxWidth:1000, display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2rem", alignItems:"center"}}>
           <div>
             <h3 style={{fontSize:"clamp(1.5rem,4vw,2.2rem)", fontWeight:700, color:"#D6C6B2", marginBottom:"1rem"}}>Готовы начать?</h3>
