@@ -186,7 +186,7 @@ export const Pages: CollectionConfig = {
       fields: [
         { name: 'icon', type: 'text', label: 'Иконка (emoji)' },
         { name: 'title', type: 'text', required: true, label: 'Заголовок' },
-        { name: 'desc', type: 'richText', label: 'Описание',  },
+        { name: 'desc', type: 'textarea', label: 'Описание' },
       ],
     },
     {

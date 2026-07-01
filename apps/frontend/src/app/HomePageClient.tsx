@@ -555,7 +555,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 {/* ===== CTA ===== */}
             {/* ===== AI CONSULTANT ===== */}
-      <section id="ai-consultant" style={{padding:"4rem 0",background:"rgba(214,198,178,0.02)"}}>
+      <section id="ai-consultant" style={{padding:"2rem 0",background:"rgba(214,198,178,0.02)"}}>
         <div style={{maxWidth:900,margin:"0 auto",padding:"0 var(--container-px,clamp(1rem,4vw,4rem))",textAlign:"center"}}>
           <Reveal>
             <div style={{marginBottom:"2.5rem"}}>
@@ -612,14 +612,6 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       </section>
 
       {/* ===== QUOTE 2 ===== */}
-      <section className="pause reveal">
-        <div style={I}>
-          <blockquote className="quote-block">
-            <p className="quote-text">«Один в поле не воин. Но вместе мы — сила, меняющая правила игры.»</p>
-            <cite className="quote-author">— Кооперативная мудрость</cite>
-          </blockquote>
-        </div>
-      </section>
 
             {/* ===== FAQ ===== */}
       <section id="seo-text" style={{...S, background:"rgba(214,198,178,0.02)"}}>
