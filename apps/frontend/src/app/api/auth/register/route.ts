@@ -19,7 +19,43 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { email, password, name, phone } = body
+    const { email, password, name, phone, captchaToken } = body
+
+    // Yandex SmartCaptcha verification
+    if (!captchaToken) {
+      return NextResponse.json(
+        { error: 'Подтвердите, что вы не робот' },
+        { status: 400 }
+      )
+    }
+
+    const captchaServerKey = process.env.SMARTCAPTCHA_SERVER_KEY
+    if (captchaServerKey) {
+      try {
+        const captchaRes = await fetch('https://smartcaptcha.yandexcloud.com/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            secret: captchaServerKey,
+            token: captchaToken,
+            ip: ip,
+          }),
+        })
+        const captchaData = await captchaRes.json()
+        if (!captchaData.status || captchaData.status !== 'ok') {
+          return NextResponse.json(
+            { error: 'Проверка капчи не пройдена. Попробуйте снова.' },
+            { status: 403 }
+          )
+        }
+      } catch (e) {
+        console.error('[register] SmartCaptcha verify failed:', e)
+        return NextResponse.json(
+          { error: 'Ошибка проверки капчи' },
+          { status: 500 }
+        )
+      }
+    }
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'Email, пароль и имя обязательны' }, { status: 400 })

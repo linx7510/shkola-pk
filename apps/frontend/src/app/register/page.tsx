@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CursorLight from "@/components/CursorLight";
+import { SmartCaptcha } from "@/components/SmartCaptcha";
 import Header from "@/components/Header";
 
 export default function RegisterPage() {
@@ -11,6 +12,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [consent, setConsent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
 
   const update = (field: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -21,6 +23,10 @@ export default function RegisterPage() {
 
     if (form.password.length < 6) {
       setError("Пароль минимум 6 символов");
+      return;
+    }
+    if (!captchaToken) {
+      setError("Подтвердите, что вы не робот");
       return;
     }
     if (!consent) {
@@ -42,6 +48,7 @@ export default function RegisterPage() {
           email: form.email,
           phone: form.phone || undefined,
           password: form.password,
+          captchaToken: captchaToken,
         }),
       });
 
@@ -204,6 +211,10 @@ export default function RegisterPage() {
                 (152-ФЗ)
               </span>
             </label>
+            <div style={{ marginBottom: "1rem" }}>
+              <SmartCaptcha onVerify={(token) => setCaptchaToken(token)} />
+            </div>
+
             <button
               type="submit"
               className="btn-primary"

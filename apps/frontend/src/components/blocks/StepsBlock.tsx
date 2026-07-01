@@ -1,3 +1,4 @@
+"use client"
 import Reveal from "@/components/Reveal"
 
 export interface StepsBlockData {
@@ -137,7 +138,37 @@ export function StepsBlock({ data }: { data: StepsBlockData }) {
                 <p style={{ fontSize: "0.95rem", color: "rgba(214,198,178,0.9)", lineHeight: 1.7, margin: "0.5rem 0 0 0", whiteSpace: "pre-wrap" }}>
                   {s.description}
                 </p>
-                {s.videoUrl && <VideoEmbed url={s.videoUrl} thumbnail={s.thumbnailUrl} />}
+                {s.videoUrl ? (
+                  <VideoEmbed url={s.videoUrl} thumbnail={s.thumbnailUrl} />
+                ) : (
+                  <a
+                    href="/register"
+                    style={{
+                      display: "block",
+                      marginTop: "0.5rem",
+                      padding: "0.75rem 1rem",
+                      background: "rgba(230,136,99,0.08)",
+                      border: "1px solid rgba(230,136,99,0.2)",
+                      borderRadius: 8,
+                      color: "#E68863",
+                      fontSize: "0.85rem",
+                      textDecoration: "none",
+                      textAlign: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "rgba(230,136,99,0.15)"
+                      e.currentTarget.style.borderColor = "rgba(230,136,99,0.4)"
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "rgba(230,136,99,0.08)"
+                      e.currentTarget.style.borderColor = "rgba(230,136,99,0.2)"
+                    }}
+                  >
+                    🔒 Доступ после бесплатной подписки →
+                  </a>
+                )}
               </div>
             </Reveal>
           ))}
