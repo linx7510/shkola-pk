@@ -169,9 +169,8 @@ export default function BlogParticles() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-0"
+      style={{ pointerEvents: "none", position: "fixed", top: 0, right: 0, bottom: 0, left: 0, zIndex: 0, opacity: 0.95 }}
       aria-hidden="true"
-      style={{ opacity: 0.95 }}
     />
   );
 }

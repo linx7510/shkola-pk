@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
-const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
+// BlogParticles disabled
+// const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
 
 // Lazy-load тяжёлых виджетов (AI чат + блог-превью)
 // Они не нужны для LCP — загружаются после idle
@@ -246,11 +247,11 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
   return (
     <>
-      <BlogParticles />
+      {/* <BlogParticles /> — отключено */}
       <Header />
 
       {/* ===== HERO ===== */}
-      <section id="hero" style={{minHeight:"100vh",display:"flex",alignItems:"center",background:"transparent",paddingTop:"calc(var(--header-h,72px) + 3rem)",position:"relative",overflow:"hidden"}}>
+      <section id="hero" style={{minHeight:"60vh",display:"flex",alignItems:"center",background:"transparent",paddingTop:"calc(var(--header-h,72px) + 1rem)",position:"relative",overflow:"hidden"}}>
         <div className="hero__ambient" />
         <div style={{...I,width:"100%",position:"relative",zIndex:2}}>
           <Reveal>
