@@ -66,7 +66,10 @@ function anonymizeIp(ip: string | null): string | null {
 
 function hashIp(ip: string | null): string | null {
   if (!ip) return null
-  const salt = process.env.IP_HASH_SALT || 'shkola-pk-salt-2026'
+  // Соль берётся ТОЛЬКО из .env (IP_HASH_SALT) — без хардкода в коде.
+  // Если переменная не задана — генерируем случайную соль на запуск (меньше
+  // стабильности, но ничего не утекает в репозиторий).
+  const salt = process.env.IP_HASH_SALT || crypto.randomBytes(16).toString('hex')
   return crypto.createHash('sha256').update(ip + salt).digest('hex')
 }
 
