@@ -23,6 +23,7 @@ export const BlogPosts: CollectionConfig = {
     {
       name: 'content',
       type: 'textarea',
+      maxLength: 200000,
       required: true,
       label: 'Содержание статьи (HTML)',
       admin: {

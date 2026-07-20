@@ -62,6 +62,7 @@ export default function FloatingChatButton() {
           fontSize: "1.5rem",
           color: "#0D0C0A",
           transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
+          maxWidth: "calc(100vw - 3rem)",
         }}
         onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)"; }}
         onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
@@ -77,7 +78,7 @@ export default function FloatingChatButton() {
             bottom: "5rem",
             right: "1.5rem",
             zIndex: 9999,
-            width: 340,
+            width: "min(340px, calc(100vw - 3rem))",
             maxHeight: 480,
             background: "#0D0C0A",
             border: "1px solid rgba(214,198,178,0.15)",
@@ -200,11 +201,17 @@ export default function FloatingChatButton() {
               gap: "0.5rem",
             }}
           >
-            <input
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && send()}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
               placeholder="Спросите о кооперации..."
+              rows={3}
               style={{
                 flex: 1,
                 padding: "0.6rem 0.9rem",
@@ -214,6 +221,10 @@ export default function FloatingChatButton() {
                 color: "#D6C6B2",
                 fontSize: "1.05rem",
                 outline: "none",
+                resize: "vertical",
+                minHeight: "72px",
+                fontFamily: "inherit",
+                lineHeight: 1.5,
               }}
             />
             <button

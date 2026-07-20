@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
 
 async function payloadApi(path: string) {
   try {
@@ -30,7 +31,7 @@ async function payloadApi(path: string) {
 function lexicalToHtml(content: any): string {
   if (!content) return '';
   if (typeof content === 'string') return content;
-  
+
   const root = content.root;
   if (!root?.children) return '';
 
@@ -96,14 +97,93 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+/**
+ * Resolve cover image URL from post.coverImage or first image in post.images.
+ * Returns absolute URL (with BASE_URL if relative).
+ */
+function resolveCoverUrl(post: any): string {
+  const defaultCover = `${BASE_URL}/images/og-preview.webp`;
+  let url: string | null = null;
+
+  if (post.coverImage) {
+    url = typeof post.coverImage === 'object' ? (post.coverImage.url || null) : post.coverImage;
+  }
+  if (!url && Array.isArray(post.images) && post.images.length > 0) {
+    const first = post.images[0];
+    if (first?.image) {
+      url = typeof first.image === 'object' ? (first.image.url || null) : first.image;
+    }
+  }
+  if (!url) return defaultCover;
+  if (url.startsWith('http')) return url;
+  return `${BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const data = await payloadApi(`/blog-posts?where[slug][equals]=${slug}&limit=1`)
   const post = data?.docs?.[0]
   if (!post) return { title: "Статья не найдена" };
+
+  const articleUrl = `${BASE_URL}/blog/${slug}`;
+  const title = post.meta?.title || post.title;
+  const description = post.meta?.description || post.excerpt || "";
+  const coverUrl = resolveCoverUrl(post);
+
+  const publishedTime = post.publishedAt || post.createdAt;
+  const modifiedTime = post.updatedAt || post.publishedAt || post.createdAt;
+  const category = typeof post.category === 'object' ? post.category?.title : post.category;
+  const tags: string[] = post.tags
+    ? String(post.tags).split(',').map((t: string) => t.trim()).filter(Boolean)
+    : [];
+
+  // Сокращённый SEO-title (≤ 70 символов). Без шаблона layout (absolute).
+  // Если полный title длиннее 70 символов — обрезаем по слову.
+  const seoTitle = title.length > 70
+    ? title.slice(0, 67).replace(/\s+\S*$/, "") + "…"
+    : title;
+
   return {
-    title: post.meta?.title || post.title ? `${post.title} | Школа ПК` : "Статья | Школа ПК",
-    description: post.meta?.description || post.excerpt || "",
+    title: { absolute: seoTitle },
+    description,
+    alternates: {
+      canonical: articleUrl,
+      languages: {
+        "ru-RU": articleUrl,
+        "ru": articleUrl,
+        "x-default": articleUrl,
+      },
+    },
+    openGraph: {
+      type: "article",
+      url: articleUrl,
+      title,
+      description,
+      siteName: "Школа ПК — Велеслав Старков",
+      locale: "ru_RU",
+      images: [{
+        url: coverUrl,
+        width: 1200,
+        height: 630,
+        alt: title,
+      }],
+      publishedTime: publishedTime ? new Date(publishedTime).toISOString() : undefined,
+      modifiedTime: modifiedTime ? new Date(modifiedTime).toISOString() : undefined,
+      authors: ["Велеслав Старков"],
+      section: category || "Кооперация",
+      tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [{
+        url: coverUrl,
+        alt: title,
+      }],
+      site: "@Veles_ST",
+      creator: "@Veles_ST",
+    },
     other: (post as any)?.headCode ? { 'custom-head': (post as any).headCode } : undefined,
   };
 }
@@ -113,6 +193,85 @@ export default async function BlogPostPage({ params }: Props) {
   const data = await payloadApi(`/blog-posts?where[slug][equals]=${slug}&limit=1`)
   const post = data?.docs?.[0]
   if (!post || !post.isPublished) notFound();
+
+  // === JSON-LD: Article + BreadcrumbList + Person ===
+  const articleUrl = `${BASE_URL}/blog/${slug}`;
+  const coverUrl = resolveCoverUrl(post);
+  const publishedISO = post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date(post.createdAt).toISOString();
+  const modifiedISO = post.updatedAt ? new Date(post.updatedAt).toISOString() : publishedISO;
+  const category = typeof post.category === 'object' ? post.category?.title : post.category;
+  const keywords: string = post.tags ? String(post.tags) : "";
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": post.meta?.description || post.excerpt || "",
+    "image": [
+      coverUrl,
+      `${BASE_URL}/images/og-preview.webp`,
+    ],
+    "datePublished": publishedISO,
+    "dateModified": modifiedISO,
+    "author": {
+      "@type": "Person",
+      "name": "Велеслав Старков",
+      "url": `${BASE_URL}/about-us`,
+      "jobTitle": "Председатель Правления Потребительского кооператива",
+      "sameAs": ["https://t.me/Veles_ST"]
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Школа ПК — Первая онлайн Школа Потребительской кооперации",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${BASE_URL}/images/og-preview.webp`,
+        "width": 1200,
+        "height": 630
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": articleUrl
+    },
+    "articleSection": category || "Кооперация",
+    "keywords": keywords,
+    "inLanguage": "ru-RU"
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Главная", "item": BASE_URL },
+      { "@type": "ListItem", "position": 2, "name": "Блог", "item": `${BASE_URL}/blog` },
+      { "@type": "ListItem", "position": 3, "name": post.title, "item": articleUrl }
+    ]
+  };
+
+  const authorJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Велеслав Старков",
+    "url": `${BASE_URL}/about-us`,
+    "image": `${BASE_URL}/images/og-preview.webp`,
+    "jobTitle": "Председатель Правления Потребительского кооператива",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Школа ПК"
+    },
+    "sameAs": [
+      "https://t.me/Veles_ST",
+      `${BASE_URL}`
+    ],
+    "knowsAbout": [
+      "Потребительский кооператив",
+      "Закон 3085-1",
+      "Защита активов",
+      "Налоговая оптимизация",
+      "Кооперативное право"
+    ]
+  };
 
   let contentHtml = lexicalToHtml(post.content);
 
@@ -129,6 +288,8 @@ export default async function BlogPostPage({ params }: Props) {
       const alt = img.alt || '';
       const align = img.align || 'none';
       const margin = img.margin || '0 1.5rem 1rem 0';
+      // loading="lazy" на все контентные изображения (кроме обложки — idx=0 = eager)
+      const loadingAttr = idx === 0 ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" decoding="async"';
       let style = '';
       let wrapperStyle = '';
       if (align === 'left') {
@@ -141,7 +302,7 @@ export default async function BlogPostPage({ params }: Props) {
       } else {
         style = `${w}display:block;margin:1.5rem auto;border-radius:8px;`;
       }
-      const imgTag = `<img src="${imgUrl}" alt="${alt.replace(/"/g, '&quot;')}" style="${style}" />`;
+      const imgTag = `<img src="${imgUrl}" alt="${alt.replace(/"/g, '&quot;')}" ${loadingAttr} style="${style}" />`;
       const captionHtml = img.caption ? `<figcaption style="font-size:1.05rem;color:rgba(214,198,178,0.8);margin-top:0.5rem;text-align:center;">${img.caption}</figcaption>` : '';
       if (align === 'center' || align === 'none') {
         return `<figure style="${wrapperStyle}">${imgTag}${captionHtml}</figure>`;
@@ -150,8 +311,28 @@ export default async function BlogPostPage({ params }: Props) {
     });
   }
 
+  // Post-process: добавить loading="lazy" decoding="async" на все <img> без loading= (кроме первого в контенте — обложки)
+  let imgCounter = 0;
+  contentHtml = contentHtml.replace(/<img([^>]*?)>/g, (match: string, attrs: string) => {
+    // Пропустить если уже есть loading
+    if (/loading\s*=/i.test(attrs)) return match;
+    imgCounter++;
+    // Первое изображение в контенте — eager (для LCP), остальные — lazy
+    const loadingAttr = imgCounter === 1
+      ? 'loading="eager" fetchpriority="high"'
+      : 'loading="lazy" decoding="async"';
+    return `<img${attrs} ${loadingAttr} />`;
+  });
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(authorJsonLd) }} />
+      {/* Preload LCP-обложки статьи для ускорения Largest Contentful Paint */}
+      {coverUrl && (
+        <link rel="preload" as="image" href={coverUrl} fetchPriority="high" />
+      )}
       <Header />
         <CursorLight />
         <Breadcrumbs items={[
@@ -179,7 +360,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           {post.category && (
             <div style={{ fontSize: "1rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.75rem" }}>
-              {post.category}
+              {typeof post.category === 'object' ? post.category.title : post.category}
             </div>
           )}
 

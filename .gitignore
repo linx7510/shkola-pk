@@ -63,3 +63,23 @@ app-payload-backup/
 
 # Old PHP site dump (NOT for git — contains secrets)
 _design-archive/
+
+# === Backup files (do NOT commit) ===
+*.bak
+*.bak.*
+**/*.bak*
+*.before-*
+
+# === Test stubs / temporary ===
+test/data/
+apps/frontend/test/
+
+# === Originals backup ===
+apps/frontend/public/images/_originals_backup/
+
+# === OS / editor ===
+*.swp
+*.swo
+*~
+.idea/
+.vscode/

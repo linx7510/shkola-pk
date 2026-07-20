@@ -1,76 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
- * Generate CSP nonce per request and set CSP header.
+ * SIMPLIFIED CSP — no nonce (caused mismatch with ISR cached HTML)
+ * Uses 'unsafe-inline' for script-src instead.
  *
- * Two CSP headers are set:
- * 1. Content-Security-Policy — enforced (blocks violations)
- *    - nonce-based (no unsafe-inline needed)
- *    - unsafe-eval kept ONLY for Yandex Metrika
- *    - report-uri /api/csp-report (collect violations)
+ * Why: pages use `revalidate` (ISR) → HTML is cached with old nonce baked in.
+ * Middleware generates new nonce per request → CSP nonce != HTML nonce → 
+ * browser blocks all scripts → "This page couldn't load" error.
  *
- * 2. Content-Security-Policy-Report-Only — monitoring only (does NOT block)
- *    - stricter version WITHOUT unsafe-eval
- *    - this tells us what would break if we removed unsafe-eval
- *    - reports also go to /api/csp-report
- *
- * Reference: https://nextjs.org/docs/app/guides/content-security-policy
+ * Site has no user-generated HTML content, so inline-script XSS risk is minimal.
+ * Yandex Metrika + Cloudflare + Yandex SmartCaptcha still work via allowlist.
  */
 
-function generateNonce(): string {
-  const bytes = new Uint8Array(16)
-  crypto.getRandomValues(bytes)
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  let result = ''
-  for (let i = 0; i < bytes.length; i += 3) {
-    const b1 = bytes[i]
-    const b2 = i + 1 < bytes.length ? bytes[i + 1] : 0
-    const b3 = i + 2 < bytes.length ? bytes[i + 2] : 0
-    result += chars[b1 >> 2]
-    result += chars[((b1 & 0x03) << 4) | (b2 >> 4)]
-    result += i + 1 < bytes.length ? chars[((b2 & 0x0f) << 2) | (b3 >> 6)] : '='
-    result += i + 2 < bytes.length ? chars[b3 & 0x3f] : '='
-  }
-  return result
-}
-
 export function middleware(request: NextRequest) {
-  // Skip middleware for API routes — let Set-Cookie headers pass through
+  // Skip middleware for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     return NextResponse.next();
   }
-  const nonce = generateNonce()
+
   const reportUri = '/api/csp-report'
 
-  // === 1. Enforced CSP — blocks violations, reports them ===
+  // === Enforced CSP — blocks violations, reports them ===
   const cspEnforced = [
     `default-src 'self'`,
-    `script-src 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
-    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
-    `frame-src 'self' https://challenges.cloudflare.com https://vk.com https://vkvideo.ru https://www.youtube.com https://rutube.ru https://captcha-api.yandex.ru`,
+    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
+    `frame-src 'self' https://challenges.cloudflare.com https://vk.com https://vkvideo.ru https://www.youtube.com https://rutube.ru https://smartcaptcha.yandexcloud.com`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
-    `form-action 'self' https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `form-action 'self' https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
     `object-src 'none'`,
     `worker-src 'self' blob:`,
     `report-uri ${reportUri}`,
     `report-to csp-endpoint`,
   ].join('; ')
 
-  // === 2. Report-Only CSP — stricter, monitoring only ===
-  // Same as enforced BUT without unsafe-eval
-  // This tells us what would break if we removed unsafe-eval entirely
+  // === Report-Only CSP — stricter (no unsafe-eval), monitoring only ===
   const cspReportOnly = [
     `default-src 'self'`,
-    `script-src 'nonce-${nonce}' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
-    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
-    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
-    `frame-src 'self' https://challenges.cloudflare.com https://vk.com https://vkvideo.ru https://www.youtube.com https://rutube.ru https://captcha-api.yandex.ru`,
+    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://smartcaptcha.yandexcloud.com`,
+    `frame-src 'self' https://challenges.cloudflare.com https://vk.com https://vkvideo.ru https://www.youtube.com https://rutube.ru https://smartcaptcha.yandexcloud.com`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
     `form-action 'self'`,
@@ -80,12 +56,8 @@ export function middleware(request: NextRequest) {
     `report-to csp-endpoint`,
   ].join('; ')
 
-  // Clone request headers and add nonce
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-nonce', nonce)
-  requestHeaders.set('Content-Security-Policy', cspEnforced)
-  
   // Forward auth_token cookie as header (workaround for Next.js 16 proxy cookie stripping)
+  const requestHeaders = new Headers(request.headers)
   const authToken = request.cookies.get('auth_token')?.value
   if (authToken) {
     requestHeaders.set('x-auth-token', authToken)
@@ -97,11 +69,11 @@ export function middleware(request: NextRequest) {
     },
   })
 
-  // Set both CSP headers
+  // Set both CSP headers (NO nonce — using unsafe-inline instead)
   response.headers.set('Content-Security-Policy', cspEnforced)
   response.headers.set('Content-Security-Policy-Report-Only', cspReportOnly)
 
-  // Reporting API endpoint group (modern browsers)
+  // Reporting API endpoint group
   response.headers.set('Report-To', JSON.stringify([
     {
       group: 'csp-endpoint',

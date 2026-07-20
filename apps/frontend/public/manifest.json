@@ -1,0 +1,49 @@
+{
+  "name": "Школа ПК — Первая онлайн Школа Потребительской Кооперации",
+  "short_name": "Школа ПК",
+  "description": "Потребительский кооператив — защита активов и ставка 0%. Обучение, услуги по закону РФ № 3085-1. Аудит устава ПК, регистрация под ключ.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0D0C0A",
+  "theme_color": "#0D0C0A",
+  "lang": "ru-RU",
+  "dir": "ltr",
+  "categories": ["education", "business", "finance"],
+  "icons": [
+    {
+      "src": "/images/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Услуги для ПК",
+      "short_name": "Услуги",
+      "url": "/uslugi-dlya-potrebitelskih-kooperativov"
+    },
+    {
+      "name": "Курсы обучения",
+      "short_name": "Курсы",
+      "url": "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn"
+    },
+    {
+      "name": "Блог",
+      "short_name": "Блог",
+      "url": "/blog"
+    },
+    {
+      "name": "Личный кабинет",
+      "short_name": "Кабинет",
+      "url": "/login"
+    }
+  ]
+}

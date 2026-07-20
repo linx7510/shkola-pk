@@ -31,7 +31,7 @@ export async function fetchHomeData(): Promise<any | null> {
       advantages: [],
       stats: [],
       howSteps: [],
-      aboutCards: [],
+      aboutCards: undefined,
       services: [],
       faqItems: [],
       blocks: [],

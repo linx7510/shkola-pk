@@ -87,8 +87,8 @@ const documentStatusFields: Field[] = [
 ]
 
 const achievementFields: Field[] = [
-  { name: 'code', type: 'text', label: 'Код', required: true },
-  { name: 'name', type: 'text', label: 'Название', required: true },
+  { name: 'code', type: 'text', label: 'Код', required: false },
+  { name: 'name', type: 'text', label: 'Название', required: false },
   { name: 'icon', type: 'text', label: 'Иконка', required: true },
   { name: 'description', type: 'textarea', label: 'Описание' },
   { name: 'xp', type: 'number', label: 'Бонусные XP' },
@@ -132,7 +132,12 @@ export const ClientProjects: CollectionConfig = {
     delete: ({ req: { user } }) => user?.role === 'admin',
   },
   fields: [
-    // ─── Клиент ────────────────────────────────────────────────────────────
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: '👤 Клиент и договор',
+          fields: [
     {
       name: 'client',
       type: 'relationship',
@@ -238,21 +243,29 @@ export const ClientProjects: CollectionConfig = {
       defaultValue: 0,
       admin: { readOnly: true },
     },
-
-    // ─── Документы (snapshot из template) ────────────────────────────────
+    { name: 'createdAt', type: 'date', label: 'Создан', admin: { readOnly: true } },
+    { name: 'updatedAt', type: 'date', label: 'Обновлён', admin: { readOnly: true } },
+          ],
+        },
+        {
+          label: '📄 Документы',
+          fields: [
     {
       name: 'documents',
       type: 'array',
       label: 'Документы',
       admin: {
         description: 'Snapshot из шаблона. Статус меняет Исполнитель.',
-        components: {
-        },
+        initCollapsed: true,
       },
       fields: documentStatusFields,
     },
 
-    // ─── Бейджи (snapshot из template) ───────────────────────────────────
+          ],
+        },
+        {
+          label: '🏆 Бейджи и чат',
+          fields: [
     {
       name: 'achievements',
       type: 'array',
@@ -265,6 +278,7 @@ export const ClientProjects: CollectionConfig = {
       name: 'chat',
       type: 'array',
       label: 'Чат с Исполнителем',
+      admin: { initCollapsed: true },
       fields: [
         {
           name: 'author',
@@ -277,8 +291,8 @@ export const ClientProjects: CollectionConfig = {
             { label: 'Система', value: 'system' },
           ],
         },
-        { name: 'message', type: 'textarea', label: 'Сообщение', required: true },
-        { name: 'sentAt', type: 'date', label: 'Дата', required: true },
+        { name: 'message', type: 'textarea', label: 'Сообщение', required: false },
+        { name: 'sentAt', type: 'date', label: 'Дата', required: false },
         {
           name: 'attachedDocumentCode',
           type: 'text',
@@ -292,9 +306,10 @@ export const ClientProjects: CollectionConfig = {
       name: 'calendar',
       type: 'array',
       label: 'Календарь сроков',
+      admin: { initCollapsed: true },
       fields: [
-        { name: 'event', type: 'text', label: 'Событие', required: true },
-        { name: 'date', type: 'date', label: 'Дата', required: true },
+        { name: 'event', type: 'text', label: 'Событие', required: false },
+        { name: 'date', type: 'date', label: 'Дата', required: false },
         {
           name: 'type',
           type: 'select',
@@ -316,15 +331,17 @@ export const ClientProjects: CollectionConfig = {
       name: 'notifications',
       type: 'array',
       label: 'Уведомления',
+      admin: { initCollapsed: true },
       fields: [
-        { name: 'type', type: 'text', label: 'Тип', required: true },
-        { name: 'message', type: 'textarea', label: 'Сообщение', required: true },
-        { name: 'sentAt', type: 'date', label: 'Отправлено', required: true },
+        { name: 'type', type: 'text', label: 'Тип', required: false },
+        { name: 'message', type: 'textarea', label: 'Сообщение', required: false },
+        { name: 'sentAt', type: 'date', label: 'Отправлено', required: false },
         { name: 'readAt', type: 'date', label: 'Прочитано' },
         {
           name: 'channel',
           type: 'select',
           label: 'Канал',
+          required: false,
           options: [
             { label: 'Email', value: 'email' },
             { label: 'Telegram', value: 'telegram' },
@@ -335,9 +352,10 @@ export const ClientProjects: CollectionConfig = {
       ],
     },
 
-    // ─── Мета ─────────────────────────────────────────────────────────────
-    { name: 'createdAt', type: 'date', label: 'Создан', admin: { readOnly: true } },
-    { name: 'updatedAt', type: 'date', label: 'Обновлён', admin: { readOnly: true } },
+          ],
+        },
+      ],
+    },
   ],
 
   hooks: {

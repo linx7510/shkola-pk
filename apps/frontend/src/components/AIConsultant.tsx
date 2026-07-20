@@ -228,12 +228,19 @@ export default function AIConsultant() {
                 e.preventDefault()
                 sendAi()
               }}
-              style={{ display: "flex", gap: "0.5rem" }}
+              style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end" }}
             >
-              <input
+              <textarea
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault()
+                    sendAi()
+                  }
+                }}
                 placeholder="Спросите о кооперации..."
+                rows={3}
                 style={{
                   flex: 1,
                   padding: "0.75rem 1rem",
@@ -243,6 +250,10 @@ export default function AIConsultant() {
                   color: "#D6C6B2",
                   fontSize: "1rem",
                   outline: "none",
+                  resize: "vertical",
+                  minHeight: "72px",
+                  fontFamily: "inherit",
+                  lineHeight: 1.5,
                 }}
               />
               <button

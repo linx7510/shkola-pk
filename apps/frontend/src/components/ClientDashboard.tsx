@@ -547,7 +547,7 @@ export default function ClientDashboard() {
                   <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Оплата</div>
                   <div style={{ fontSize: '0.95rem', fontWeight: 700, color: project.contract.paymentStatus === 'paid' ? '#6DB89A' : '#D4A856' }}>
                     {project.contract.paymentStatus === 'paid' || project.contract.paymentStatus === 'paid_100' ? '✅ Оплачено' 
-                     : project.contract.paymentStatus === 'prepaid_50' ? '⏸ Предоплата 50%' 
+                     : (project.contract.paymentStatus === 'prepaid_50' || project.contract.paymentStatus === 'partial') ? '⏸ Предоплата 50%' 
                      : project.contract.paymentStatus === 'prepaid_100' ? '⏸ Предоплата 100%' 
                      : '⏳ Ожидает оплаты'}
                   </div>
@@ -720,7 +720,7 @@ export default function ClientDashboard() {
                       </div>
                       <div style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: 'rgba(214,198,178,0.5)' }}>
                         {p.contract?.paymentStatus === 'paid' || p.contract?.paymentStatus === 'paid_100' ? '✅ Оплачено'
-                         : p.contract?.paymentStatus === 'prepaid_50' ? '⏸ Предоплата 50%'
+                         : (p.contract?.paymentStatus === 'prepaid_50' || p.contract?.paymentStatus === 'partial') ? '⏸ Предоплата 50%'
                          : p.contract?.paymentStatus === 'prepaid_100' ? '⏸ Предоплата 100%'
                          : '⏳ Ожидает оплаты'}
                       </div>
@@ -813,7 +813,7 @@ export default function ClientDashboard() {
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                 {stage0Ready.map((doc) => {
-                  const fileUrl = DIRECT_FILE_URLS[doc.code] || doc.file?.url || '#';
+                  const fileUrl = DIRECT_FILE_URLS[doc.code] || (doc.file?.url ? doc.file.url.replace('/api/media/file/', '/documents/') : '#') || '#';
                   return (
                     <div key={doc.code} style={{ padding: '1.25rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(109,184,154,0.3)', borderRadius: 12 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>

@@ -22,7 +22,7 @@ const CursorLight = dynamic(() => import("@/components/CursorLight"), { loading:
 export const metadata: Metadata = {
   title: {
     default: "Потребительский кооператив | Школа ПК — Велеслав Старков",
-    template: "%s | Школа ПК — Велеслав Старков",
+    template: "%s | велеслав.рус",
   },
   description:
     "Потребительский кооператив — защита активов и ставка 0%. Обучение, услуги по закону РФ № 3085-1. Аудит устава ПК, регистрация под ключ, сопровождение при проверках ФНС.",
@@ -48,7 +48,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Потребительский кооператив — защита активов и ставка 0%",
     description: "Первая онлайн Школа потребительской кооперации с 2015 года.",
-    images: ["https://2980738.ru/images/og-preview.webp"],
+    images: [{
+      url: "https://2980738.ru/images/og-preview.webp",
+      alt: "Потребительский кооператив — защита активов и ставка 0%",
+    }],
+    site: "@Veles_ST",
+    creator: "@Veles_ST",
   },
   alternates: {
     canonical: "https://2980738.ru",
@@ -58,7 +63,7 @@ export const metadata: Metadata = {
       "x-default": "https://2980738.ru",
     },
   },
-  robots: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  robots: { index: false, follow: false, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1, noarchive: true, nosnippet: true, noimageindex: true },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -90,7 +95,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <link rel="preload" as="image" href="/images/hero-logo.webp" fetchPriority="high" />
         {/* Preconnect to Yandex Metrika origin (saves DNS+TLS on tag.js fetch) */}
         {/* Yandex Metrika preconnect убран — скрипт грузится через requestIdleCallback */}
-        <Script src="https://captcha-api.yandex.ru/captcha.js" strategy="beforeInteractive" />
+        <Script src="https://smartcaptcha.yandexcloud.com/captcha.js" strategy="lazyOnload" />
         {/* Preconnect только к Yandex Metrika — единственный 3rd party JS */}
 
 

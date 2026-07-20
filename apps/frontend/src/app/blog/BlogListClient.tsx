@@ -14,7 +14,7 @@ interface BlogPost {
   createdAt: string;
 }
 
-const POSTS_PER_PAGE = 12;
+const POSTS_PER_PAGE = 24;
 
 export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);

@@ -30,7 +30,7 @@ export default async function BlogPage() {
     slug: p.slug,
     excerpt: p.excerpt || null,
     coverImage: p.coverImage || null,
-    category: p.category || null,
+    category: (typeof p.category === 'object' && p.category ? p.category.title : p.category) || null,
     tags: p.tags || null,
     publishedAt: p.publishedAt || p.createdAt,
     createdAt: p.createdAt,

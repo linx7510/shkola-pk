@@ -28,13 +28,13 @@ export function CtaBlock({ data }: { data: CtaBlockData }) {
   const hasBg = !!data.backgroundImage?.url
 
   return (
-    <section style={{ padding: "3rem 1.5rem" }}>
+    <section style={{ padding: "0 1.5rem 0" }}>
       <div
         className="cta__inner"
         style={{
           maxWidth: 900,
           margin: "0 auto",
-          padding: "3rem 2.5rem",
+          padding: "1.5rem 2.5rem",
           background: hasBg
             ? `linear-gradient(rgba(13,12,10,0.85), rgba(13,12,10,0.92)), url(${data.backgroundImage!.url}) center/cover`
             : "linear-gradient(135deg, rgba(201,110,77,0.15), rgba(214,198,178,0.05))",
@@ -66,7 +66,7 @@ export function CtaBlock({ data }: { data: CtaBlockData }) {
                 marginBottom: "1.5rem",
                 lineHeight: 1.6,
                 maxWidth: 600,
-                margin: "0 auto 1.5rem",
+                margin: "0 auto 1rem",
               }}
             >
               {description}

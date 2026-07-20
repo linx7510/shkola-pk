@@ -79,86 +79,79 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
           </Reveal>
         )}
 
-        {/* Плеер-превью с кнопкой Play */}
-        <div
-          onClick={() => embedUrl && setOpen(true)}
-          style={{
-            position: "relative",
-            paddingBottom: "56.25%",
-            height: 0,
-            borderRadius: 12,
-            overflow: "hidden",
-            background: "linear-gradient(135deg, rgba(13,12,10,0.95), rgba(24,22,19,0.95))",
-            border: "1px solid rgba(214,198,178,0.12)",
-            cursor: embedUrl ? "pointer" : "default",
-            transition: "border-color 0.3s, box-shadow 0.3s",
-          }}
-          onMouseEnter={(e) => {
-            if (embedUrl) {
-              e.currentTarget.style.borderColor = "rgba(230,136,99,0.4)"
-              e.currentTarget.style.boxShadow = "0 0 30px rgba(230,136,99,0.15)"
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "rgba(214,198,178,0.12)"
-            e.currentTarget.style.boxShadow = "none"
-          }}
-        >
-          {/* Декоративный фон с иконкой */}
+        {/* Плеер: превью при клике заменяется на iframe */}
+        {open && embedUrl ? (
           <div
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column",
-              gap: "1rem",
+              position: "relative",
+              paddingBottom: "56.25%",
+              height: 0,
+              borderRadius: 12,
+              overflow: "hidden",
+              border: "1px solid rgba(214,198,178,0.12)",
             }}
           >
-                      {data.thumbnailUrl && (
-            <img
-              src={data.thumbnailUrl}
-              alt={data.title || "Видео"}
+            <iframe
+              src={embedUrl + "&autoplay=1"}
               style={{
                 position: "absolute",
                 top: 0,
                 left: 0,
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
-                zIndex: 1,
+                border: 0,
               }}
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;"
+              allowFullScreen
+              title={data.title || "Видео"}
             />
-          )}
-          {data.thumbnailUrl && (
+          </div>
+        ) : (
+          <div
+            onClick={() => embedUrl && setOpen(true)}
+            style={{
+              position: "relative",
+              paddingBottom: "56.25%",
+              height: 0,
+              borderRadius: 12,
+              overflow: "hidden",
+              background: "linear-gradient(135deg, rgba(13,12,10,0.95), rgba(24,22,19,0.95))",
+              border: "1px solid rgba(214,198,178,0.12)",
+              cursor: embedUrl ? "pointer" : "default",
+              transition: "border-color 0.3s, box-shadow 0.3s",
+            }}
+            onMouseEnter={(e) => {
+              if (embedUrl) {
+                e.currentTarget.style.borderColor = "rgba(230,136,99,0.4)"
+                e.currentTarget.style.boxShadow = "0 0 30px rgba(230,136,99,0.15)"
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "rgba(214,198,178,0.12)"
+              e.currentTarget.style.boxShadow = "none"
+            }}
+          >
+            {data.thumbnailUrl && (
+              <img
+                src={data.thumbnailUrl}
+                alt={data.title || "Видео"}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  zIndex: 1,
+                }}
+              />
+            )}
             <div
               style={{
                 position: "absolute",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: 70,
-                height: 70,
-                borderRadius: "50%",
-                background: "rgba(201,110,77,0.9)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "1.8rem",
-                color: "#fff",
-                boxShadow: "0 0 30px rgba(0,0,0,0.5)",
-                zIndex: 3,
-              }}
-            >
-              ▶
-            </div>
-          )}
-          <div
-              style={{
                 width: 80,
                 height: 80,
                 borderRadius: "50%",
@@ -169,16 +162,28 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
                 fontSize: "2rem",
                 color: "#fff",
                 boxShadow: "0 0 30px rgba(230,136,99,0.4)",
+                zIndex: 3,
                 transition: "transform 0.3s",
               }}
             >
               ▶
             </div>
-            <div style={{ color: "rgba(214,198,178,0.75)", fontSize: "1rem" }}>
+            <div
+              style={{
+                position: "absolute",
+                bottom: "1rem",
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                color: "rgba(214,198,178,0.75)",
+                fontSize: "1rem",
+                zIndex: 3,
+              }}
+            >
               {embedUrl ? "Нажмите, чтобы посмотреть видео" : "Видео скоро будет добавлено"}
             </div>
           </div>
-        </div>
+        )}
 
         {data.description && (
           <p

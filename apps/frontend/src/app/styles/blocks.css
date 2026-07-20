@@ -510,7 +510,7 @@
 
 .service-card__desc {
   font-size: 0.88rem;
-  color: rgba(214,198,178,0.95);
+  color: rgba(214,198,178,1);
   line-height: 1.6;
 }
 

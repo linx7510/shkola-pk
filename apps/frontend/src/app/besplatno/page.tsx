@@ -68,6 +68,11 @@ export default async function BesplatnoPage() {
             </h1>
           </section>
         )}
+        {(page as any).content && (page as any).content.trim().length > 10 && (
+          <section style={{ padding: '0 1.5rem 4rem', maxWidth: 900, margin: '0 auto' }}>
+            <div className="article-content" style={{ color: '#D6C6B2', lineHeight: 1.8, fontSize: '1.05rem' }} dangerouslySetInnerHTML={{ __html: (page as any).content }} />
+          </section>
+        )}
         {/* AI-консультант — точная копия блока с главной страницы */}
         <AIConsultant />
       </main>

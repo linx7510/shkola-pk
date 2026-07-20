@@ -32,19 +32,32 @@ export async function generateMetadata({ params }: Props) {
   const title = (page as any).meta?.title || (page as any).title || "Школа ПК"
   const description = (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
   
+  const BASE_URL = "https://2980738.ru"
+  const finalTitle = `${title} | велеслав.рус`
+  const ogImage = `${BASE_URL}/images/og-preview.webp`
+
   return {
-    title,
+    title: { absolute: finalTitle },
     description,
     openGraph: {
-      title,
+      title: finalTitle,
       description,
-      url: `https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/${slug}`,
+      url: `${BASE_URL}/uslugi-dlya-potrebitelskih-kooperativov/${slug}`,
       type: "website",
       locale: "ru_RU",
       siteName: "Школа ПК — Велеслав Старков",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: finalTitle }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: finalTitle,
+      description,
+      images: [{ url: ogImage, alt: finalTitle }],
+      site: "@Veles_ST",
+      creator: "@Veles_ST",
     },
     alternates: {
-      canonical: `https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/${slug}`,
+      canonical: `${BASE_URL}/uslugi-dlya-potrebitelskih-kooperativov/${slug}`,
     },
   }
 }

@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Fallback description для about-us если не получен из БД
   const finalDescription = description || (isAboutUs 
     ? 'Велеслав Старков — председатель Правления ПК с 2015 года. Основатель Первой онлайн Школы потребительской кооперации. 120+ зарегистрированных ПК, регистрация под ключ, аудит устава, налоговая оптимизация.'
-    : '')
+    : `Страница «${title}» — Школа Потребительской Кооперации. Обучение, услуги и консультации по созданию потребительских кооперативов по закону РФ № 3085-1.`)
   const defaultOgImage = isAboutUs 
     ? `${BASE_URL}/images/starkov_portrait.webp` 
     : `${BASE_URL}/images/og-preview.webp`
@@ -56,9 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : defaultOgImage
 
   // Для about-us — используем полный title как на велеслав.рус
+  // Для остальных страниц — добавляем бренд
   const finalTitle = isAboutUs
     ? 'О нас | Велеслав Старков — Первая онлайн школа Потребкооперации'
-    : title
+    : `${title} | велеслав.рус`
 
   return {
     title: {
@@ -67,7 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: finalDescription,
     keywords: 'потребительский кооператив, кооперация, онлайн-обучение, защита активов, налоговая оптимизация, Велеслав Старков, регистрация ПК, обнуление НДС, паевой взнос',
     openGraph: {
-      title: isAboutUs ? 'Велеслав Старков — эксперт по потребительской кооперации | Школа ПК' : title,
+      title: isAboutUs ? 'Велеслав Старков — эксперт по потребительской кооперации | Школа ПК' : `${title} | велеслав.рус`,
       description: finalDescription,
       url: `${BASE_URL}/${slug}`,
       type: isAboutUs ? 'profile' : 'website',
@@ -77,14 +78,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: ogImage, 
         width: isAboutUs ? 380 : 1200, 
         height: isAboutUs ? 507 : 630, 
-        alt: isAboutUs ? 'Велеслав Старков — основатель Школы ПК' : title 
+        alt: isAboutUs ? 'Велеслав Старков — основатель Школы ПК' : `${title} | велеслав.рус`
       }],
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: `${title} | велеслав.рус`,
       description: finalDescription,
-      images: [ogImage],
+      images: [{
+        url: ogImage,
+        alt: `${title} | велеслав.рус`,
+      }],
+      site: '@Veles_ST',
+      creator: '@Veles_ST',
     },
     authors: isAboutUs ? [{ name: 'Велеслав Старков', url: `${BASE_URL}/about-us` }] : undefined,
     creator: isAboutUs ? 'Велеслав Старков' : undefined,

@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from "react";
  * BlogParticles — оптимизированные световые частицы
  * Desktop only (mobile ≤768px — выключено для экономии GPU).
  * Также отключается при prefers-reduced-motion (пункт 17 плана).
- * 
- * v4: canvas element НЕ рендерится на мобильных (раньше только анимация
- *     останавливалась, но сам canvas оставался в DOM)
+ *
+ * v5: исправлена работа mouseleave/mouseenter, добавленоятно отслеживание
+ *     координат мыши даже когда курсор покидает окно.
  */
 export default function BlogParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -15,19 +15,19 @@ export default function BlogParticles() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
+
     // === Mobile detection (max-width: 768px) — не рендерим canvas на телефонах ===
     const mqMobile = window.matchMedia("(max-width: 768px)");
     const mqReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    
+
     const checkEnabled = () => {
       setEnabled(!mqMobile.matches && !mqReducedMotion.matches);
     };
-    
+
     checkEnabled();
     mqMobile.addEventListener("change", checkEnabled);
     mqReducedMotion.addEventListener("change", checkEnabled);
-    
+
     return () => {
       mqMobile.removeEventListener("change", checkEnabled);
       mqReducedMotion.removeEventListener("change", checkEnabled);
@@ -47,9 +47,10 @@ export default function BlogParticles() {
     let paused = false;
     let mouseX = -1000;
     let mouseY = -1000;
-    const REPEL_RADIUS = 110;
-    const REPEL_FORCE = 0.6;
-    const MAX_PARTICLES = 45;
+    let mouseActive = false;
+    const REPEL_RADIUS = 130;
+    const REPEL_FORCE = 0.8;
+    const MAX_PARTICLES = 50;
 
     interface Particle {
       x: number;
@@ -68,10 +69,10 @@ export default function BlogParticles() {
       if (!canvas || !ctx) return;
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      
+
       const count = Math.min(MAX_PARTICLES, Math.floor((canvas.width * canvas.height) / 30000));
       particles = [];
-      
+
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * canvas.width,
@@ -99,19 +100,30 @@ export default function BlogParticles() {
         if (p.y < 0) p.y = canvas.height;
         if (p.y > canvas.height) p.y = 0;
 
-        const dx = p.x - mouseX;
-        const dy = p.y - mouseY;
-        const distSq = dx * dx + dy * dy;
+        // Отталкивание от курсора мыши — только если курсор активен
+        if (mouseActive) {
+          const dx = p.x - mouseX;
+          const dy = p.y - mouseY;
+          const distSq = dx * dx + dy * dy;
 
-        if (distSq < REPEL_RADIUS * REPEL_RADIUS && distSq > 0) {
-          const dist = Math.sqrt(distSq);
-          const force = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
-          p.vx += (dx / dist) * force;
-          p.vy += (dy / dist) * force;
+          if (distSq < REPEL_RADIUS * REPEL_RADIUS && distSq > 0) {
+            const dist = Math.sqrt(distSq);
+            const force = (1 - dist / REPEL_RADIUS) * REPEL_FORCE;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
+          }
         }
 
-        p.vx *= 0.98;
-        p.vy *= 0.98;
+        // Лёгкое возвращение к базовой скорости
+        p.vx *= 0.97;
+        p.vy *= 0.97;
+
+        // Минимальная скорость, чтобы частицы не останавливались
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (speed < 0.05) {
+          p.vx += (Math.random() - 0.5) * 0.05;
+          p.vy += (Math.random() - 0.5) * 0.05;
+        }
 
         p.alpha += (p.baseAlpha - p.alpha) * 0.03;
 
@@ -141,8 +153,38 @@ export default function BlogParticles() {
     };
     document.addEventListener("visibilitychange", handleVisibility);
 
-    const handleMouse = (e: MouseEvent) => { mouseX = e.clientX; mouseY = e.clientY; };
-    window.addEventListener("mousemove", handleMouse, { passive: true });
+    // === Mouse tracking — надёжный ===
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseActive = true;
+    };
+    const handleMouseLeave = () => {
+      mouseActive = false;
+      mouseX = -1000;
+      mouseY = -1000;
+    };
+    const handleMouseEnter = () => {
+      mouseActive = true;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        mouseX = e.touches[0].clientX;
+        mouseY = e.touches[0].clientY;
+        mouseActive = true;
+      }
+    };
+    const handleTouchEnd = () => {
+      mouseActive = false;
+    };
+
+    // mousemove на window — ловит движения мыши по всей странице
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("mouseenter", handleMouseEnter);
+    // Touch для планшетов с touch-screen
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd);
 
     let resizeTimer: ReturnType<typeof setTimeout>;
     const handleResize = () => {
@@ -157,7 +199,11 @@ export default function BlogParticles() {
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("mousemove", handleMouse);
+      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mouseenter", handleMouseEnter);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimer);
     };
@@ -169,7 +215,7 @@ export default function BlogParticles() {
   return (
     <canvas
       ref={canvasRef}
-      style={{ pointerEvents: "none", position: "fixed", top: 0, right: 0, bottom: 0, left: 0, zIndex: 0, opacity: 0.95 }}
+      style={{ pointerEvents: "none", position: "fixed", top: 0, right: 0, bottom: 0, left: 0, zIndex: 1, opacity: 0.95 }}
       aria-hidden="true"
     />
   );

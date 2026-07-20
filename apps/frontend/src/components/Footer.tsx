@@ -110,14 +110,14 @@ export default function Footer() {
         padding: "1.25rem clamp(1rem, 4vw, 4rem) 0",
         borderTop: "1px solid rgba(214,198,178,0.08)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        fontSize: "0.78rem", color: "rgba(214,198,178,0.35)",
+        fontSize: "0.78rem", color: "rgba(214,198,178,0.65)",
         flexWrap: "wrap", gap: "0.5rem",
       }}>
         <span>{copyright || "© ИП Старков Велеслав Владимирович, 2015–2026. Все права защищены."}</span>
         <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
           {legalLinks.map((link: any, lidx: number) => (
             <Link key={link.id || lidx} href={link.href} className="footer-link" style={{
-              color: "rgba(214,198,178,0.45)", textDecoration: "none", transition: "color 0.15s",
+              color: "rgba(214,198,178,0.7)", textDecoration: "none", transition: "color 0.15s",
             }}>{link.label}</Link>
           ))}
         </div>
