@@ -322,17 +322,17 @@ export default function AuditUstavaLanding() {
       {/* BENEFITS */}
       <section style={{ padding: "2rem 1.5rem", maxWidth: 1300, margin: "0 auto" }}>
         <div style={{ display: "flex", gap: "2rem", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap" }}>
-          <div style={{ flex: "0 0 300px", display: "flex", justifyContent: "center" }}>
-            <img 
-              src="/api/media/file/0129.webp" 
-              alt="Два специалиста Школы ПК проводят аудит Устава потребительского кооператива за рабочим столом" 
-              width={300} 
+          <div style={{ flex: "0 0 300px", display: "flex", justifyContent: "center", position: "relative", zIndex: 10 }}>
+            <img
+              src="/api/media/file/0129.webp"
+              alt="Два специалиста Школы ПК проводят аудит Устава потребительского кооператива за рабочим столом"
+              width={300}
               height={300}
               loading="lazy"
-              style={{ maxWidth: 300, width: "100%", height: "auto", borderRadius: 12, border: "1px solid rgba(214,198,178,0.1)" }}
+              style={{ maxWidth: 300, width: "100%", height: "auto", borderRadius: 12, border: "1px solid rgba(214,198,178,0.1)", position: "relative", zIndex: 10 }}
             />
           </div>
-          <div style={{ flex: "1 1 400px" }}>
+          <div style={{ flex: "1 1 400px", position: "relative", zIndex: 1 }}>
             <h2 className="heading-sweep" data-text="Преимущества" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", color: "#E7DCCF", fontWeight: 700, marginBottom: "0.5rem" }}>Преимущества аудита устава</h2>
             <p style={{ color: "rgba(214,198,178,0.8)", fontSize: "1rem", lineHeight: 1.5 }}>Почему 120+ кооперативов прошли аудит у нас и ни один не получил предписания от ФНС</p>
           </div>
@@ -367,18 +367,18 @@ export default function AuditUstavaLanding() {
       {/* STEPS */}
       <section style={{ padding: "2rem 1.5rem", maxWidth: 1300, margin: "0 auto" }}>
         <div style={{ display: "flex", gap: "2rem", alignItems: "center", marginBottom: "2.5rem", flexWrap: "wrap" }}>
-          <div style={{ flex: "1 1 400px" }}>
+          <div style={{ flex: "1 1 400px", position: "relative", zIndex: 1 }}>
             <h2 className="heading-sweep" data-text="Как мы работаем" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", color: "#E7DCCF", fontWeight: 700, marginBottom: "0.5rem" }}>Как мы работаем — 5 этапов</h2>
             <p style={{ color: "rgba(214,198,178,0.8)", fontSize: "1rem", lineHeight: 1.5 }}>От запроса до отчёта с рекомендациями — 5–7 рабочих дней</p>
           </div>
-          <div style={{ flex: "0 0 300px", display: "flex", justifyContent: "center" }}>
-            <img 
-              src="/api/media/file/0130.webp" 
-              alt="Презентация результатов аудита Устава потребительского кооператива — специалист объясняет схему клиенту" 
-              width={300} 
+          <div style={{ flex: "0 0 300px", display: "flex", justifyContent: "center", position: "relative", zIndex: 10 }}>
+            <img
+              src="/api/media/file/0130.webp"
+              alt="Презентация результатов аудита Устава потребительского кооператива — специалист объясняет схему клиенту"
+              width={300}
               height={302}
               loading="lazy"
-              style={{ maxWidth: 300, width: "100%", height: "auto", borderRadius: 12, border: "1px solid rgba(214,198,178,0.1)" }}
+              style={{ maxWidth: 300, width: "100%", height: "auto", borderRadius: 12, border: "1px solid rgba(214,198,178,0.1)", position: "relative", zIndex: 10 }}
             />
           </div>
         </div>
