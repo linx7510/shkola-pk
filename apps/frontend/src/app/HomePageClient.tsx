@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
@@ -12,6 +12,7 @@ const LatestBlogPosts = dynamic(() => import("./home/LatestBlogPosts").then(m =>
 import { FAQAccordion } from "./home/FAQAccordion";
 import { LeadForm } from "./home/LeadForm";
 import Reveal from "@/components/Reveal";
+import ExpressAuditCTA from "@/components/ExpressAuditCTA";
 import { BlockRenderer } from "@/components/BlockRenderer";
 
 // Тип данных главной страницы из Payload CMS
@@ -191,6 +192,18 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       title: "Почему предприниматели выбирают Школу Потребительской кооперации",
       desc: "Школа поддерживает активное сообщество участников и кооператоров. В закрытых каналах участники обмениваются опытом, обсуждают сложные кейсы и получают поддержку от единомышленников из разных регионов России. За десять лет работы Школа стала ведущей платформой обучения кооперации в России. Более 120 предпринимателей уже открыли свои ПК с нашей помощью. Школа поддерживает активное сообщество — более 500 участников из 40 регионов России. Законодательство в сфере некоммерческих организаций меняется регулярно, и команда отслеживает все изменения в Законе № 3085-1, ГК РФ и фискальном законодательстве. Традиционные методики создания некоммерческих организаций опирались на бумажные регламенты и устаревшие шаблоны. Школа предлагает принципиально иной подход. Основной фокус направлен на цифровизацию процессов и адаптацию уставных документов к реалиям 2025–2026 годов. Каждая целевая потребительская программа разрабатывается индивидуально, с учётом конкретного ОКВЭД, региональной налоговой практики и судебных прецедентов последних лет. Это позволяет минимизировать риски при проверках ФНС и обеспечить документальное подтверждение деятельности с первого дня работы организации. Модель учитывает изменённую редакцию Закона РФ № 3085-1, статьи 123.1–123.3 Гражданского кодекса и актуальную практику Федеральной налоговой службы. В отличие от готовых шаблонов из интернета, которые часто содержат противоречия и устаревшие формулировки, каждый документ в рамках модели С500 проходит экспертную проверку на соответствие действующему законодательству.",
     },
+    {
+      icon: "📈",
+      color: "orange",
+      title: "Реальные кейсы: кооперативы, которые экономят миллионы",
+      desc: "Завод газобетона в Екатеринбурге — экономия 895 000 ₽ в год после перехода в ПК. Торговая компания в Краснодаре — экономия 2,87 млн ₽ в год. Семь фермеров в Краснодарском крае — повышение цены реализации на 33% через кооперативный элеватор. Мебельная фабрика в Перми — беспроцентные оборотные средства 15 млн ₽ от пайщиков. Эти результаты — не реклама, а документально подтверждённые кейсы, которые мы разбираем на консультациях.",
+    },
+    {
+      icon: "🔧",
+      color: "green",
+      title: "Методика С500 — авторская система создания кооперативов",
+      desc: "Модель С500 — это структурированная методика создания и ведения потребительского кооператива, разработанная Велеславом Старковым за 10 лет практической работы. Методика включает 5 этапов: Сбор пайщиков, Структура устава, Старт деятельности, Сопровождение, Саморегулирование. С 2015 года по модели С500 создано более 120 ПК. Ни один не ликвидирован ФНС. Методика адаптирована под разные виды деятельности: торговля, производство, сельское хозяйство, услуги, кредитование.",
+    },
   ];
 
   const faqItems = [
@@ -214,11 +227,11 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
   const howStepsData = (homeData?.howSteps && homeData.howSteps.length > 0)
     ? homeData.howSteps.map((s, i) => ({ ...s, color: (["orange","green","blue"])[i % 3] }))
     : howSteps;
-  const aboutCardsData = (homeData?.aboutCards && homeData.aboutCards.length > 0)
+  const aboutCardsData = (homeData?.aboutCards && Array.isArray(homeData.aboutCards) && homeData.aboutCards.length > 0 && homeData.aboutCards[0]?.title)
     ? homeData.aboutCards.map((c, i) => ({
         ...c,
         desc: c.desc,
-        color: (["orange","blue","green","beige"])[i % 4],
+        color: (["orange","blue","green","beige","orange","green"])[i % 6],
       }))
     : aboutCards;
   const servicesData = (homeData?.services && homeData.services.length > 0)
@@ -322,10 +335,10 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                 <tbody>
                   {advantagesData.map((a,i) => (
                     <tr key={i} style={{transition:"background 0.25s"}} onMouseEnter={e => {e.currentTarget.style.background="rgba(230,136,99,0.05)";}} onMouseLeave={e => {e.currentTarget.style.background="transparent";}}>
-                      <td style={{padding:"1rem 1.25rem", color:"rgba(214,198,178,0.97)", fontSize:"0.95rem", borderBottom:"1px solid rgba(214,198,178,0.06)", fontWeight:600}}>{String(i+1).padStart(2,"0")}</td>
+                      <td style={{padding:"1rem 1.25rem", color:"rgba(214,198,178,1)", fontSize:"0.95rem", borderBottom:"1px solid rgba(214,198,178,0.06)", fontWeight:600}}>{String(i+1).padStart(2,"0")}</td>
                       <td style={{padding:"1rem 1.25rem", fontSize:"1.8rem", borderBottom:"1px solid rgba(214,198,178,0.06)", lineHeight:1}}>{a.icon}</td>
                       <td style={{padding:"1rem 1.25rem", color:"#E7DCCF", fontSize:"1rem", fontWeight:600, borderBottom:"1px solid rgba(214,198,178,0.06)"}}>{a.title}</td>
-                      <td style={{padding:"1rem 1.25rem", color:"rgba(214,198,178,0.97)", fontSize:"0.9rem", lineHeight:1.6, borderBottom:"1px solid rgba(214,198,178,0.06)"}}>{a.desc}</td>
+                      <td style={{padding:"1rem 1.25rem", color:"rgba(214,198,178,1)", fontSize:"0.9rem", lineHeight:1.6, borderBottom:"1px solid rgba(214,198,178,0.06)"}}>{a.desc}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -372,7 +385,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
           <Reveal>
             <div className="section-label">О Школе</div>
             <h2 className="section-title heading-sweep" data-text="О Школе">О Школе</h2>
-            <p style={{fontSize:"1.05rem", color:"rgba(214,198,178,0.97)", lineHeight:1.8, maxWidth:800, margin:"1.5rem auto 2rem", textAlign:"center"}}>
+            <p style={{fontSize:"1.05rem", color:"rgba(214,198,178,1)", lineHeight:1.8, maxWidth:800, margin:"1.5rem auto 2rem", textAlign:"center"}}>
               Первая онлайн Школа потребительской кооперации — образовательный проект, запущенный в 2015 году Велеславом Старковым. За десять лет работы Школа стала крупнейшим в России центром подготовки предпринимателей к ведению деятельности через паевую модель. Более 120 учеников открыли собственные Кооперативы и успешно ведут бизнес по всей стране.
             </p>
           </Reveal>
@@ -416,12 +429,12 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                 />
                 <div style={{position:"absolute", bottom:0, left:0, right:0, padding:"1rem 1.25rem", background:"linear-gradient(to top, rgba(20,18,16,0.95), transparent)", color:"#E7DCCF"}}>
                   <div style={{fontWeight:600, fontSize:"1rem"}}>Велеслав Старков</div>
-                  <div style={{fontSize:"0.82rem", color:"rgba(214,198,178,0.97)", marginTop:"0.15rem"}}>Председатель Правления ПК с 2015 года</div>
+                  <div style={{fontSize:"0.82rem", color:"rgba(214,198,178,1)", marginTop:"0.15rem"}}>Председатель Правления ПК с 2015 года</div>
                 </div>
               </div>
             </Reveal>
             <Reveal delay={2}>
-              <div style={{fontSize:"1.05rem", color:"rgba(214,198,178,0.97)", lineHeight:1.9, textAlign:"left"}}>
+              <div style={{fontSize:"1.05rem", color:"rgba(214,198,178,1)", lineHeight:1.9, textAlign:"left"}}>
                 <p style={{marginBottom:"1.25rem"}}>
                   Меня зовут <strong style={{color:"#E7DCCF"}}>Велеслав Старков</strong>. Учу предпринимателей кооперативной модели.
                 </p>
@@ -456,7 +469,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
               <div className="section-label">УСЛУГИ</div>
               <h2 className="section-title heading-sweep" data-text="Услуги для Потребительских кооперативов">Услуги для Потребительских кооперативов</h2>
-              <p style={{color:"rgba(214,198,178,0.95)", marginTop:"1rem", fontSize:"1.05rem", maxWidth:700, margin:"1rem auto 0"}}>Полное юридическое сопровождение ПК: от аудита устава до регистрации «под ключ»</p>
+              <p style={{color:"rgba(214,198,178,1)", marginTop:"1rem", fontSize:"1.05rem", maxWidth:700, margin:"1rem auto 0"}}>Полное юридическое сопровождение ПК: от аудита устава до регистрации «под ключ»</p>
             </div>
           </Reveal>
           <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(320px, 1fr))", gap:"1.5rem"}}>
@@ -476,7 +489,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                       <span style={{fontSize:"0.95rem", fontWeight:600, color:"#E68863", background:"rgba(230,136,99,0.1)", padding:"0.25rem 0.75rem", borderRadius:8, whiteSpace:"nowrap"}}>{s.price}</span>
                     </div>
                     <h3 style={{fontSize:"1.1rem", fontWeight:600, color:"#E7DCCF", marginBottom:"0.6rem", lineHeight:1.3}}>{s.title}</h3>
-                    <p style={{fontSize:"0.88rem", color:"rgba(214,198,178,0.95)", lineHeight:1.6}}>{s.desc}</p>
+                    <p style={{fontSize:"0.88rem", color:"rgba(214,198,178,1)", lineHeight:1.6}}>{s.desc}</p>
                   </div>
                   <div style={{marginTop:"1rem", fontSize:"0.85rem", color:"#E68863", fontWeight:500}}>Подробнее →</div>
                 </Link>
@@ -498,7 +511,9 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
               <div className="section-label">БЛОГ</div>
               <h2 className="section-title heading-sweep" data-text="Последние полезные материалы">Последние полезные материалы</h2>
-              <p style={{color:"rgba(214,198,178,0.95)", marginTop:"0.5rem"}}>Свежие статьи о потребительской кооперации</p>
+              <p style={{color:"rgba(214,198,178,1)", marginTop:"0.5rem", fontSize:"1.05rem", lineHeight:1.7, maxWidth:700, margin:"0.5rem auto 0"}}>
+                Свежие статьи о потребительской кооперации: налоговая оптимизация через ПК, обнуление НДС, защита активов, аудит устава, регистрация кооператива под ключ. Все материалы основаны на действующем законодательстве и практике работы с 2015 года. Более 120 созданных кооперативов, сотни выигранных споров с ФНС, миллионы сэкономленных налогов — за каждым материалом стоит реальный опыт.
+              </p>
             </div>
           </Reveal>
           <LatestBlogPosts />
@@ -512,7 +527,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             <div style={{maxWidth:800, margin:"0 auto", textAlign:"center", padding:"2rem"}}>
               <div className="section-label">ОБУЧЕНИЕ</div>
               <h2 className="section-title heading-sweep" data-text="Обучающий курс по модели С500">Обучающий курс по модели С500</h2>
-              <p style={{color:"rgba(214,198,178,0.97)", fontSize:"1.1rem", lineHeight:1.8, marginTop:"1.5rem", marginBottom:"2rem"}}>
+              <p style={{color:"rgba(214,198,178,1)", fontSize:"1.1rem", lineHeight:1.8, marginTop:"1.5rem", marginBottom:"2rem"}}>
                 Авторская методика Велеслава Старкова — пять этапов от анализа бизнес-модели до запуска деятельности.
                 Ни один ПК, созданный по модели С500, не был ликвидирован по решению ФНС.
               </p>
@@ -561,7 +576,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             <div style={{marginBottom:"2.5rem"}}>
               <div className="section-label">AI-АССИСТЕНТ</div>
               <h2 className="section-title heading-sweep" data-text="Задайте вопрос AI-ассистенту">🤖 Задайте вопрос AI-ассистенту</h2>
-              <p style={{fontSize:"1rem",color:"rgba(214,198,178,0.7)",maxWidth:600,margin:"1rem auto 0"}}>
+              <p style={{fontSize:"1rem",color:"rgba(214,198,178,0.85)",maxWidth:600,margin:"1rem auto 0"}}>
                 Наш AI-помощник специально натренирован на потребительскую кооперацию и законодательство РФ
               </p>
             </div>
@@ -575,7 +590,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                   <div style={{fontSize:"0.8rem",color:"#6DB89A"}}>● Онлайн</div>
                 </div>
               </div>
-              <p style={{color:"rgba(214,198,178,0.9)",fontSize:"0.95rem",lineHeight:1.6,marginBottom:"1.5rem",textAlign:"left"}}>
+              <p style={{color:"rgba(214,198,178,1)",fontSize:"0.95rem",lineHeight:1.6,marginBottom:"1.5rem",textAlign:"left"}}>
                 Привет! Я AI-ассистент Школы Кооперативов. Помогу разобраться с потребительской кооперацией — просто и понятно. Спрашивай!
               </p>
               <div style={{display:"flex",gap:"0.5rem",flexWrap:"wrap",justifyContent:"center"}}>
@@ -584,11 +599,12 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                 <span style={{padding:"0.5rem 0.9rem",background:"rgba(91,141,170,0.1)",border:"1px solid rgba(91,141,170,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#5B8DAA",cursor:"pointer"}}>💬 Сколько стоит?</span>
                 <span style={{padding:"0.5rem 0.9rem",background:"rgba(201,177,154,0.1)",border:"1px solid rgba(201,177,154,0.2)",borderRadius:8,fontSize:"0.85rem",color:"#CAB19A",cursor:"pointer"}}>📝 Как зарегистрировать ПК?</span>
               </div>
-              <div style={{marginTop:"1rem",display:"flex",gap:"0.5rem"}}>
-                <input
-                  type="text"
+              <div style={{marginTop:"1rem",display:"flex",gap:"0.5rem",alignItems:"flex-end"}}>
+                <textarea
                   placeholder="Ваш вопрос..."
-                  style={{flex:1,padding:"0.75rem 1rem",background:"rgba(214,198,178,0.05)",border:"1px solid rgba(214,198,178,0.15)",borderRadius:10,color:"#E7DCCF",fontSize:"0.9rem",outline:"none"}}
+                  rows={3}
+                  onKeyDown={(e)=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();(e.currentTarget.nextElementSibling as HTMLButtonElement)?.click();}}}
+                  style={{flex:1,padding:"0.75rem 1rem",background:"rgba(214,198,178,0.05)",border:"1px solid rgba(214,198,178,0.15)",borderRadius:10,color:"#E7DCCF",fontSize:"0.9rem",outline:"none",resize:"vertical",minHeight:"72px",fontFamily:"inherit",lineHeight:1.5}}
                 />
                 <button
                   style={{padding:"0.75rem 1.5rem",background:"linear-gradient(135deg, #C96E4D, #E68863)",border:"none",borderRadius:10,color:"#0D0C0A",fontWeight:600,cursor:"pointer",fontSize:"0.9rem"}}
@@ -636,61 +652,123 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
               <div className="section-label">ТЕМЫ</div>
               <h2 className="section-title heading-sweep" data-text="Облако тегов">Облако тегов</h2>
+              <p style={{color:"rgba(214,198,178,0.7)", marginTop:"0.75rem", fontSize:"0.95rem"}}>Каждый тег — живая ссылка на статью, услугу, раздел или документ. Кликните, чтобы перейти.</p>
             </div>
           </Reveal>
           <Reveal delay={2}>
-            <div style={{display:"flex", flexWrap:"wrap", gap:"0.6rem", justifyContent:"center", maxWidth:800, margin:"0 auto"}}>
-              {[
-                {label:"Потребительский кооператив", size:1.3, color:"#E68863"},
-                {label:"Обнуление НДС", size:1.2, color:"#E68863"},
-                {label:"Защита активов", size:1.25, color:"#6DB89A"},
-                {label:"Паевой взнос", size:1.1, color:"#BCA891"},
-                {label:"Закон 3085-1", size:1.2, color:"#E68863"},
-                {label:"Налоги 0%", size:1.3, color:"#E68863"},
-                {label:"Устав ПК", size:1.05, color:"#BCA891"},
-                {label:"Регистрация кооператива", size:1.15, color:"#6DB89A"},
-                {label:"Пайщик", size:1.1, color:"#BCA891"},
-                {label:"Субсидиарная ответственность", size:1.0, color:"#8A7F74"},
-                {label:"ФНС", size:1.0, color:"#8A7F74"},
-                {label:"Некоммерческая организация", size:1.05, color:"#BCA891"},
-                {label:"НДФЛ", size:1.0, color:"#8A7F74"},
-                {label:"Кооперативные выплаты", size:1.0, color:"#6DB89A"},
-                {label:"Модель С500", size:1.1, color:"#E68863"},
-                {label:"Аудит устава", size:1.0, color:"#8A7F74"},
-                {label:"ЕГРЮЛ", size:0.9, color:"#8A7F74"},
-                {label:"Целевая программа", size:1.0, color:"#BCA891"},
-                {label:"Кооперация", size:1.15, color:"#E68863"},
-                {label:"Налоговая оптимизация", size:1.1, color:"#6DB89A"},
-                {label:"Онлайн-касса не нужна", size:1.0, color:"#BCA891"},
-                {label:"Потребительское общество", size:1.05, color:"#BCA891"},
-                {label:"Ставка 0%", size:1.2, color:"#E68863"},
-                {label:"Возврат пая", size:1.0, color:"#8A7F74"},
-                {label:"Паевой фонд", size:0.95, color:"#8A7F74"},
-                {label:"Общее собрание", size:0.95, color:"#8A7F74"},
-                {label:"Правление ПК", size:0.9, color:"#8A7F74"},
-                {label:"Ревизионная комиссия", size:0.9, color:"#8A7F74"},
-                {label:"Резервный фонд", size:0.9, color:"#8A7F74"},
-                {label:"Кооперативный возврат", size:0.95, color:"#6DB89A"},
-              ].map((tag, i) => (
-                <span key={i} style={{
+            <div style={{display:"flex", flexWrap:"wrap", gap:"0.6rem", justifyContent:"center", maxWidth:900, margin:"0 auto"}}>
+              {([
+                // ===== Статьи блога: ключевые темы =====
+                {label:"Потребительский кооператив", href:"/blog/potrebitelskiy-kooperativ-prosto-2026", size:1.3, color:"#E68863"},
+                {label:"Обнуление НДС", href:"/blog/obnulenie-nds-cherez-potrebitelskiy-kooperativ", size:1.2, color:"#E68863"},
+                {label:"Налоги 0%", href:"/blog/nalogi-potrebitelskogo-kooperativa", size:1.3, color:"#E68863"},
+                {label:"Ставка 0%", href:"/blog/obnulenie-nds-cherez-potrebitelskiy-kooperativ", size:1.2, color:"#E68863"},
+                {label:"Налоговая оптимизация", href:"/blog/obnulenie-nds-cherez-potrebitelskiy-kooperativ", size:1.1, color:"#6DB89A"},
+                {label:"Защита активов", href:"/blog/potrebitelskiy-kooperativ-dlya-biznesa-2026-zakonnoe-obnulenie-nds", size:1.25, color:"#6DB89A"},
+                {label:"Беспроцентные инвестиции", href:"/blog/kak-poluchit-besprocentnye-investicii-cherez-pk", size:1.15, color:"#E68863"},
+                {label:"Кооператив под ключ", href:"/blog/kooperativ-pod-klyuch-polnoe-rukovodstvo-2026", size:1.25, color:"#E68863"},
+                {label:"Модель С500", href:"/blog/kooperativ-pod-klyuch-polnoe-rukovodstvo-2026", size:1.1, color:"#E68863"},
+                {label:"Регистрация кооператива", href:"/blog/kak-otkryt-kooperativ-v-2026", size:1.15, color:"#6DB89A"},
+                {label:"Как открыть кооператив", href:"/blog/kak-otkryt-kooperativ-v-2026", size:1.1, color:"#6DB89A"},
+                {label:"Устав ПК", href:"/blog/ustav-potrebitelskogo-kooperativa-kak-sostavit", size:1.1, color:"#BCA891"},
+                {label:"Субсидиарная ответственность", href:"/blog/subsidiarnaya-otvetstvennost-payschika-potrebitelskogo-kooperativa", size:1.05, color:"#8A7F74"},
+                {label:"Как проверить кооператив", href:"/blog/kak-proverit-kooperativ-na-moshennichestvo", size:1.1, color:"#6DB89A"},
+                {label:"Некоммерческая организация", href:"/blog/kooperativ-eto-nekommercheskaya-ili-kommercheskaya-organizatsiya", size:1.05, color:"#BCA891"},
+                {label:"НКО или коммерческая", href:"/blog/kooperativ-eto-nekommercheskaya-ili-kommercheskaya-organizatsiya", size:1.0, color:"#BCA891"},
+                {label:"11 видов ПК", href:"/blog/11-vidov-potrebitelskih-kooperativov-v-rossii", size:1.1, color:"#BCA891"},
+                {label:"Потребительское общество", href:"/blog/11-vidov-potrebitelskih-kooperativov-v-rossii", size:1.05, color:"#BCA891"},
+                {label:"20 терминов кооперации", href:"/blog/20-glavnyh-terminov-kooperatsii", size:1.1, color:"#BCA891"},
+                {label:"Паевой взнос", href:"/blog/20-glavnyh-terminov-kooperatsii", size:1.1, color:"#BCA891"},
+                {label:"Пайщик", href:"/blog/20-glavnyh-terminov-kooperatsii", size:1.05, color:"#BCA891"},
+                {label:"Паевой фонд", href:"/blog/20-glavnyh-terminov-kooperatsii", size:1.0, color:"#BCA891"},
+                {label:"Кооперативные выплаты", href:"/blog/20-glavnyh-terminov-kooperatsii", size:1.0, color:"#6DB89A"},
+                {label:"Возврат пая", href:"/blog/kak-rabotaet-potrebitelskiy-kooperativ-2026", size:1.0, color:"#8A7F74"},
+                {label:"Кооперативный возврат", href:"/blog/kak-rabotaet-potrebitelskiy-kooperativ-2026", size:0.95, color:"#6DB89A"},
+                {label:"Общее собрание", href:"/blog/ustav-potrebitelskogo-kooperativa-kak-sostavit", size:0.95, color:"#8A7F74"},
+                {label:"Правление ПК", href:"/blog/ustav-potrebitelskogo-kooperativa-kak-sostavit", size:0.9, color:"#8A7F74"},
+                {label:"Ревизионная комиссия", href:"/blog/ustav-potrebitelskogo-kooperativa-kak-sostavit", size:0.9, color:"#8A7F74"},
+                {label:"Резервный фонд", href:"/blog/ustav-potrebitelskogo-kooperativa-kak-sostavit", size:0.9, color:"#8A7F74"},
+                {label:"НДФЛ", href:"/blog/nalogi-potrebitelskogo-kooperativa", size:1.0, color:"#8A7F74"},
+                {label:"Онлайн-касса не нужна", href:"/blog/nalogi-potrebitelskogo-kooperativa", size:1.0, color:"#BCA891"},
+                {label:"ФНС", href:"/blog/kak-otkryt-kooperativ-v-2026", size:1.0, color:"#8A7F74"},
+                {label:"ЕГРЮЛ", href:"/blog/kak-otkryt-kooperativ-v-2026", size:0.9, color:"#8A7F74"},
+                {label:"Кооперация", href:"/blog/potrebitelskie-kooperativy-rossiyskiy-opyt", size:1.15, color:"#E68863"},
+                {label:"Закон 3085-1 разбор", href:"/blog/potrebitelskiy-kooperativ-i-zakon", size:1.1, color:"#E68863"},
+                {label:"Аудит устава (статья)", href:"/blog/audit-ustava-pk-riski-subsidiarka", size:1.0, color:"#8A7F74"},
+
+                // ===== Услуги и страницы =====
+                {label:"Услуги для ПК", href:"/uslugi-dlya-potrebitelskih-kooperativov", size:1.2, color:"#B8956A"},
+                {label:"Кооператив под ключ (услуга)", href:"/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch", size:1.2, color:"#B8956A"},
+                {label:"Аудит устава (услуга)", href:"/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa", size:1.05, color:"#B8956A"},
+                {label:"Консультации", href:"/potrebitelskiy-kooperativ-konsultatsii", size:1.15, color:"#6DB89A"},
+                {label:"Курсы кооперации", href:"/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn", size:1.05, color:"#6DB89A"},
+                {label:"Бесплатные материалы", href:"/besplatno", size:1.1, color:"#6DB89A"},
+                {label:"О нас", href:"/about-us", size:0.95, color:"#8A7F74"},
+                {label:"Помощь проекту", href:"/pomosch-proektu", size:0.9, color:"#8A7F74"},
+                {label:"FAQ — частые вопросы", href:"/faq", size:1.0, color:"#8A7F74"},
+
+                // ===== Публичные лид-магниты (для холодного рынка) =====
+                {label:"Закон 3085-1 (.docx)", href:"/downloads/3085-1.docx", size:1.2, color:"#B8956A", download:true},
+                {label:"Устав (скелет, .docx)", href:"/downloads/ustav_skeleton.docx", size:1.05, color:"#B8956A", download:true},
+              ] as {label:string; href:string; size:number; color:string; download?:boolean}[]).map((tag, i) => {
+                const tagStyle: CSSProperties = {
                   fontSize: tag.size + "rem",
                   padding: "0.4rem 0.9rem",
                   borderRadius: 999,
                   border: "1px solid " + tag.color + "33",
                   background: tag.color + "0D",
                   color: tag.color,
-                  cursor: "default",
+                  cursor: "pointer",
                   transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
-                  display:"inline-block",
-                }}
-                onMouseEnter={e => {e.currentTarget.style.borderColor=tag.color+"99"; e.currentTarget.style.background=tag.color+"1A"; e.currentTarget.style.transform="translateY(-2px)"}}
-                onMouseLeave={e => {e.currentTarget.style.borderColor=tag.color+"33"; e.currentTarget.style.background=tag.color+"0D"; e.currentTarget.style.transform="translateY(0)"}}
-                >{tag.label}</span>
-              ))}
+                  display: "inline-block",
+                  textDecoration: "none",
+                  lineHeight: 1.4,
+                };
+                const onEnter = (e: ReactMouseEvent<HTMLElement>) => {
+                  e.currentTarget.style.borderColor = tag.color + "99";
+                  e.currentTarget.style.background = tag.color + "1A";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                };
+                const onLeave = (e: ReactMouseEvent<HTMLElement>) => {
+                  e.currentTarget.style.borderColor = tag.color + "33";
+                  e.currentTarget.style.background = tag.color + "0D";
+                  e.currentTarget.style.transform = "translateY(0)";
+                };
+                if (tag.download) {
+                  return (
+                    <a
+                      key={i}
+                      href={tag.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      style={tagStyle}
+                      onMouseEnter={onEnter}
+                      onMouseLeave={onLeave}
+                    >
+                      {tag.label}
+                    </a>
+                  );
+                }
+                return (
+                  <Link
+                    key={i}
+                    href={tag.href}
+                    style={tagStyle}
+                    onMouseEnter={onEnter}
+                    onMouseLeave={onLeave}
+                  >
+                    {tag.label}
+                  </Link>
+                );
+              })}
             </div>
           </Reveal>
         </div>
       </section>
+
+      {/* ===== EXPRESS AUDIT CTA (трипфайер) ===== */}
+      <ExpressAuditCTA />
 
       {/* ===== LEAD FORM ===== */}
             <section id="lead-form" style={{...S, background:"rgba(214,198,178,0.02)"}}>
@@ -699,7 +777,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             <div style={{textAlign:"center", marginBottom:"2.5rem"}}>
               <div className="section-label">ЗАЯВКА</div>
               <h2 className="section-title heading-sweep" data-text="Оставьте заявку">Оставьте заявку</h2>
-              <p style={{color:"rgba(214,198,178,0.7)", marginTop:"0.5rem"}}>Заполните форму — перезвоним в течение рабочего дня</p>
+              <p style={{color:"rgba(214,198,178,0.85)", marginTop:"0.5rem"}}>Заполните форму — перезвоним в течение рабочего дня</p>
             </div>
           </Reveal>
           <LeadForm />
