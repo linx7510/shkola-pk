@@ -49,6 +49,24 @@ export interface AuditPreview {
   missingSectionsCount: number
   /** Призыв к действию в зависимости от балла */
   ctaMessage: string
+  /** Блок последствий — чем страшнее, тем ниже балл. null для хороших уставов */
+  consequences: ConsequenceBlock | null
+}
+
+/**
+ * Блок последствий неисправленных ошибок.
+ * Адаптируется под тяжесть найденных проблем (балл + кол-во high-рисков).
+ * Цель — мотивировать срочно пройти полный аудит.
+ */
+export interface ConsequenceBlock {
+  /** Заголовок блока («Чем это грозит, если не исправить?» и т.п.) */
+  title: string
+  /** Тон блока: чем хуже, тем тревожнее цвет */
+  tone: 'warning' | 'danger' | 'critical'
+  /** Список конкретных последствий (доначисления, переквалификация и т.д.) */
+  items: string[]
+  /** Финальный призыв к срочному действию */
+  urgentCta: string
 }
 
 /**
@@ -106,6 +124,122 @@ function ctaForScore(score: number, issuesCount: number): string {
 }
 
 /**
+ * Формирует блок последствий неисправленных ошибок.
+ * Адаптация под тяжесть:
+ *   • score >= 75 И high-рисков 0-1 → null (устав хороший, пугать незачем)
+ *   • score 55-74 → tone 'warning', умеренные последствия
+ *   • score 35-54 → tone 'danger', серьёзные последствия
+ *   • score < 35  → tone 'critical', максимально тревожный блок
+ *
+ * Состав последствий зависит от найденных категорий:
+ *   если есть займы → «переквалификация в кредитный кооператив/финансовую пирамиду»;
+ *   если нет новации → «доначисление УСН/НДС»;
+ *   если нет комплаенса (115-ФЗ) → «внимание Росфинмониторинга»;
+ *   и т.д.
+ */
+function buildConsequences(
+  score: number,
+  highCount: number,
+  medCount: number,
+  risks: { category: string; severity: string }[]
+): ConsequenceBlock | null {
+  // Хороший устав (балл ≥ 70) — блок последствий не показываем В ПРИНЦИПЕ,
+  // даже если LLM нашёл high-риски. Высокий балл = устав в порядке.
+  // LLM иногда маркирует как high то, что по факту medium — поэтому опираемся на балл.
+  if (score >= 70) {
+    return null
+  }
+  // Умеренный устав (60-69) — показываем только если есть high-риски или много medium
+  if (score >= 60 && highCount === 0 && medCount < 3) {
+    return null
+  }
+
+  // Категории, найденные в рисках — определяют конкретные последствия
+  const cats = new Set(risks.map((r) => r.category))
+  const hasZaymy = cats.has('запрет-займов')
+  const hasNovatsiya = cats.has('новация')
+  const hasNalogi = cats.has('налоги')
+  const hasKomplaens = cats.has('комплаенс')
+  const hasUpravlenie = cats.has('управление')
+  const hasKrupnye = cats.has('крупные-сделки')
+
+  const items: string[] = []
+
+  // Набор последствий в порядке «от самого вероятного к тяжёлому».
+  // Конкретика зависит от найденных категорий.
+  if (hasZaymy) {
+    items.push(
+      'Переквалификация в кредитный потребительский кооператив (КПК) или финансовую пирамиду — деятельность признают незаконной, кооператив ликвидируют через суд (ст. 61 ГК РФ).'
+    )
+  }
+  if (hasNalogi || hasNovatsiya) {
+    items.push(
+      'Доначисление налогов (УСН, НДС) и пени — возврат паевого взноса переквалифицируют в реализацию товаров/услуг. Сумма доначислений может превышать обороты кооператива за год.'
+    )
+  }
+  if (hasNovatsiya) {
+    items.push(
+      'Исключение взносов из льготы ст. 251 НК РФ — паевые и членские взносы обложат налогом как выручку, ретроспективно за весь период работы.'
+    )
+  }
+  if (hasKomplaens) {
+    items.push(
+      'Внимание Росфинмониторинга (115-ФЗ) — блокировка счетов кооператива банком, проверка на отмывание доходов, штрафы до 1% от операции.'
+    )
+  }
+  if (hasKrupnye || hasUpravlenie) {
+    items.push(
+      'Субсидиарная ответственность учредителей и Председателя — при недостатке имущества кооператива долги взыщут с вас лично (ст. 53.1, 399 ГК РФ).'
+    )
+  }
+  if (score < 35) {
+    items.push(
+      'Уголовное преследование руководства — при крупном ущербе пайщикам или бюджету возможны ст. 165, 159, 201 УК РФ (присвоение, мошенничество, злоупотребление полномочиями).'
+    )
+  }
+  items.push(
+    'Несостоятельность проекта — отзыв поддержки банка (счета, эквайринг), отказ партнёров работать с кооперативом, потеря доверия пайщиков. Всё, ради чего создавался кооператив, обнуляется.'
+  )
+
+  // Если специфических последствий не нашлось — даём универсальный набор
+  if (items.length <= 1) {
+    items.unshift(
+      'Предписания ФНС и обязательная перерегистрация — кооператив принудят изменить Устав, а до этого его деятельность приостановят.'
+    )
+  }
+
+  // Тон и заголовок по тяжести
+  let tone: ConsequenceBlock['tone'] = 'warning'
+  let title = 'Чем это грозит, если не исправить?'
+  let urgentCta = 'Закажите полный аудит — получите готовые формулировки правок со ссылками на законы.'
+
+  if (score < 35) {
+    tone = 'critical'
+    title = '⚠ Критическая ситуация — кооператив под угрозой'
+    urgentCta =
+      'Срочно нужен полный аудит. Без правок Устава — доначисления, переквалификация и личная ответственность руководства. Не откладывайте.'
+  } else if (score < 55) {
+    tone = 'danger'
+    title = '🚨 Серьёзные риски — если не исправить, возможны тяжёлые последствия'
+    urgentCta =
+      'Рекомендуем срочно пройти полный аудит устава. Готовые правки со ссылками на законы РФ защитят кооператив и его руководство.'
+  } else if (score < 75 || medCount >= 3) {
+    tone = 'warning'
+    title = 'Чем грозят найденные ошибки, если их оставить как есть?'
+    urgentCta =
+      'Пройдите полный аудит — устраним пробелы и защитим кооператив от рисков. Это дешевле, чем разбираться с последствиями.'
+  }
+
+  // Ограничиваем 5 пунктами, чтобы блок не стал слишком длинным
+  return {
+    title,
+    tone,
+    items: items.slice(0, 5),
+    urgentCta,
+  }
+}
+
+/**
  * Сортировка проблем по серьёзности (high → medium → low).
  */
 const SEVERITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 }
@@ -143,8 +277,16 @@ export function buildPreview(full: FullAuditResult): AuditPreview {
   const totalIssuesFound = (full.risks?.length || 0) + (full.missing_sections?.length || 0)
   const missingSectionsCount = full.missing_sections?.length || 0
 
+  // Подсчёт рисков по тяжести — для блока последствий
+  const allRisks = full.risks || []
+  const highCount = allRisks.filter((r) => r.severity === 'high').length
+  const medCount = allRisks.filter((r) => r.severity === 'medium').length
+
   // summary пропускаем через обобщающую версию — без деталей
   const summary = generalizeSummary(full.summary, score)
+
+  // Блок последствий — «чем это грозит, если не исправить»
+  const consequences = buildConsequences(score, highCount, medCount, allRisks)
 
   return {
     complianceScore: score,
@@ -154,6 +296,7 @@ export function buildPreview(full: FullAuditResult): AuditPreview {
     totalIssuesFound,
     missingSectionsCount,
     ctaMessage: ctaForScore(score, totalIssuesFound),
+    consequences,
   }
 }
 

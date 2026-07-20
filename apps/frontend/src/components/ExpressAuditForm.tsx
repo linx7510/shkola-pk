@@ -20,6 +20,13 @@ interface PreviewIssue {
   severity: "high" | "medium" | "low"
   categoryLabel: string
 }
+interface ConsequenceBlock {
+  title: string
+  tone: "warning" | "danger" | "critical"
+  items: string[]
+  urgentCta: string
+}
+
 interface AuditPreview {
   complianceScore: number
   scoreTone: "green" | "beige" | "orange"
@@ -28,6 +35,7 @@ interface AuditPreview {
   totalIssuesFound: number
   missingSectionsCount: number
   ctaMessage: string
+  consequences: ConsequenceBlock | null
 }
 
 type Status = "idle" | "uploading" | "analyzing" | "result" | "error"
@@ -36,6 +44,12 @@ const TONE_COLORS = {
   green: { bg: "rgba(109,184,154,0.12)", border: "rgba(109,184,154,0.4)", text: "#6DB89A", glow: "0 0 30px rgba(109,184,154,0.15)" },
   beige: { bg: "rgba(214,198,178,0.10)", border: "rgba(214,198,178,0.35)", text: "#D6C6B2", glow: "0 0 30px rgba(214,198,178,0.12)" },
   orange: { bg: "rgba(201,110,77,0.12)", border: "rgba(201,110,77,0.4)", text: "#E68863", glow: "0 0 30px rgba(201,110,77,0.18)" },
+} as const
+
+const CONSEQUENCE_TONES = {
+  warning: { bg: "rgba(184,149,106,0.08)", border: "rgba(184,149,106,0.3)", accent: "#D6A86A", icon: "⚠️" },
+  danger: { bg: "rgba(201,110,77,0.10)", border: "rgba(201,110,77,0.4)", accent: "#E68863", icon: "🚨" },
+  critical: { bg: "rgba(180,60,60,0.12)", border: "rgba(220,80,80,0.45)", accent: "#FF6B6B", icon: "⛔" },
 } as const
 
 const SEVERITY_META = {
@@ -315,6 +329,11 @@ function ResultView({ preview, onReset }: { preview: AuditPreview; onReset: () =
           </div>
         )}
 
+        {/* === БЛОК ПОСЛЕДСТВИЙ — чем грозят ошибки, если не исправить === */}
+        {preview.consequences && (
+          <ConsequenceBlockView block={preview.consequences} />
+        )}
+
         <div style={{ marginTop: "1.5rem", padding: "1rem 1.25rem", background: "rgba(214,198,178,0.04)", border: "1px solid rgba(214,198,178,0.12)", borderRadius: 12, fontSize: "0.85rem", color: "#BCA891", lineHeight: 1.6 }}>
           💡 <strong style={{ color: "#D6C6B2" }}>Это экспресс-превью.</strong> Конкретные формулировки
           проблем, цитаты из вашего устава и готовые правки текста со ссылками на статьи закона
@@ -332,6 +351,79 @@ function ResultView({ preview, onReset }: { preview: AuditPreview; onReset: () =
 
         <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
           <button className="btn-secondary" onClick={onReset} style={{ fontSize: "0.9rem" }}>↻ Проверить другой устав</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Подкомпонент: блок последствий неисправленных ошибок ─── */
+function ConsequenceBlockView({ block }: { block: ConsequenceBlock }) {
+  const tone = CONSEQUENCE_TONES[block.tone]
+  return (
+    <div
+      style={{
+        marginTop: "1.5rem",
+        padding: 0,
+        borderRadius: 14,
+        overflow: "hidden",
+        background: tone.bg,
+        border: `1px solid ${tone.border}`,
+        boxShadow: block.tone === "critical" ? "0 0 30px rgba(220,80,80,0.12)" : "none",
+      }}
+    >
+      {/* Шапка блока */}
+      <div
+        style={{
+          padding: "1rem 1.25rem",
+          borderBottom: `1px solid ${tone.border}`,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+        }}
+      >
+        <span style={{ fontSize: "1.3rem", flexShrink: 0 }}>{tone.icon}</span>
+        <h4 style={{ margin: 0, fontSize: "1.05rem", fontWeight: 700, color: tone.accent, lineHeight: 1.3 }}>
+          {block.title}
+        </h4>
+      </div>
+
+      {/* Список последствий */}
+      <div style={{ padding: "1rem 1.25rem" }}>
+        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "0.65rem" }}>
+          {block.items.map((item, i) => (
+            <li
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.6rem",
+                color: "rgba(245,240,232,0.92)",
+                fontSize: "0.9rem",
+                lineHeight: 1.55,
+              }}
+            >
+              <span style={{ color: tone.accent, fontWeight: 700, flexShrink: 0, marginTop: "0.05rem" }}>▸</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Срочный призыв */}
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "0.85rem 1rem",
+            background: "rgba(0,0,0,0.25)",
+            borderRadius: 10,
+            borderLeft: `3px solid ${tone.accent}`,
+            color: "#F5F0E8",
+            fontSize: "0.92rem",
+            fontWeight: 600,
+            lineHeight: 1.5,
+          }}
+        >
+          {block.urgentCta}
         </div>
       </div>
     </div>
