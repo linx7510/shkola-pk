@@ -29,7 +29,7 @@ function anonymizeIp(ip: string | null): string | null {
 // SHA-256 хеш IP с солью (152-ФЗ — для анонимной аналитики без возможности деанонимизации)
 function hashIp(ip: string | null): string | null {
   if (!ip) return null
-  const salt = process.env.IP_HASH_SALT || 'shkola-pk-salt-2026'
+  const salt = process.env.IP_HASH_SALT || crypto.randomBytes(16).toString("hex")
   return crypto.createHash('sha256').update(ip + salt).digest('hex')
 }
 
