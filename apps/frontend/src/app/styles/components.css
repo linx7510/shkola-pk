@@ -1159,3 +1159,133 @@ div[style*="display:flex"] .heading-sweep::after {
   bottom: -3px;
   height: 1.5px;
 }
+
+/* === FAQ аккордеон (нативный details/summary) — для контентных страниц === */
+.article-content details {
+  margin: 0 0 1rem;
+  border: 1px solid rgba(184, 149, 106, 0.25);
+  border-radius: 8px;
+  background: rgba(26, 25, 23, 0.4);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.article-content details:hover {
+  border-color: rgba(184, 149, 106, 0.45);
+}
+.article-content details[open] {
+  border-color: rgba(230, 136, 99, 0.4);
+  background: rgba(26, 25, 23, 0.6);
+}
+.article-content summary {
+  cursor: pointer;
+  padding: 1rem 1.2rem;
+  font-weight: 600;
+  color: #F5F0E8;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  user-select: none;
+  transition: background 0.2s;
+}
+.article-content summary:hover {
+  background: rgba(184, 149, 106, 0.08);
+}
+.article-content summary::-webkit-details-marker {
+  display: none;
+}
+.article-content summary::after {
+  content: "+";
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: #E68863;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+  line-height: 1;
+}
+.article-content details[open] summary::after {
+  content: "−";
+  transform: rotate(180deg);
+}
+.article-content details > p,
+.article-content details > div {
+  padding: 0 1.2rem 1.1rem;
+  margin: 0;
+  color: rgba(214, 198, 178, 0.92);
+  line-height: 1.7;
+}
+.article-content details[open] > p:first-of-type {
+  padding-top: 0.2rem;
+}
+
+/* === Figure с обтеканием для контентных изображений === */
+.article-content figure {
+  margin: 1.5rem 0;
+}
+.article-content figcaption {
+  font-size: 0.88rem;
+  color: rgba(214, 198, 178, 0.6);
+  margin-top: 0.5rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Картинка с обтеканием слева (float-left) */
+.article-content .img-float-left {
+  float: left;
+  width: 350px;
+  max-width: 50%;
+  margin: 0.3rem 1.8rem 1rem 0;
+  border-radius: 10px;
+}
+/* Картинка с обтеканием справа (float-right) */
+.article-content .img-float-right {
+  float: right;
+  width: 350px;
+  max-width: 50%;
+  margin: 0.3rem 0 1rem 1.8rem;
+  border-radius: 10px;
+}
+/* Картинка по центру (full width, но ограничена) */
+.article-content .img-center {
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  margin: 2rem auto;
+  border-radius: 10px;
+}
+.article-content .img-float-left img,
+.article-content .img-float-right img,
+.article-content .img-center img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+}
+
+/* Очистка обтекания после floated-блоков */
+.article-content .clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Адаптивность: на мобильных убираем обтекание, картинка по центру */
+@media (max-width: 768px) {
+  .article-content .img-float-left,
+  .article-content .img-float-right {
+    float: none;
+    width: 100%;
+    max-width: 100%;
+    margin: 1.5rem auto;
+    display: block;
+  }
+}

@@ -165,7 +165,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
         ) : hasContent ? (
-          <section style={{ padding: "0 1.5rem 4rem", maxWidth: 900, margin: "0 auto" }}>
+          <section style={{ padding: "0 1.5rem 4rem", maxWidth: 1280, margin: "0 auto" }}>
             <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2", marginBottom: "1.5rem", fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800 }}>
               {(page as any).title}
             </h1>
