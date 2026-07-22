@@ -6,7 +6,7 @@ const serviceLinks = [
   { label: "Аудит устава ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" },
   { label: "Кооператив под ключ", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
   { label: "Пакет документов для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
-  { label: "Разработка Положений", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
+  { label: "Разработка Положений для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov/sozdanie-polnogo-komplekta-polozheniy" },
   { label: "Целевые программы", href: "/uslugi-dlya-potrebitelskih-kooperativov#target-programs" },
   { label: "Налоговая и судебная практика", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
   { label: "Сопровождение при проверках", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
