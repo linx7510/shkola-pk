@@ -150,6 +150,8 @@ export default async function UslugiPodSlugPage({ params }: Props) {
   const hasBlocks = Array.isArray(blocks) && blocks.length > 0
   const pageContent = (page as any).content
   const hasContent = typeof pageContent === "string" && pageContent.length > 0
+  // headCode — JSON-LD микроразметка (Service schema и др.) для SEO
+  const headCode = (page as any).headCode || ''
 
   return (
     <>
@@ -180,6 +182,8 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
         { label: (page as any).title || "" }
       ], "https://2980738.ru")) }} />
+      {/* headCode — Service schema и другая микроразметка из Payload */}
+      {headCode && <div dangerouslySetInnerHTML={{ __html: headCode }} />}
     </>
   )
 }
