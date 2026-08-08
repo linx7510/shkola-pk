@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { BlockRenderer } from "@/components/BlockRenderer"
-import Header from "@/components/Header"
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs"
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL || "http://localhost:3001"
@@ -59,7 +60,8 @@ export default async function UslugiSlugPage({ params }: Props) {
             <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
           </section>
         )}
-      </main>
+            <Footer />
+    </main>
     </>
   )
 }

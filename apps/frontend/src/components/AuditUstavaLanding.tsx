@@ -195,7 +195,7 @@ export default function AuditUstavaLanding() {
           "provider": {
             "@type": "Organization",
             "name": "Школа ПК — Велеслав Старков",
-            "url": "https://2980738.ru",
+            "url": "https://велеслав.рус",
             "telephone": "+79024720738",
             "email": "boss@2980738.ru"
           },
@@ -216,7 +216,7 @@ export default function AuditUstavaLanding() {
               "description": "Аудит + новый Устав, 7 дней, готовые формулировки"
             }
           ],
-          "url": "https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa"
+          "url": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa"
         },
         {
           "@type": "FAQPage",
@@ -229,8 +229,8 @@ export default function AuditUstavaLanding() {
         {
           "@type": "BreadcrumbList",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://2980738.ru/" },
-            { "@type": "ListItem", "position": 2, "name": "Услуги для ПК", "item": "https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov" },
+            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://велеслав.рус/" },
+            { "@type": "ListItem", "position": 2, "name": "Услуги для ПК", "item": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov" },
             { "@type": "ListItem", "position": 3, "name": "Аудит устава ПК" }
           ]
         }

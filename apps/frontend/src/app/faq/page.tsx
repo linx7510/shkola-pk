@@ -2,6 +2,7 @@ import { Metadata } from "next";
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 import Breadcrumbs from "@/components/Breadcrumbs"
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import FaqListClient from "./FaqListClient";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
@@ -16,10 +17,10 @@ async function payloadApi(path: string) {
   }
 }
 
-const PAGE_URL = "https://2980738.ru/faq";
+const PAGE_URL = "https://велеслав.рус/faq";
 const PAGE_TITLE = "FAQ — Частые вопросы о потребительских кооперативах";
 const PAGE_DESCRIPTION = "162 ответа на вопросы о потребительских кооперативах: налоги, устав, регистрация, субсидиарная ответственность, целевые программы, проверки ФНС и мошенничество.";
-const PAGE_IMAGE = "https://2980738.ru/images/og-preview.webp";
+const PAGE_IMAGE = "https://велеслав.рус/images/og-preview.webp";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -69,8 +70,8 @@ export const metadata: Metadata = {
     ],
   },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
     "max-video-preview": -1,
     "max-image-preview": "large",
     "max-snippet": -1,
@@ -141,7 +142,7 @@ export default async function FaqPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Главная", item: "https://2980738.ru" },
+      { "@type": "ListItem", position: 1, name: "Главная", item: "https://велеслав.рус" },
       { "@type": "ListItem", position: 2, name: "FAQ", item: PAGE_URL },
     ],
   };
@@ -162,6 +163,7 @@ export default async function FaqPage() {
         { label: "FAQ" }
       ]} />
       <FaqListClient items={items} />
+          <Footer />
     </>
   );
 }

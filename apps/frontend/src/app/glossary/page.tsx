@@ -2,6 +2,7 @@ import { Metadata } from "next";
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 import Breadcrumbs from "@/components/Breadcrumbs"
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import GlossaryListClient from "./GlossaryListClient";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
@@ -16,10 +17,10 @@ async function payloadApi(path: string) {
   }
 }
 
-const PAGE_URL = "https://2980738.ru/glossary";
+const PAGE_URL = "https://велеслав.рус/glossary";
 const PAGE_TITLE = "Глоссарий — ключевые термины потребительской кооперации";
 const PAGE_DESCRIPTION = "102 термина потребительской кооперации с определениями: общие понятия, правовые термины, финансовые термины, управление ПК. Поиск по алфавиту и категориям.";
-const PAGE_IMAGE = "https://2980738.ru/images/og-preview.webp";
+const PAGE_IMAGE = "https://велеслав.рус/images/og-preview.webp";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -128,7 +129,7 @@ export default async function GlossaryPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Главная", item: "https://2980738.ru" },
+      { "@type": "ListItem", position: 1, name: "Главная", item: "https://велеслав.рус" },
       { "@type": "ListItem", position: 2, name: "Глоссарий", item: PAGE_URL },
     ],
   };
@@ -149,6 +150,7 @@ export default async function GlossaryPage() {
         { label: "Глоссарий" }
       ]} />
       <GlossaryListClient terms={terms} />
+          <Footer />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { BlockRenderer } from "@/components/BlockRenderer"
-import Header from "@/components/Header"
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import KooperativPodKlyuchLanding from "@/components/KooperativPodKlyuchLanding"
 import AuditUstavaLanding from "@/components/AuditUstavaLanding"
 import Breadcrumbs from "@/components/Breadcrumbs"
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: Props) {
   const title = (page as any).meta?.title || (page as any).title || "Школа ПК"
   const description = (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
   
-  const BASE_URL = "https://2980738.ru"
+  const BASE_URL = "https://велеслав.рус"
   const finalTitle = `${title} | велеслав.рус`
   const ogImage = `${BASE_URL}/images/og-preview.webp`
 
@@ -75,29 +76,29 @@ export default async function UslugiPodSlugPage({ params }: Props) {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Кооператив под ключ — законная регистрация потребительского кооператива за 25 дней",
-      "description": "31 документ. Устав, 13 Положений, Целевые программы. 0% НДС, 0% налог на прибыль. 120+ ПК создано с 2015 года. Ни один не ликвидирован ФНС.",
+      "description": "16 Положений + 100+ рабочих документов. Устав редакции 27-5, Целевые программы. 0% НДС, 0% налог на прибыль. 120+ ПК создано с 2015 года. Ни один не ликвидирован ФНС.",
       "author": {
         "@type": "Person",
         "name": "Велеслав Старков",
         "jobTitle": "Председатель Правления Потребительского кооператива",
-        "url": "https://2980738.ru/about-us"
+        "url": "https://велеслав.рус/about-us"
       },
       "publisher": {
         "@type": "Organization",
         "name": "Школа ПК — Первая онлайн Школа Потребительской кооперации",
-        "url": "https://2980738.ru",
+        "url": "https://велеслав.рус",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://2980738.ru/images/og-preview.webp"
+          "url": "https://велеслав.рус/images/og-preview.webp"
         }
       },
       "datePublished": "2026-01-15",
       "dateModified": "2026-06-26",
-      "image": "https://2980738.ru/images/og-preview.webp",
-      "url": "https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch",
+      "image": "https://велеслав.рус/images/og-preview.webp",
+      "url": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch"
+        "@id": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch"
       }
     }
     
@@ -122,19 +123,19 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         "@type": "Person",
         "name": "Велеслав Старков",
         "jobTitle": "Председатель Правления Потребительского кооператива",
-        "url": "https://2980738.ru/about-us"
+        "url": "https://велеслав.рус/about-us"
       },
       "publisher": {
         "@type": "Organization",
         "name": "Школа ПК — Первая онлайн Школа Потребительской кооперации",
-        "url": "https://2980738.ru",
-        "logo": { "@type": "ImageObject", "url": "https://2980738.ru/images/og-preview.webp" }
+        "url": "https://велеслав.рус",
+        "logo": { "@type": "ImageObject", "url": "https://велеслав.рус/images/og-preview.webp" }
       },
       "datePublished": "2026-01-15",
       "dateModified": "2026-06-26",
-      "image": "https://2980738.ru/images/og-preview.webp",
-      "url": "https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
-      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://2980738.ru/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" }
+      "image": "https://велеслав.рус/images/og-preview.webp",
+      "url": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa",
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" }
     }
     return (
       <>
@@ -176,12 +177,13 @@ export default async function UslugiPodSlugPage({ params }: Props) {
             <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
           </section>
         )}
-      </main>
+            <Footer />
+    </main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
         { label: "Главная", href: "/" },
         { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
         { label: (page as any).title || "" }
-      ], "https://2980738.ru")) }} />
+      ], "https://велеслав.рус")) }} />
       {/* headCode — Service schema и другая микроразметка из Payload */}
       {headCode && <div dangerouslySetInnerHTML={{ __html: headCode }} />}
     </>

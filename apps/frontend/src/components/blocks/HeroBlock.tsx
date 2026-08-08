@@ -14,7 +14,7 @@ export interface HeroBlockData {
 /**
  * HeroBlock — унифицирован с главной страницей.
  * Использует те же CSS-классы (.heading-sweep, .btn-primary, .btn-secondary, .hero-block),
- * что и hero-секция на 2980738.ru, чтобы hover-анимации заголовков и кнопок
+ * что и hero-секция на велеслав.рус, чтобы hover-анимации заголовков и кнопок
  * работали идентично на всех страницах.
  */
 export function HeroBlock({ data }: { data: HeroBlockData }) {

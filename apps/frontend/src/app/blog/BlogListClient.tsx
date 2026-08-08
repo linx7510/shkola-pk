@@ -106,7 +106,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
             <Link href={`/blog/${featuredPost.slug}`} className="blog-featured__card">
               <div className="blog-featured__img-wrap">
                 {featuredPost.coverImage ? (
-                  <img src={typeof featuredPost.coverImage === "object" ? featuredPost.coverImage.url : featuredPost.coverImage} alt={featuredPost.title} style={{width:"100%",height:"100%",objectFit:"cover"}} />
+                  <img src={typeof featuredPost.coverImage === "object" ? featuredPost.coverImage.url : featuredPost.coverImage} alt={featuredPost.title} fetchPriority="high" style={{width:"100%",height:"100%",objectFit:"cover"}} />
                 ) : (
                   <div style={{ width: "100%", height: "100%", background: "rgba(201,110,77,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem" }}>📄</div>
                 )}
@@ -138,7 +138,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
                 <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ textDecoration: "none", color: "inherit" }}>
                   <div className="blog-card__img-wrap">
                     {post.coverImage ? (
-                      <img src={typeof post.coverImage === "object" ? post.coverImage.url : post.coverImage} alt={post.title} style={{width:"100%",height:"100%",objectFit:"cover"}} />
+                      <img src={typeof post.coverImage === "object" ? post.coverImage.url : post.coverImage} alt={post.title} loading="lazy" decoding="async" style={{width:"100%",height:"100%",objectFit:"cover"}} />
                     ) : (
                       <div style={{ width: "100%", height: "100%", background: "rgba(201,110,77,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem" }}>📄</div>
                     )}
