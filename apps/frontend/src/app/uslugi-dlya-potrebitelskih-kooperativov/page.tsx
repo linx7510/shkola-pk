@@ -1,13 +1,14 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { BlockRenderer } from "@/components/BlockRenderer";
-import AIConsultant from "@/components/AIConsultant";
+import AIConsultantLazy from "@/components/AIConsultantLazy";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://велеслав.рус";
 
 export const revalidate = 300;
 
@@ -109,8 +110,9 @@ export default async function UslugiPage() {
           <BlockRenderer blocks={blocks} />
         )}
         {/* 3. AI-консультант */}
-        <AIConsultant />
-      </main>
+        <AIConsultantLazy />
+            <Footer />
+    </main>
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
         { label: "Главная", href: "/" },
         { label: "Услуги для ПК" }

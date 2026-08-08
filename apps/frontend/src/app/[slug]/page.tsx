@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { BlockRenderer } from '@/components/BlockRenderer'
 import Header from '@/components/Header'
-import CursorLight from '@/components/CursorLight'
+import Footer from '@/components/Footer'
+import CursorLightLazy from '@/components/CursorLightLazy'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import { breadcrumbJsonLd } from '@/components/Breadcrumbs'
 
@@ -10,7 +11,7 @@ const PAYLOAD_API = process.env.PAYLOAD_API_URL
                || process.env.NEXT_PUBLIC_PAYLOAD_URL
                || 'http://localhost:3001'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://2980738.ru'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://велеслав.рус'
 
 export const revalidate = 300
 
@@ -105,8 +106,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     robots: {
       // Тестовый домен — закрыть от индексации
-      index: false,
-      follow: false,
+      index: true,
+      follow: true,
     },
   }
 }
@@ -154,7 +155,7 @@ export default async function SlugPage({ params }: Props) {
   return (
     <>
       <Header />
-      <CursorLight />
+      <CursorLightLazy />
       <Breadcrumbs items={[
         { label: 'Главная', href: '/' },
         { label: (page as any).title || '' }
@@ -194,11 +195,12 @@ export default async function SlugPage({ params }: Props) {
             )}
           </>
         )}
-      </main>
+            <Footer />
+    </main>
       <script type='application/ld+json' dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
         { label: 'Главная', href: '/' },
         { label: (page as any).title || '' }
-      ], 'https://2980738.ru')) }} />
+      ], 'https://велеслав.рус')) }} />
 
       {/* SEO Schema — только для about-us (E-E-A-T) */}
       {slug === 'about-us' && (
@@ -213,8 +215,8 @@ export default async function SlugPage({ params }: Props) {
               '@type': 'Organization',
               'name': 'Школа ПК — Первая онлайн Школа Потребительской Кооперации',
             },
-            'url': 'https://2980738.ru/about-us',
-            'image': 'https://2980738.ru/images/starkov_portrait.webp',
+            'url': 'https://велеслав.рус/about-us',
+            'image': 'https://велеслав.рус/images/starkov_portrait.webp',
             'telephone': '+79024720738',
             'email': 'boss@2980738.ru',
             'address': {
@@ -237,7 +239,7 @@ export default async function SlugPage({ params }: Props) {
             ],
             'sameAs': [
               'https://t.me/Veles_ST',
-              'https://2980738.ru',
+              'https://велеслав.рус',
             ],
             'alumniOf': {
               '@type': 'EducationalOrganization',
@@ -269,7 +271,7 @@ export default async function SlugPage({ params }: Props) {
                 'name': 'Что такое Школа ПК?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'Школа ПК (2980738.ru) — Первая онлайн Школа потребительской кооперации в России. Платформа предлагает обучение, услуги по регистрации ПК под ключ, аудит устава, налоговую оптимизацию и защиту активов. Создана в 2015 году Велеславом Старковым.',
+                  'text': 'Школа ПК (велеслав.рус) — Первая онлайн Школа потребительской кооперации в России. Платформа предлагает обучение, услуги по регистрации ПК под ключ, аудит устава, налоговую оптимизацию и защиту активов. Создана в 2015 году Велеславом Старковым.',
                 },
               },
               {
@@ -293,7 +295,7 @@ export default async function SlugPage({ params }: Props) {
                 'name': 'Что входит в пакет «ПК под ключ»?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'Полный пакет из 31 документа: Устав ПК, Протокол №1 учредительного собрания, заявление Р11001, 13 внутренних положений (о паевых взносах, членстве, ЦПП, ревизионной комиссии и др.), 2 целевые потребительские программы (базовая + индивидуальная), 13 образцов документов. Плюс подача в ФНС, открытие счёта, выпуск ЭЦП.',
+                  'text': 'Полный пакет: индивидуальный Устав редакции 27-5, Протокол №1 учредительного собрания, заявление Р11001, 16 Положений (о паевых взносах, членстве, ЦПП, ревизионной комиссии и др.), 2 целевые потребительские программы (базовая + индивидуальная), 100+ рабочих документов (формы, журналы, акты, чек-листы). Плюс подача в ФНС, открытие счёта, выпуск ЭЦП.',
                 },
               },
               {
@@ -317,7 +319,7 @@ export default async function SlugPage({ params }: Props) {
                 'name': 'Как начать работу с Школой ПК?',
                 'acceptedAnswer': {
                   '@type': 'Answer',
-                  'text': 'Зарегистрируйтесь в Личном кабинете на 2980738.ru, выберите услугу (ПК под ключ или Аудит устава), оплатите предоплату 50%. После этого скачайте 3 анкеты, заполните их и загрузите обратно. Исполнитель приступит к разработке документов в течение 1 рабочего дня.',
+                  'text': 'Зарегистрируйтесь в Личном кабинете на велеслав.рус, выберите услугу (ПК под ключ или Аудит устава), оплатите предоплату 50%. После этого скачайте 3 анкеты, заполните их и загрузите обратно. Исполнитель приступит к разработке документов в течение 1 рабочего дня.',
                 },
               },
             ],
@@ -328,7 +330,7 @@ export default async function SlugPage({ params }: Props) {
             '@context': 'https://schema.org',
             '@type': 'AboutPage',
             'name': 'О нас — Велеслав Старков и Школа ПК',
-            'url': 'https://2980738.ru/about-us',
+            'url': 'https://велеслав.рус/about-us',
             'description': 'Велеслав Старков — эксперт по потребительской кооперации с 2015 года. 120+ зарегистрированных ПК, первая онлайн Школа ПК.',
             'mainEntity': {
               '@type': 'Person',
@@ -337,7 +339,7 @@ export default async function SlugPage({ params }: Props) {
             'publisher': {
               '@type': 'EducationalOrganization',
               'name': 'Школа ПК',
-              'url': 'https://2980738.ru',
+              'url': 'https://велеслав.рус',
             },
           }) }} />
         </>

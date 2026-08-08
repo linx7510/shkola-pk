@@ -3,7 +3,8 @@ export const revalidate = 300; // ISR: revalidate every 5 minutes
 import { Metadata } from "next";
 
 import Header from "@/components/Header";
-const CursorLight = dynamic(() => import("@/components/CursorLight"));
+import Footer from "@/components/Footer";
+import CursorLightLazy from "@/components/CursorLightLazy";
 const BlogParticles = dynamic(() => import("@/components/BlogParticles"));
 import Link from "next/link";
 
@@ -13,7 +14,7 @@ import dynamic from "next/dynamic";
 
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://велеслав.рус";
 
 async function payloadApi(path: string) {
   try {
@@ -334,7 +335,7 @@ export default async function BlogPostPage({ params }: Props) {
         <link rel="preload" as="image" href={coverUrl} fetchPriority="high" />
       )}
       <Header />
-        <CursorLight />
+        <CursorLightLazy />
         <Breadcrumbs items={[
           { label: "Главная", href: "/" },
           { label: "Блог", href: "/blog" },
@@ -419,7 +420,8 @@ export default async function BlogPostPage({ params }: Props) {
         </article>
 
         {/* AI-консультант — точная копия блока с главной страницы */}
-      </main>
+            <Footer />
+    </main>
     </>
   );
 }

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import dynamic from "next/dynamic";
 const BlogParticles = dynamic(() => import("@/components/BlogParticles"), { loading: () => null });
 const CursorLight = dynamic(() => import("@/components/CursorLight"), { ssr: false });
@@ -9,10 +10,11 @@ const CursorLight = dynamic(() => import("@/components/CursorLight"), { ssr: fal
 // Lazy-load тяжёлых виджетов (AI чат + блог-превью)
 // Они не нужны для LCP — загружаются после idle
 const LatestBlogPosts = dynamic(() => import("./home/LatestBlogPosts").then(m => m.LatestBlogPosts), { loading: () => null });
+// Lazy-load ExpressAuditCTA — компактный CTA-блок, не нужен для LCP
+const ExpressAuditCTA = dynamic(() => import("@/components/ExpressAuditCTA"), { loading: () => null });
 import { FAQAccordion } from "./home/FAQAccordion";
 import { LeadForm } from "./home/LeadForm";
 import Reveal from "@/components/Reveal";
-import ExpressAuditCTA from "@/components/ExpressAuditCTA";
 import { BlockRenderer } from "@/components/BlockRenderer";
 
 // Тип данных главной страницы из Payload CMS
@@ -292,7 +294,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                 <div className="hero__logo-glow" />
                 <div className="hero__logo-ring" style={{width:560,height:560}} />
                 <div className="hero__logo-ring" style={{width:720,height:720,animationDelay:"-3s"}} />
-                <img src="/images/hero-logo.webp" alt="Потребительский кооператив — защита активов и ставка 0%. Школа ПК" width={400} height={400} className="hero__logo-img" fetchPriority="high" />
+                <img src="/images/hero-logo.webp" alt="Потребительский кооператив — защита активов и ставка 0%. Школа ПК" width={200} height={200} className="hero__logo-img" fetchPriority="high" />
               </div>
             </div>
           </Reveal>
@@ -791,7 +793,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
       {/* ===== AI CHAT WIDGET — lazy по кнопке ===== */}
       <LazyAIChatButton />
+      <Footer />
     </>
   );
 }
-

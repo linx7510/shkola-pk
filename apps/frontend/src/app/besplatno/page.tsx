@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { BlockRenderer } from "@/components/BlockRenderer";
-import AIConsultant from "@/components/AIConsultant";
+import AIConsultantLazy from "@/components/AIConsultantLazy";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
@@ -28,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
   if (!page) return { title: "Бесплатно | Школа ПК" };
   const title = page.meta?.title || page.title || "Бесплатные материалы — Школа ПК";
   const description = page.meta?.description || "";
-  const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
+  const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://велеслав.рус";
   return {
     title,
     description,
@@ -74,8 +75,9 @@ export default async function BesplatnoPage() {
           </section>
         )}
         {/* AI-консультант — точная копия блока с главной страницы */}
-        <AIConsultant />
-      </main>
+        <AIConsultantLazy />
+            <Footer />
+    </main>
     </>
   );
 }

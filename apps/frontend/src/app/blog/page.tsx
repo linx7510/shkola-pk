@@ -2,8 +2,9 @@ import { Metadata } from "next";
 import Breadcrumbs from "@/components/Breadcrumbs"
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import BlogListClient from "./BlogListClient";
-import AIConsultant from "@/components/AIConsultant";
+import AIConsultantLazy from "@/components/AIConsultantLazy";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
@@ -44,7 +45,8 @@ export default async function BlogPage() {
         { label: "Блог" }
       ]} />
       <BlogListClient posts={posts} />
-      <AIConsultant />
+      <AIConsultantLazy />
+          <Footer />
     </>
   );
 }

@@ -2,9 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import CursorLight from "@/components/CursorLight";
+import CursorLightLazy from '@/components/CursorLightLazy'
 import { SmartCaptcha } from "@/components/SmartCaptcha";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function RegisterPage() {
 
   return (
     <div style={{ background: "var(--color-bg-950)", minHeight: "100vh" }}>
-      <CursorLight />
+      <CursorLightLazy />
       <Header />
 
       <div className="auth-page">
