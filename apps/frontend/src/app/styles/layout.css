@@ -38,7 +38,7 @@
   border-radius: 100px;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.06);
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.15em;
@@ -83,7 +83,7 @@
 }
 
 .quote-author {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.9rem;
   font-style: italic;
   color: var(--color-text-muted);

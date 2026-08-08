@@ -254,7 +254,7 @@
 }
 
 .contact-block__label {
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -334,7 +334,7 @@
   display: inline-flex;
   padding: 0.25rem 0.6rem;
   border-radius: 6px;
-  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.1em;

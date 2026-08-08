@@ -75,7 +75,7 @@
 /* ─── 25. Heading Sweep — ЕДИНОЕ ОПРЕДЕЛЕНИЕ для главной и второстепенных страниц ───
    Эффект: всегда работающая бесконечная подсветка (4s) + при hover — усиление свечения,
    цвет в бежевый, лёгкий подъём вверх, и подчёркивание снизу раскрывается на всю ширину.
-   Это ТОТ ЖЕ эффект, что применяется на главной странице 2980738.ru.
+   Это ТОТ ЖЕ эффект, что применяется на главной странице велеслав.рус.
    ВАЖНО: overflow: visible — чтобы «пробегающий свет» ВЫЛЕТАЛ за правый край заголовка
    (как было на исходнике velaslav.rus до правок). */
 .heading-sweep {
@@ -83,6 +83,7 @@
   display: inline-block;
   overflow: visible;
   cursor: default;
+  isolation: isolate;
   transition: color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               text-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -156,6 +157,19 @@ main h3.heading-sweep {
   position: relative;
   display: inline-block;
   overflow: visible;
+}
+
+/* КАРТИНКИ ВЫШЕ АНИМАЦИИ — все img рядом с heading-sweep получают z-index: 2,
+   чтобы heading-sweep::before (z-index:1) НЕ МОГ их перекрыть */
+.heading-sweep ~ img,
+img:has(+ .heading-sweep),
+img:has(~ .heading-sweep) {
+  position: relative;
+  z-index: 2;
+}
+section img {
+  position: relative;
+  z-index: 2;
 }
 
 @keyframes headingSweep {

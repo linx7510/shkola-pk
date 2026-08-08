@@ -595,3 +595,57 @@ a.ci-value:hover { color:#E68863; }
 .rounded { border-radius: 0.25rem; }
 .rounded-lg { border-radius: 0.5rem; }
 .rounded-full { border-radius: 9999px; }
+
+/* ============================================================
+   MOBILE FIX — CTA форма "Готовы начать?" + Footer
+   ============================================================ */
+@media (max-width: 768px) {
+  /* CTA форма — 1 колонка вместо 2 */
+  .cta > div {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .cta > div > div:first-child {
+    text-align: center;
+  }
+  
+  /* Footer — 1 колонка + уменьшенные отступы */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+    padding: 0 1rem !important;
+  }
+  .site-footer {
+    padding: 2rem 0 1rem !important;
+  }
+  .footer-bottom {
+    font-size: 0.7rem !important;
+    padding: 1rem 1rem !important;
+  }
+  
+  /* Уменьшить шрифт в footer ссылках */
+  .footer-link {
+    font-size: 0.85rem !important;
+  }
+  
+  /* Секции — меньше отступов */
+  .cta {
+    padding: 2rem 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* CTA форма — минимальные отступы */
+  .cta > div {
+    padding: 0 !important;
+    gap: 1rem !important;
+  }
+  .cta > div > div:last-child {
+    padding: 1rem !important;
+  }
+  
+  /* Footer — компактный */
+  .footer-grid {
+    gap: 1rem !important;
+  }
+}
