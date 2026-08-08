@@ -1,10 +1,12 @@
 import type { GlobalConfig } from 'payload'
-import { richTextEditor } from '../lexicalFeatures'
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
   label: { singular: 'Настройки сайта', plural: 'Настройки сайта' },
-  access: { read: () => true },
+  access: {
+    read: () => true,
+    update: ({ req: { user } }) => Boolean(user),
+  },
   fields: [
     { name: 'siteName', type: 'text', defaultValue: 'Школа ПК', label: 'Название сайта' },
     { name: 'siteDescription', type: 'textarea', defaultValue: 'Первая Онлайн Школа Потребительских Кооперативов', label: 'Описание сайта' },
@@ -12,7 +14,7 @@ export const Settings: GlobalConfig = {
     { name: 'headerPhone', type: 'text', label: 'Телефон в шапке' },
     { name: 'headerEmail', type: 'email', label: 'Email в шапке' },
     { name: 'headerTelegram', type: 'text', label: 'Telegram' },
-    { name: 'footerText', type: 'richText', label: 'Текст в подвале', editor: richTextEditor },
+    { name: 'footerText', type: 'richText', label: 'Текст в подвале' },
     { name: 'yookassaShopId', type: 'text', label: 'YooKassa Shop ID', admin: { position: 'sidebar' } },
     { name: 'yookassaSecretKey', type: 'text', label: 'YooKassa Secret Key', admin: { position: 'sidebar' } },
     { name: 'smtpHost', type: 'text', label: 'SMTP Host', admin: { position: 'sidebar' } },
@@ -27,6 +29,28 @@ export const Settings: GlobalConfig = {
         { name: 'googleAnalyticsId', type: 'text', label: 'Google Analytics ID' },
       ],
     },
+    {
+      name: 'seoCode',
+      type: 'group',
+      label: 'Произвольный код (SEO, верификация)',
+      fields: [
+        {
+          name: 'headCode',
+          type: 'textarea',
+          label: 'Код в <head> (мета-теги верификации, пиксели)',
+          admin: {
+            description: 'HTML-код для секции <head>. Мета-теги верификации (Яндекс, Google), пиксели ретаргетинга.',
+          },
+        },
+        {
+          name: 'bodyCode',
+          type: 'textarea',
+          label: 'Код в конец <body> (счётчики, скрипты)',
+          admin: {
+            description: 'HTML-код для конца <body>. Счётчики аналитики, скрипты.',
+          },
+        },
+      ],
+    },
   ],
 }
-

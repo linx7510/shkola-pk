@@ -12,7 +12,7 @@ const DownloadButton = (props: any) => {
   if (!data?.url) return null
   
   // Формируем полный URL
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://2980738.ru'
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://велеслав.рус'
   const fileUrl = data.url.startsWith('http') ? data.url : `${baseUrl}${data.url}`
   
   return React.createElement('div', {

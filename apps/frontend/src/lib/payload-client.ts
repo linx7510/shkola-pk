@@ -6,7 +6,7 @@
  */
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001';
-const PAYLOAD_PUBLIC_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://2980738.ru';
+const PAYLOAD_PUBLIC_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || 'http://localhost:3001';
 
 interface PayloadListResponse<T> {
   docs: T[];

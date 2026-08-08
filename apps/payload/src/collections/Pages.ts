@@ -275,6 +275,26 @@ export const Pages: CollectionConfig = {
         InstructorBlock, SnakeAnimationBlock,
       ],
     },
+
+    // === SEO: Произвольный код для страницы ===
+    {
+      name: 'seoHeadCode',
+      type: 'textarea',
+      label: 'Код в <head> (для этой страницы)',
+      admin: {
+        position: 'sidebar',
+        description: 'Мета-теги, пиксели — только для этой страницы.',
+      },
+    },
+    {
+      name: 'seoBodyCode',
+      type: 'textarea',
+      label: 'Код в <body> (для этой страницы)',
+      admin: {
+        position: 'sidebar',
+        description: 'Скрипты, счётчики — только для этой страницы.',
+      },
+    },
   ],
   timestamps: true,
 }

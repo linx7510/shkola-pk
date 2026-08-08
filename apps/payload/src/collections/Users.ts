@@ -53,7 +53,7 @@ export const Users: CollectionConfig = {
         // and only if user is not yet verified
         if (operation === 'create' && !doc._verified && doc._verification) {
           try {
-            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://2980738.ru'
+            const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://велеслав.рус'
             const verifyUrl = `${appUrl}/verify-email?token=${doc._verification}&email=${encodeURIComponent(doc.email)}`
 
             // Log verification URL to console (always — for debugging)
@@ -75,7 +75,7 @@ export const Users: CollectionConfig = {
                     <p style="font-size: 14px; color: #8B7E6B; line-height: 1.5;">Если кнопка не работает, скопируйте ссылку:<br>${verifyUrl}</p>
                     <p style="font-size: 14px; color: #8B7E6B;">Если вы не регистрировались на сайте — просто проигнорируйте это письмо.</p>
                     <hr style="border: none; border-top: 1px solid #2A2520; margin: 2rem 0;">
-                    <p style="font-size: 12px; color: #6B5F4F; text-align: center;">Школа ПК — Велеслав Старков<br>2980738.ru</p>
+                    <p style="font-size: 12px; color: #6B5F4F; text-align: center;">Школа ПК — Велеслав Старков<br>велеслав.рус</p>
                   </div>
                 `
                 await req.payload.sendEmail({

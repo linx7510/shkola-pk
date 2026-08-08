@@ -19,10 +19,10 @@ export const sendTestEmailEndpoint: Endpoint = {
           html: `
             <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background: #0D0C0A; color: #D6C6B2; padding: 2rem;">
               <h1 style="color: #E7DCCF;">✓ SMTP настроен!</h1>
-              <p style="font-size: 16px; line-height: 1.6;">Это тестовое письмо от платформы Школа ПК (2980738.ru).</p>
+              <p style="font-size: 16px; line-height: 1.6;">Это тестовое письмо от платформы Школа ПК (велеслав.рус).</p>
               <p style="font-size: 16px; line-height: 1.6;">Email-уведомления работают. Теперь при регистрации клиентов, загрузке документов и новых заказах вы будете получать письма на этот адрес.</p>
               <hr style="border: none; border-top: 1px solid #2A2520; margin: 2rem 0;">
-              <p style="font-size: 12px; color: #6B5F4F;">Школа ПК — Велеслав Старков<br>2980738.ru</p>
+              <p style="font-size: 12px; color: #6B5F4F;">Школа ПК — Велеслав Старков<br>велеслав.рус</p>
             </div>
           `,
         })

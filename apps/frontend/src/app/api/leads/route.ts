@@ -95,6 +95,21 @@ export async function POST(request: NextRequest) {
       console.warn('[leads] Telegram notify failed:', e)
     }
 
+
+    // Email-уведомление администратору
+    try {
+      const { sendEmail } = await import('@/lib/email')
+      const { newLeadEmail } = await import('@/lib/email')
+      await sendEmail({
+        to: '22@xn--80adbka9ab1c.xn--p1acf',
+        subject: `Новая заявка: ${name} (${source || 'homepage'})`,
+        html: newLeadEmail({ name, email: email || '', phone: phone || '', message: message || '', source: source || 'homepage' }),
+      })
+      console.log(`[Lead] Email notification sent to 22@велеслав.рус`)
+    } catch (e) {
+      console.warn('[leads] Email notify failed:', e)
+    }
+
     return NextResponse.json({
       ok: true,
       leadId: lead.doc?.id || lead.id,

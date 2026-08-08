@@ -131,3 +131,21 @@ export function contactFormEmail(name: string, email: string, phone: string, mes
   };
 }
 
+export function newLeadEmail({ name, email, phone, message, source }: { name: string; email: string; phone: string; message: string; source: string }): string {
+  return `
+    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #0D0C0A; color: #D6C6B2;">
+      <h2 style="color: #E68863; margin-bottom: 20px;">Новая заявка с сайта велеслав.рус</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px 0; color: rgba(214,198,178,0.6); width: 120px;">Имя:</td><td style="padding: 8px 0; color: #F5F0E8; font-weight: 600;">${name}</td></tr>
+        <tr><td style="padding: 8px 0; color: rgba(214,198,178,0.6);">Телефон:</td><td style="padding: 8px 0; color: #F5F0E8;">${phone || '—'}</td></tr>
+        <tr><td style="padding: 8px 0; color: rgba(214,198,178,0.6);">Email:</td><td style="padding: 8px 0; color: #F5F0E8;">${email || '—'}</td></tr>
+        <tr><td style="padding: 8px 0; color: rgba(214,198,178,0.6);">Источник:</td><td style="padding: 8px 0; color: #F5F0E8;">${source}</td></tr>
+        ${message ? `<tr><td style="padding: 8px 0; color: rgba(214,198,178,0.6); vertical-align: top;">Сообщение:</td><td style="padding: 8px 0; color: #F5F0E8;">${message}</td></tr>` : ''}
+      </table>
+      <p style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(214,198,178,0.1); font-size: 0.85rem; color: rgba(214,198,178,0.5);">
+        Школа ПК — Велеслав Старков<br>
+        <a href="https://велеслав.рус" style="color: #E68863;">велеслав.рус</a> · +7 (902) 472-07-38
+      </p>
+    </div>
+  `;
+}

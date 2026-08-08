@@ -129,8 +129,8 @@ export default buildConfig({
   })(),
   typescript: { outputFile: path.resolve(dirname, 'src/payload-types.ts') },
   graphQL: { disable: false },
-  cors: ['http://2980738.ru', 'https://2980738.ru', 'http://localhost:3000', 'http://frontend:3000'],
-  csrf: ['http://2980738.ru', 'https://2980738.ru', 'http://localhost:3000', 'http://frontend:3000'],
+  cors: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'http://localhost:3000', 'http://frontend:3000'],
+  csrf: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'http://localhost:3000', 'http://frontend:3000'],
   endpoints: [
     updateProjectProgressEndpoint,
     sendTestEmailEndpoint,
@@ -145,16 +145,19 @@ export default buildConfig({
   ...(process.env.SMTP_PASS && process.env.SMTP_PASS !== 'email_password_change_me' ? {
     email: nodemailerAdapter({
       defaultFromName: 'Школа ПК',
-      defaultFromAddress: process.env.SMTP_USER || 'boss@2980738.ru',
+      defaultFromAddress: process.env.SMTP_USER || '22@xn--80adbka9ab1c.xn--p1acf',
       transportOptions: {
-        host: process.env.SMTP_HOST || 'smtp.mail.ru',
+        host: process.env.SMTP_HOST || 'sm39.hosting.reg.ru',
         port: Number(process.env.SMTP_PORT) || 587,
         auth: {
-          user: process.env.SMTP_USER || '',
+          user: process.env.SMTP_USER || '22@xn--80adbka9ab1c.xn--p1acf',
           pass: process.env.SMTP_PASS,
         },
         secure: false,
         requireTLS: true,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
       },
     }),
   } : {}),

@@ -11,7 +11,7 @@
 
 const PAYLOAD_URL = process.env.PAYLOAD_URL || 'http://localhost:3001';
 const API_KEY = process.env.PAYLOAD_API_KEY || '';
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://2980738.ru';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://велеслав.рус';
 
 const headers = {
   'Content-Type': 'application/json',
