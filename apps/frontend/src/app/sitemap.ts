@@ -13,7 +13,7 @@ async function payloadApi(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://2980738.ru";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://велеслав.рус";
 
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 1.0 },

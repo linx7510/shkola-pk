@@ -1,11 +1,12 @@
-# ═══════════════════════════════════════════
-# ТЕСТОВЫЙ ДОМЕН — ПОЛНОЕ ЗАКРЫТИЕ ИНДЕКСАЦИИ
-# ═══════════════════════════════════════════
-
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /register/
 
-# AI-боты
+# AI-боты — ЗАПРЕЩЕНЫ (защита контента от воровства нейросетями)
 User-agent: GPTBot
 Disallow: /
 
@@ -60,5 +61,6 @@ Disallow: /
 User-agent: Mjbot
 Disallow: /
 
-# Sitemap отключён на тестовом домене
-# Sitemap: https://2980738.ru/sitemap.xml
+# Sitemap
+Sitemap: https://велеслав.рус/sitemap.xml
+Host: https://велеслав.рус
