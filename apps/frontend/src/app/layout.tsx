@@ -1,22 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono } from "next/font/google";
+// System fonts — 0 KB download (was 169 KB with Inter + IBM Plex Mono)
+const inter = { variable: "" };
 import "./globals.css";
 import "./header-mobile.css";
 
 
-const inter = Inter({
-  subsets: ['cyrillic', 'latin'],
-  weight: ['400', '600', '700'],
-  display: 'swap',
-  variable: '--font-inter',
-});
 
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ['cyrillic', 'latin'],
-  weight: ['400'],
-  display: 'swap',
-  variable: '--font-ibm-plex-mono',
-});
 
 async function getSeoCode(): Promise<{ headCode: string | null; bodyCode: string | null }> {
   const empty = { headCode: null, bodyCode: null };
@@ -97,7 +86,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const { bodyCode } = await getSeoCode();
 
   return (
-    <html lang="ru" className={`${inter.variable} ${ibmPlexMono.variable}`}>
+    <html lang="ru">
       <head>
         <meta name="twitter:label1" content="Телефон" />
         <meta name="twitter:data1" content="+7 (902) 472-07-38" />

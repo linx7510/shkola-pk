@@ -8,7 +8,7 @@ html {
 }
 
 body {
-  font-family: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   background: var(--color-bg-950);
   color: var(--color-text-secondary);
   line-height: 1.6;
