@@ -33,12 +33,30 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
+
+/**
+ * Парсит мета-теги из HTML-строки для metadata.other.
+ * Next.js выведет их в <head> как <meta name="..." content="..." />
+ */
+function parseMetaTags(html: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const regex = /<meta\s+name=["']([^"']+)["']\s+content=["']([^"']+)["'][^>]*>/gi;
+  let match;
+  while ((match = regex.exec(html)) !== null) {
+    result[match[1]] = match[2];
+  }
+  return result;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const page = await fetchPage(slug)
   if (!page) return { title: 'Страница не найдена' }
 
   const title = (page as any).meta?.title || (page as any).metaTitle || (page as any).title || 'Школа ПК'
+  // Читаем seoHeadCode и headCode из БД — для произвольных мета-тегов
+  const headCodeForMeta = (page as any).seoHeadCode || (page as any).headCode || ''
+  const metaTags = headCodeForMeta ? parseMetaTags(headCodeForMeta) : {}
   const description = (page as any).meta?.description || (page as any).metaDescription || (page as any).excerpt || ''
   
   // Для about-us — используем фото Велеслава и type=profile
@@ -104,6 +122,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'x-default': `${BASE_URL}/${slug}`,
       },
     },
+    other: metaTags,
     robots: {
       // Тестовый домен — закрыть от индексации
       index: true,
