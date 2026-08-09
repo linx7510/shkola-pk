@@ -85,12 +85,12 @@ export function CtaBlock({ data }: { data: CtaBlockData }) {
               }}
             >
               {b1Text && b1Link && (
-                <Link href={b1Link} className="btn-primary">
+                <Link href={b1Link} prefetch={false} className="btn-primary">
                   {b1Text}
                 </Link>
               )}
               {b2Text && b2Link && (
-                <Link href={b2Link} className="btn-secondary">
+                <Link href={b2Link} prefetch={false} className="btn-secondary">
                   {b2Text}
                 </Link>
               )}

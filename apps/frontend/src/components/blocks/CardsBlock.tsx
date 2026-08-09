@@ -113,7 +113,7 @@ export function CardsBlock({ data }: { data: CardsBlockData }) {
                       {cardInner}
                     </a>
                   ) : (
-                    <Link href={c.link} style={{ textDecoration: "none", color: "inherit" }}>
+                    <Link href={c.link} prefetch={false} style={{ textDecoration: "none", color: "inherit" }}>
                       {cardInner}
                     </Link>
                   )

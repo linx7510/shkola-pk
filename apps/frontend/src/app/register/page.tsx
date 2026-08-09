@@ -206,7 +206,7 @@ export default function RegisterPage() {
               />
               <span>
                 Я согласен на обработку персональных данных в соответствии с{" "}
-                <Link href="/politika-konfidentsialnosti" style={{ color: "#B8956A", textDecoration: "underline" }}>
+                <Link href="/politika-konfidentsialnosti" prefetch={false} style={{ color: "#B8956A", textDecoration: "underline" }}>
                   Политикой конфиденциальности
                 </Link>{" "}
                 (152-ФЗ)
@@ -234,7 +234,7 @@ export default function RegisterPage() {
 
           <p style={{ textAlign: "center", fontSize: "1rem" }}>
             Уже есть аккаунт?{" "}
-            <Link href="/login" className="auth-link">
+            <Link href="/login" prefetch={false} className="auth-link">
               Войти
             </Link>
           </p>

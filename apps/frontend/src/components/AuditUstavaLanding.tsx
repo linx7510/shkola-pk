@@ -267,10 +267,10 @@ export default function AuditUstavaLanding() {
           Проверка Устава и Положений на соответствие Закону 3085-1, ГК РФ, НК РФ. Отчёт с ошибками, рисками и готовыми формулировками. 120+ аудитов с 2015 года.
         </p>
         <p style={{ fontSize: "1.05rem", color: "rgba(214,198,178,0.8)", marginBottom: "2rem" }}>
-          Автор: <Link href="/about-us" style={{ color: "#B8956A", textDecoration: "none" }}>Велеслав Старков</Link>, 10 лет практики · Обновлено: июнь 2026
+          Автор: <Link href="/about-us" prefetch={false} style={{ color: "#B8956A", textDecoration: "none" }}>Велеслав Старков</Link>, 10 лет практики · Обновлено: июнь 2026
         </p>
         <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
-          <Link href="#cta" className="btn-primary" style={{ display: "inline-block", padding: "0.9rem 2rem", fontSize: "1rem", textDecoration: "none" }}>Заказать аудит</Link>
+          <Link href="#cta" prefetch={false} className="btn-primary" style={{ display: "inline-block", padding: "0.9rem 2rem", fontSize: "1rem", textDecoration: "none" }}>Заказать аудит</Link>
           <a href="#pricing" style={{ display: "inline-block", padding: "0.9rem 2rem", fontSize: "1rem", border: "1px solid rgba(214,198,178,0.2)", borderRadius: 8, color: "#D6C6B2", textDecoration: "none" }}>От 15 000 ₽</a>
         </div>
       </section>
@@ -491,7 +491,7 @@ export default function AuditUstavaLanding() {
         <h2 className="heading-sweep" data-text="Похожие материалы" style={{ textAlign: "center", fontSize: "clamp(1.5rem, 3vw, 2rem)", color: "#E7DCCF", marginBottom: "2rem", fontWeight: 700 }}>Похожие материалы</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
           {relatedArticles.map((article, i) => (
-            <Link key={i} href={article.href} style={{ display: "block", padding: "1.25rem", background: "rgba(214,198,178,0.03)", borderRadius: 10, border: "1px solid rgba(214,198,178,0.08)", color: "#D6C6B2", textDecoration: "none", fontSize: "1rem", lineHeight: 1.4 }}>
+            <Link key={i} href={article.href} prefetch={false} style={{ display: "block", padding: "1.25rem", background: "rgba(214,198,178,0.03)", borderRadius: 10, border: "1px solid rgba(214,198,178,0.08)", color: "#D6C6B2", textDecoration: "none", fontSize: "1rem", lineHeight: 1.4 }}>
               📄 {article.title}
             </Link>
           ))}

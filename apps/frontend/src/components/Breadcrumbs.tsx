@@ -28,7 +28,7 @@ export default function Breadcrumbs({ items }: { items: Crumb[] }) {
         {items.map((item, i) => (
           <li key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             {item.href && i < items.length - 1 ? (
-              <Link href={item.href} className="breadcrumb-link" style={{
+              <Link href={item.href} prefetch={false} className="breadcrumb-link" style={{
                 color: "#B8956A",
                 textDecoration: "none",
               }}>

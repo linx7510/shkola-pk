@@ -56,8 +56,8 @@ function PaymentSuccessContent() {
               {isTest ? "Тестовый режим: платёж симулирован. Вы автоматически записаны на курс." : "Вы успешно оплатили курс и записаны на обучение."}
             </p>
             <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-              <Link href="/dashboard" className="btn-primary" style={{ textDecoration: "none" }}>Перейти к обучению</Link>
-              <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" className="btn-secondary" style={{ textDecoration: "none" }}>Все курсы</Link>
+              <Link href="/dashboard" prefetch={false} className="btn-primary" style={{ textDecoration: "none" }}>Перейти к обучению</Link>
+              <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" prefetch={false} className="btn-secondary" style={{ textDecoration: "none" }}>Все курсы</Link>
             </div>
           </>
         )}

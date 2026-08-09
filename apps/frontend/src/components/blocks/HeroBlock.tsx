@@ -77,12 +77,12 @@ export function HeroBlock({ data }: { data: HeroBlockData }) {
             }}
           >
             {data.ctaText && data.ctaLink && (
-              <Link href={data.ctaLink} className="btn-primary">
+              <Link href={data.ctaLink} prefetch={false} className="btn-primary">
                 {data.ctaText}
               </Link>
             )}
             {data.ctaText2 && data.ctaLink2 && (
-              <Link href={data.ctaLink2} className="btn-secondary">
+              <Link href={data.ctaLink2} prefetch={false} className="btn-secondary">
                 {data.ctaText2}
               </Link>
             )}

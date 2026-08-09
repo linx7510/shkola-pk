@@ -116,7 +116,7 @@ export default function LoginPage() {
 
           <p style={{ textAlign: "center", fontSize: "1rem" }}>
             Нет аккаунта?{" "}
-            <Link href="/register" className="auth-link">
+            <Link href="/register" prefetch={false} className="auth-link">
               Зарегистрироваться
             </Link>
           </p>

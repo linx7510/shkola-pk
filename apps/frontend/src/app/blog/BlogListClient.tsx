@@ -103,7 +103,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
         <div ref={containerRef}>
           {/* Featured (первая статья — акцент) */}
           {featuredPost && (
-            <Link href={`/blog/${featuredPost.slug}`} className="blog-featured__card">
+            <Link href={`/blog/${featuredPost.slug} prefetch={false}`} className="blog-featured__card">
               <div className="blog-featured__img-wrap">
                 {featuredPost.coverImage ? (
                   <img src={typeof featuredPost.coverImage === "object" ? featuredPost.coverImage.url : featuredPost.coverImage} alt={featuredPost.title} fetchPriority="high" style={{width:"100%",height:"100%",objectFit:"cover"}} />
@@ -135,7 +135,7 @@ export default function BlogListClient({ posts }: { posts: BlogPost[] }) {
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.5rem" }}>
               {paginatedPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="blog-card" style={{ textDecoration: "none", color: "inherit" }}>
+                <Link key={post.id} href={`/blog/${post.slug} prefetch={false}`} className="blog-card" style={{ textDecoration: "none", color: "inherit" }}>
                   <div className="blog-card__img-wrap">
                     {post.coverImage ? (
                       <img src={typeof post.coverImage === "object" ? post.coverImage.url : post.coverImage} alt={post.title} loading="lazy" decoding="async" style={{width:"100%",height:"100%",objectFit:"cover"}} />
