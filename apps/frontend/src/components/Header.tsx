@@ -87,7 +87,7 @@ export default function Header() {
     <>
       <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
         <div className="header-inner">
-          <Link href="/" className="header-logo">
+          <Link href="/" prefetch={false} className="header-logo">
             <img src="/images/header-logo-tiny.webp" alt="Школа ПК" width={88} height={88} className="header-logo-img" />
             <span className="header-logo-text">Школа Кооперативов</span>
           </Link>
@@ -102,7 +102,7 @@ export default function Header() {
                   onMouseEnter={handleDropdownEnter}
                   onMouseLeave={handleDropdownLeave}
                 >
-                  <Link href={item.href} className="header-nav-link">
+                  <Link href={item.href} prefetch={false} className="header-nav-link">
                     {item.label}
                     <svg className="dropdown-chevron" width="10" height="6" viewBox="0 0 10 6" style={{ marginLeft: 4, opacity: 0.5 }}>
                       <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" />
@@ -111,7 +111,7 @@ export default function Header() {
                   {servicesOpen && (
                     <div className="header-dropdown">
                       {item.dropdown.map((sub) => (
-                        <Link key={sub.label} href={sub.href} className="header-dropdown-link">
+                        <Link key={sub.label} href={sub.href} prefetch={false} className="header-dropdown-link">
                           {sub.label}
                         </Link>
                       ))}
@@ -119,13 +119,13 @@ export default function Header() {
                   )}
                 </div>
               ) : (
-                <Link key={item.label} href={item.href} className="header-nav-link">
+                <Link key={item.label} href={item.href} prefetch={false} className="header-nav-link">
                   {item.label}
                 </Link>
               )
             )}
             {/* Кабинет — рядом с навигацией, как в 033 */}
-            <Link href="/login" className="header-cta-btn">Кабинет</Link>
+            <Link href="/login" prefetch={false} className="header-cta-btn">Кабинет</Link>
           </nav>
 
           {/* Правый верхний угол: телефон + соцсети */}
@@ -171,7 +171,7 @@ export default function Header() {
       <div className={`mobile-overlay ${mobileOpen ? "active" : ""}`} onClick={() => setMobileOpen(false)} />
       <div className={`mobile-menu ${mobileOpen ? "active" : ""}`}>
         <div className="mobile-menu-head">
-          <Link href="/" className="header-logo" onClick={() => setMobileOpen(false)}>
+          <Link href="/" prefetch={false} className="header-logo" onClick={() => setMobileOpen(false)}>
             <img src="/images/header-logo-tiny.webp" alt="Логотип Школа Кооперативов — Велеслав Старков" width={88} height={88} className="header-logo-img" />
             <span className="header-logo-text">Школа Кооперативов</span>
           </Link>
@@ -190,11 +190,11 @@ export default function Header() {
                 </button>
                 {mobileServicesOpen && (
                   <div className="mobile-accordion-panel">
-                    <Link href={item.href} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
+                    <Link href={item.href} prefetch={false} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
                       Все услуги
                     </Link>
                     {item.dropdown.map((sub) => (
-                      <Link key={sub.label} href={sub.href} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
+                      <Link key={sub.label} href={sub.href} prefetch={false} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
                         {sub.label}
                       </Link>
                     ))}
@@ -202,12 +202,12 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              <Link key={item.label} href={item.href} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+              <Link key={item.label} href={item.href} prefetch={false} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
                 {item.label}
               </Link>
             )
           )}
-          <Link href="/login" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>Кабинет</Link>
+          <Link href="/login" prefetch={false} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>Кабинет</Link>
           <a href="tel:+79024720738" className="mobile-phone-link">+7 (902) 472-07-38</a>
           {/* Соцсети в мобильном меню */}
           <div className="mobile-socials">

@@ -13,7 +13,7 @@ const inter = Inter({
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['cyrillic', 'latin'],
-  weight: ['400', '600'],
+  weight: ['400'],
   display: 'swap',
   variable: '--font-ibm-plex-mono',
 });

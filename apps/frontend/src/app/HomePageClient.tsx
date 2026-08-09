@@ -484,7 +484,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
               {icon:"🌐", title:"Создание «кооперативного сайта» под ключ", price:"50 000 ₽", desc:"Сайт для ПК с учётом специфики: лендинг для привлечения новых членов, личный кабинет, блог. Всё, чтобы ваш сайт выглядел профессионально и привлекал новых участников.", href:"/uslugi"},
             ].map((s, i) => (
               <Reveal key={i} delay={i + 1}>
-                <Link href={s.href} style={{display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"1.75rem", background:"rgba(214,198,178,0.03)", border:"1px solid rgba(214,198,178,0.08)", borderRadius:14, textDecoration:"none", color:"inherit", transition:"all 0.3s", minHeight:280}} onMouseEnter={e => {e.currentTarget.style.borderColor="rgba(230,136,99,0.3)"; e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 8px 30px rgba(0,0,0,0.3)"}} onMouseLeave={e => {e.currentTarget.style.borderColor="rgba(214,198,178,0.08)"; e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"}}>
+                <Link href={s.href} prefetch={false} style={{display:"flex", flexDirection:"column", justifyContent:"space-between", padding:"1.75rem", background:"rgba(214,198,178,0.03)", border:"1px solid rgba(214,198,178,0.08)", borderRadius:14, textDecoration:"none", color:"inherit", transition:"all 0.3s", minHeight:280}} onMouseEnter={e => {e.currentTarget.style.borderColor="rgba(230,136,99,0.3)"; e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 8px 30px rgba(0,0,0,0.3)"}} onMouseLeave={e => {e.currentTarget.style.borderColor="rgba(214,198,178,0.08)"; e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"}}>
                   <div>
                     <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"0.75rem"}}>
                       <span style={{fontSize:"2rem", lineHeight:1}}>{s.icon}</span>
@@ -500,7 +500,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
           </div>
           <Reveal delay={8}>
             <div style={{textAlign:"center", marginTop:"2.5rem"}}>
-              <Link href="/uslugi" className="btn-primary" style={{display:"inline-block", padding:"0.85rem 2rem", fontSize:"1rem", textDecoration:"none"}}>Все услуги для ПК</Link>
+              <Link href="/uslugi" prefetch={false} className="btn-primary" style={{display:"inline-block", padding:"0.85rem 2rem", fontSize:"1rem", textDecoration:"none"}}>Все услуги для ПК</Link>
             </div>
           </Reveal>
         </div>
@@ -540,7 +540,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                   <h3 className="c500-title">Консультации</h3>
                   <p className="c500-desc">Индивидуально или группой. Онлайн. Разбор вашей ситуации с цифрами и кейсами</p>
                   <div className="c500-price">1 час — 6 000 ₽</div>
-                  <Link href="/konsultacii" className="c500-btn c500-btn-primary">Записаться →</Link>
+                  <Link href="/konsultacii" prefetch={false} className="c500-btn c500-btn-primary">Записаться →</Link>
                 </div>
                 {/* Бесплатные видео-уроки */}
                 <div className="c500-card c500-card-2">
@@ -548,7 +548,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                   <h3 className="c500-title">Бесплатные видео-уроки</h3>
                   <p className="c500-desc">13 базовых уроков. Понимание основ кооперации. Доступ сразу после регистрации</p>
                   <div className="c500-price">Бесплатно</div>
-                  <Link href="/besplatno" className="c500-btn c500-btn-secondary">Смотреть →</Link>
+                  <Link href="/besplatno" prefetch={false} className="c500-btn c500-btn-secondary">Смотреть →</Link>
                 </div>
                 {/* Обучающий курс — ЯРКИЙ */}
                 <div className="c500-card c500-card-featured">
@@ -563,7 +563,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
                     <li>✅ 12 месяцев поддержки</li>
                     <li>✅ Доступ к закрытому сообществу</li>
                   </ul>
-                  <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" className="c500-btn c500-btn-featured">Подробнее →</Link>
+                  <Link href="/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" prefetch={false} className="c500-btn c500-btn-featured">Подробнее →</Link>
                 </div>
               </div>
             </div>

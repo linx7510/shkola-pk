@@ -256,7 +256,7 @@
 .contact-block__label {
   font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-muted);
@@ -336,7 +336,7 @@
   border-radius: 6px;
   font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 0.75rem;

@@ -40,7 +40,7 @@
   border: 1px solid rgba(255,255,255,0.06);
   font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-text-muted);

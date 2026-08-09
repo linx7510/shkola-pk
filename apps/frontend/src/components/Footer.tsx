@@ -57,7 +57,7 @@ export default function Footer() {
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {col.links.map((link: any, lidx: number) => (
                   <li key={link.id || lidx} style={{ marginBottom: "0.6rem" }}>
-                    <Link href={link.href} className="footer-link" style={{
+                    <Link href={link.href} prefetch={false} className="footer-link" style={{
                       fontSize: "1rem", color: "rgba(214,198,178,0.75)",
                       textDecoration: "none", transition: "color 0.15s",
                     }}>{link.label}</Link>
@@ -90,7 +90,7 @@ export default function Footer() {
                       fontSize: "1.05rem", transition: "all 0.15s",
                     };
                     return isInternal ? (
-                      <Link key={soc.id || sidx} href={soc.href} title={soc.title || soc.label}
+                      <Link key={soc.id || sidx} href={soc.href} prefetch={false} title={soc.title || soc.label}
                         style={socialStyle} className="footer-social-link">{soc.label}</Link>
                     ) : (
                       <a key={soc.id || sidx} href={soc.href} target="_blank" rel="noopener noreferrer"
@@ -116,7 +116,7 @@ export default function Footer() {
         <span>{copyright || "© ИП Старков Велеслав Владимирович, 2015–2026. Все права защищены."}</span>
         <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
           {legalLinks.map((link: any, lidx: number) => (
-            <Link key={link.id || lidx} href={link.href} className="footer-link" style={{
+            <Link key={link.id || lidx} href={link.href} prefetch={false} className="footer-link" style={{
               color: "rgba(214,198,178,0.7)", textDecoration: "none", transition: "color 0.15s",
             }}>{link.label}</Link>
           ))}
