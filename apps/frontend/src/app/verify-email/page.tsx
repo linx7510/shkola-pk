@@ -6,8 +6,13 @@ export const dynamic = 'force-dynamic' // CORRECT: token-based page, not a CMS p
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
-export default async function VerifyEmailPage({ searchParams }: { searchParams: { token?: string; email?: string } }) {
-  const { token, email } = searchParams
+// Next.js 16: searchParams is a Promise, must be awaited
+export default async function VerifyEmailPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string; email?: string }>
+}) {
+  const { token, email } = await searchParams
 
   if (!token || !email) {
     return (
@@ -31,7 +36,7 @@ export default async function VerifyEmailPage({ searchParams }: { searchParams: 
       verified = true
     } else {
       const data = await res.json().catch(() => ({}))
-      errorMsg = data.errors?.[0]?.message || 'Не удалось подтвердить email. Возможно, ссылка устарела.'
+      errorMsg = data.errors?.[0]?.message || data.message || 'Не удалось подтвердить email. Возможно, ссылка устарела.'
     }
   } catch (err) {
     errorMsg = 'Ошибка соединения с сервером. Попробуйте позже.'
