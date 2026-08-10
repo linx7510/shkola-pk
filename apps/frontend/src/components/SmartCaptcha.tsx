@@ -56,7 +56,7 @@ export function SmartCaptcha({ onVerify }: { onVerify: (token: string) => void }
     const existing = document.querySelector('script[data-captcha]')
     if (!existing) {
       const script = document.createElement('script')
-      script.src = 'https://smartcaptcha.yandexcloud.com/captcha.js?onload=onSmartCaptchaReady&render=explicit'
+      script.src = 'https://captcha-api.yandex.ru/captcha.js?onload=onSmartCaptchaReady&render=explicit'
       script.async = true
       script.defer = true
       script.setAttribute('data-captcha', 'yandex')
