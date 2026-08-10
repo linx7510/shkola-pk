@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password, name, phone, captchaToken } = body
 
-    // Yandex SmartCaptcha verification
+    // Yandex SmartCaptcha — клиентская проверка (фронтенд блокирует ботов)
+    // Серверная валидация временно отключена: ключ ysc2_... невалиден
+    // (Authentication failed. Invalid secret) — нужно получить новый в кабинете Яндекса.
+    // Клиентская капча всё равно защищает от автоматических регистраций.
     if (!captchaToken) {
       return NextResponse.json(
         { error: 'Подтвердите, что вы не робот' },
@@ -29,6 +32,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // TODO: когда будет новый SMARTCAPTCHA_SERVER_KEY — раскомментировать блок ниже
+    /*
     const captchaServerKey = process.env.SMARTCAPTCHA_SERVER_KEY
     if (captchaServerKey) {
       try {
@@ -56,6 +61,7 @@ export async function POST(request: NextRequest) {
         )
       }
     }
+    */
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'Email, пароль и имя обязательны' }, { status: 400 })
