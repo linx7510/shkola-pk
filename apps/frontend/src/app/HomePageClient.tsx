@@ -84,53 +84,6 @@ const PAYLOAD_PUBLIC_URL = process.env.NEXT_PUBLIC_PAYLOAD_URL || "";
 
 
 
-// Lazy AI Chat Button — загружает AIChatWidget только при клике
-function LazyAIChatButton() {
-  const [open, setOpen] = useState(false);
-  const [AIChatWidget, setAIChatWidget] = useState<any>(null);
-
-  const handleClick = async () => {
-    if (!AIChatWidget) {
-      // Lazy load AIChatWidget только при первом клике
-      const mod = await import("./home/AIChatWidget");
-      setAIChatWidget(() => mod.AIChatWidget);
-    }
-    setOpen(!open);
-  };
-
-  return (
-    <>
-      <button
-        onClick={handleClick}
-        aria-label="Открыть чат с AI-консультантом"
-        style={{
-          position: "fixed",
-          bottom: "1.5rem",
-          right: "1.5rem",
-          zIndex: 9999,
-          width: 56,
-          height: 56,
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, #C96E4D, #E68863)",
-          border: "none",
-          cursor: "pointer",
-          boxShadow: "0 4px 20px rgba(201,110,77,0.4), 0 0 30px rgba(230,136,99,0.2)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "1.5rem",
-          color: "#0D0C0A",
-          transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
-      >
-        {open ? "✕" : "💬"}
-      </button>
-      {open && AIChatWidget && <AIChatWidget />}
-    </>
-  );
-}
 
 export default function HomePageClient({ homeData }: { homeData: HomePageData | null }) {
   const [aboutOpen, setAboutOpen] = useState<number | null>(null);
@@ -791,8 +744,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
         <BlockRenderer blocks={homeData.blocks} />
       )}
 
-      {/* ===== AI CHAT WIDGET — lazy по кнопке ===== */}
-      <LazyAIChatButton />
+      {/* AI CHAT WIDGET теперь глобальный в layout.tsx */}
       <Footer />
     </>
   );

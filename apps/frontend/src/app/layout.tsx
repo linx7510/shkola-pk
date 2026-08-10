@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import LazyAIChatButton from "@/components/LazyAIChatButton";
 // System fonts — 0 KB download (was 169 KB with Inter + IBM Plex Mono)
 const inter = { variable: "" };
 import "./globals.css";
@@ -141,23 +142,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         })}} />
 {children}
         {bodyCode && <div dangerouslySetInnerHTML={{ __html: bodyCode }} />}
-        {/* Yandex.Metrika counter — strategy="lazyOnload" loads during browser idle time,
-            does NOT block main thread during initial render.
-            Initial pageview still tracked via inline ym() call below. */}
-        <Script id="yandex-metrika-init" strategy="lazyOnload">
-          {`window.addEventListener('load', function() {
-            requestIdleCallback(function() {
-              (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-              ym(${METRIKA_ID}, "init", {
-                webvisor:true,
-                clickmap:true,
-                ecommerce:"112",
-                referrer: document.referrer,
-                url: location.href,
-                accurateTrackBounce:true,
-                trackLinks:true
-              });
-            }, {timeout: 5000});
+        <LazyAIChatButton />
+        {/* Yandex.Metrika counter — strategy="afterInteractive" для немедленного запуска */}
+        <Script id="yandex-metrika-init" strategy="afterInteractive">
+          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+          ym(${METRIKA_ID}, "init", {
+            webvisor:true,
+            clickmap:true,
+            ecommerce:"112",
+            referrer: document.referrer,
+            url: location.href,
+            accurateTrackBounce:true,
+            trackLinks:true
           });`}
         </Script>
         <noscript>
