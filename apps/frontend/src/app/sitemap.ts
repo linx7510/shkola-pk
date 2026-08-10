@@ -13,18 +13,23 @@ async function payloadApi(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://велеслав.рус";
+  // Принудительно Unicode (велеслав.рус), не Punycode (xn--80adbka9ab1c.xn--p1acf)
+  // canonical и og:url в HTML используют Unicode — sitemap должен совпадать
+  const baseUrl = "https://велеслав.рус";
 
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 1.0 },
     { url: `${baseUrl}/about-us`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.9 },
     { url: `${baseUrl}/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${baseUrl}/uslugi-dlya-potrebitelskih-kooperativov`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${baseUrl}/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/potrebitelskiy-kooperativ-konsultatsii`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/besplatno`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
     { url: `${baseUrl}/glossary`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
     { url: `${baseUrl}/faq`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${baseUrl}/politika-konfidentsialnosti`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
     { url: `${baseUrl}/pomosch-proektu`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
   ];
 
@@ -55,7 +60,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [
-    { url: `${baseUrl}/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
-...staticPages, ...blogPages, ...glossaryPages, ...servicePages];
+  return [...staticPages, ...blogPages, ...glossaryPages, ...servicePages];
 }

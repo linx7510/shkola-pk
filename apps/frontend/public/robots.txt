@@ -1,10 +1,10 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
-Disallow: /api/
-Disallow: /dashboard/
-Disallow: /login/
-Disallow: /register/
+Disallow: /admin
+Disallow: /api
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
 
 # AI-боты — ЗАПРЕЩЕНЫ (защита контента от воровства нейросетями)
 User-agent: GPTBot
