@@ -266,6 +266,24 @@ ${params.full.missing_sections?.length ? `<b>Отсутствуют раздел
 👉 <b>Действие:</b> связаться с клиентом, предложить полный аудит с готовыми правками. Email: ${params.email}`
 
     await sendTelegramMessage(text)
+
+    // Дублирование на email (надёжный канал, не зависит от блокировок Telegram)
+    try {
+      const { sendEmail } = await import('@/lib/email')
+      await sendEmail({
+        to: process.env.NOTIFY_EMAIL || 'boss@2980738.ru',
+        subject: `🔍 Экспресс-аудит устава: ${params.score}/100 — ${params.name}`,
+        html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #f5f5f5; padding: 20px;">
+          <div style="background: white; border-radius: 8px; padding: 24px; border-left: 4px solid #C96E4D;">
+            <h2 style="margin: 0 0 16px; color: #333;">🔍 Экспресс-аудит устава</h2>
+            <pre style="white-space: pre-wrap; font-family: sans-serif; color: #333; line-height: 1.6;">${text.replace(/</g, '&lt;')}</pre>
+          </div>
+        </div>`,
+      })
+      console.log('[express-audit] Email уведомление отправлено')
+    } catch (emailErr) {
+      console.error('[express-audit] Email error:', emailErr)
+    }
   } catch (e) {
     console.warn('[express-audit] Telegram notify failed:', e)
   }
