@@ -97,6 +97,8 @@ interface ClientProject {
   };
   template?: { id?: string; name?: string; slug?: string } | string | null;
   templateSnapshot?: { name?: string; slug?: string; totalXP?: number; priceMin?: number; priceMax?: number } | null;
+  consultationDate?: string | null;
+  consultationTime?: string | null;
   stage: string;
   totalXP: number;
   percent: number;
@@ -222,6 +224,135 @@ interface ServiceTemplate {
 // ──────────────────────────────────────────────────────────────
 // Главный компонент
 // ──────────────────────────────────────────────────────────────
+
+// ════════════════════════════════════════════════════════════
+// ConsultationDatePicker — выбор даты и времени консультации
+// ════════════════════════════════════════════════════════════
+function ConsultationDatePicker({ projectId, token, onBooked }: {
+  projectId: string;
+  token: string;
+  onBooked: () => void;
+}) {
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const timeSlots = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+
+  const handleSubmit = async () => {
+    if (!date || !time) {
+      setError('Выберите дату и время');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/client-projects/set-consultation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `JWT ${token}`,
+        },
+        body: JSON.stringify({ projectId, date, time }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'Ошибка при записи');
+      } else {
+        setSuccess(true);
+        setTimeout(() => onBooked(), 1500);
+      }
+    } catch (e) {
+      setError('Ошибка соединения');
+    }
+    setLoading(false);
+  };
+
+  // Минимальная дата — завтра
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split('T')[0];
+
+  return (
+    <div style={{ marginTop: '1rem', padding: '1.5rem', background: 'rgba(109,184,154,0.06)', border: '1px solid rgba(109,184,154,0.2)', borderRadius: 12 }}>
+      <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#6DB89A', marginBottom: '0.75rem' }}>📅 Запланировать консультацию</h4>
+      <p style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.7)', marginBottom: '1rem' }}>
+        Выберите удобную дату и время. Консультация проводится онлайн (Telegram/Zoom).
+      </p>
+      {success ? (
+        <div style={{ padding: '1rem', background: 'rgba(109,184,154,0.1)', borderRadius: 8, color: '#6DB89A', fontWeight: 600, textAlign: 'center' }}>
+          ✅ Записано! Дата: {new Date(date).toLocaleDateString('ru-RU')} в {time}
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.75rem', alignItems: 'end' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.3rem' }}>Дата</label>
+            <input
+              type="date"
+              min={minDate}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.6rem 0.8rem',
+                background: 'rgba(214,198,178,0.05)',
+                border: '1px solid rgba(214,198,178,0.2)',
+                borderRadius: 8,
+                color: '#E7DCCF',
+                fontSize: '0.95rem',
+              }}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.3rem' }}>Время</label>
+            <select
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.6rem 0.8rem',
+                background: 'rgba(214,198,178,0.05)',
+                border: '1px solid rgba(214,198,178,0.2)',
+                borderRadius: 8,
+                color: '#E7DCCF',
+                fontSize: '0.95rem',
+              }}
+            >
+              <option value="">— Выбрать —</option>
+              {timeSlots.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !date || !time}
+            style={{
+              padding: '0.6rem 1.5rem',
+              background: loading || !date || !time ? 'rgba(214,198,178,0.2)' : 'linear-gradient(135deg, #6DB89A, #5BA888)',
+              border: 'none',
+              color: '#0D0C0A',
+              borderRadius: 8,
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              cursor: loading || !date || !time ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {loading ? '...' : 'Записаться →'}
+          </button>
+        </div>
+      )}
+      {error && (
+        <div style={{ marginTop: '0.75rem', padding: '0.6rem 0.8rem', background: 'rgba(244,67,54,0.1)', borderRadius: 6, color: '#F44336', fontSize: '0.85rem' }}>
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -551,12 +682,25 @@ export default function ClientDashboard() {
                   <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#E7DCCF' }}>{serviceDuration}</div>
                 </div>
                 <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Дата консультации</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#E7DCCF' }}>
+                    {project.consultationDate
+                      ? new Date(project.consultationDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) + (project.consultationTime ? ' в ' + project.consultationTime : '')
+                      : '📅 Не выбрана'}
+                  </div>
+                </div>
+                <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
                   <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Статус</div>
                   <div style={{ fontSize: '0.95rem', fontWeight: 700, color: effectivePercent === 100 ? '#6DB89A' : '#D4A856' }}>
                     {effectivePercent === 100 ? '✅ Завершено' : '⏳ Запланировано'}
                   </div>
                 </div>
               </div>
+
+              {/* Форма выбора даты консультации (если дата не выбрана) */}
+              {!project.consultationDate && (
+                <ConsultationDatePicker projectId={project.id} token={token} onBooked={() => { refreshProject(); }} />
+              )}
               <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(230,136,99,0.06)', borderRadius: 8, fontSize: '0.85rem', color: 'rgba(214,198,178,0.8)' }}>
                 {serviceDescription}
               </div>
@@ -1762,4 +1906,3 @@ function ServiceCard({ service, token, onOrdered }: {
     </div>
   );
 }
-

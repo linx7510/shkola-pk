@@ -243,7 +243,10 @@ export const ClientProjects: CollectionConfig = {
       defaultValue: 0,
       admin: { readOnly: true },
     },
-    { name: 'createdAt', type: 'date', label: 'Создан', admin: { readOnly: true } },
+    // Поля для консультаций (дата и время запланированной консультации)
+  { name: 'consultationDate', type: 'date', label: 'Дата консультации', admin: { position: 'sidebar', date: { displayFormat: 'dd.MM.yyyy' } } },
+  { name: 'consultationTime', type: 'text', label: 'Время консультации', admin: { position: 'sidebar' } },
+  { name: 'createdAt', type: 'date', label: 'Создан', admin: { readOnly: true } },
     { name: 'updatedAt', type: 'date', label: 'Обновлён', admin: { readOnly: true } },
           ],
         },
