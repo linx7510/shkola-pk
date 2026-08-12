@@ -1981,8 +1981,8 @@ function ServiceCard({ service, token, onOrdered }: {
           </a>
         ) : (
         isConsultation ? (
-          <a
-            href="/dashboard/consultation"
+          <button
+            onClick={() => setShowForm(true)}
             style={{
               display: 'block',
               textAlign: 'center',
@@ -1994,11 +1994,11 @@ function ServiceCard({ service, token, onOrdered }: {
               fontSize: '0.95rem',
               fontWeight: 700,
               cursor: 'pointer',
-              textDecoration: 'none',
+              width: '100%',
             }}
           >
-            {'💬 Выбрать время консультации'}
-          </a>
+            {'🛒 Заказать консультацию'}
+          </button>
         ) : (
         <button
           onClick={() => setShowForm(true)}
@@ -2029,13 +2029,13 @@ function ServiceCard({ service, token, onOrdered }: {
           )}
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>
-              Название кооператива / проекта:
+              {isConsultation ? 'Тема консультации:' : 'Название кооператива / проекта:'}
             </label>
             <input
               type="text"
               value={coopName}
               onChange={(e) => setCoopName(e.target.value)}
-              placeholder="Например: Кооператив «Восход»"
+              placeholder={isConsultation ? "Например: Консультация по кооперации" : "Например: Кооператив «Восход»"}
               style={{
                 width: '100%',
                 padding: '0.6rem 0.8rem',
