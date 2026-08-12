@@ -416,14 +416,8 @@ export const ClientProjects: CollectionConfig = {
               unlocked: false,
             }))
 
-            // Инициализируем чат приветствием
-            data.chat = [{
-              author: 'system',
-              message: `Добро пожаловать в Личный кабинет! Ваш проект «${data.coopName}» запущен. ` +
-                       `Шаблон услуги: ${template.name}. Всего документов: ${docs.length}. ` +
-                       `Следите за прогрессом здесь и получайте уведомления о готовности каждого документа.`,
-              sentAt: new Date().toISOString(),
-            }]
+            // Чат пустой — клиент напишет первым когда будет готов
+            data.chat = []
           }
         }
         return data
