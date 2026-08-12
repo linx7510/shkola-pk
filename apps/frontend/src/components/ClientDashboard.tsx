@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
@@ -99,11 +99,19 @@ interface ClientProject {
   templateSnapshot?: { name?: string; slug?: string; totalXP?: number; priceMin?: number; priceMax?: number } | null;
   consultationDate?: string | null;
   consultationTime?: string | null;
+  chat?: ChatMessage[];
   stage: string;
   totalXP: number;
   percent: number;
   documents: DocumentItem[];
   achievements: Achievement[];
+}
+
+interface ChatMessage {
+  author: 'client' | 'executor' | 'system';
+  message?: string;
+  sentAt?: string;
+  attachedDocumentCode?: string;
 }
 
 const STAGES = [
@@ -353,6 +361,170 @@ function ConsultationDatePicker({ projectId, token, onBooked }: {
   );
 }
 
+
+
+// ════════════════════════════════════════════════════════════
+// ProjectChat — рабочий чат с Исполнителем
+// ════════════════════════════════════════════════════════════
+function ProjectChat({ projectId, messages, token, onSent }: {
+  projectId: string;
+  messages: ChatMessage[];
+  token: string;
+  onSent: () => void;
+}) {
+  const [text, setText] = useState('');
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!text.trim() || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/client-projects/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `JWT ${token}`,
+        },
+        body: JSON.stringify({ projectId, message: text.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setText('');
+        onSent();
+      } else {
+        setError(data.error || 'Ошибка отправки');
+      }
+    } catch (e) {
+      setError('Ошибка соединения');
+    }
+    setSending(false);
+  };
+
+  const authorLabel = (author: string) => {
+    switch (author) {
+      case 'client': return { name: 'Вы', color: '#E68863', bg: 'rgba(230,136,99,0.1)', align: 'right' };
+      case 'executor': return { name: 'Исполнитель', color: '#6DB89A', bg: 'rgba(109,184,154,0.1)', align: 'left' };
+      case 'system': return { name: 'Система', color: '#D4A856', bg: 'rgba(212,168,86,0.08)', align: 'center' };
+      default: return { name: author, color: '#8B7E6B', bg: 'rgba(214,198,178,0.05)', align: 'left' };
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: 800, margin: '0 auto' }}>
+      <div style={{
+        padding: '1.5rem',
+        background: 'rgba(214,198,178,0.04)',
+        border: '1px solid rgba(214,198,178,0.12)',
+        borderRadius: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem',
+      }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#E7DCCF', marginBottom: '0.5rem' }}>
+          💬 Чат с Исполнителем
+        </h3>
+
+        {/* Сообщения */}
+        <div style={{
+          maxHeight: '400px',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
+          padding: '0.5rem',
+        }}>
+          {messages.length === 0 ? (
+            <p style={{ color: 'rgba(214,198,178,0.5)', textAlign: 'center', padding: '2rem 0' }}>
+              Напишите первое сообщение — Исполнитель ответит в ближайшее время.
+            </p>
+          ) : (
+            messages.map((msg, i) => {
+              const a = authorLabel(msg.author);
+              return (
+                <div key={i} style={{
+                  alignSelf: a.align === 'right' ? 'flex-end' : a.align === 'center' ? 'center' : 'flex-start',
+                  maxWidth: '80%',
+                  padding: '0.75rem 1rem',
+                  background: a.bg,
+                  borderRadius: 12,
+                  border: `1px solid ${a.color}30`,
+                }}>
+                  <div style={{ fontSize: '0.75rem', color: a.color, fontWeight: 700, marginBottom: '0.3rem' }}>
+                    {a.name}{msg.sentAt ? ' · ' + new Date(msg.sentAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: '#D6C6B2', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                    {msg.message || ''}
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Форма отправки */}
+        {error && (
+          <div style={{ padding: '0.5rem 0.75rem', background: 'rgba(244,67,54,0.1)', borderRadius: 6, color: '#F44336', fontSize: '0.85rem' }}>
+            {error}
+          </div>
+        )}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Напишите сообщение..."
+            rows={2}
+            style={{
+              flex: 1,
+              padding: '0.6rem 0.8rem',
+              background: 'rgba(214,198,178,0.05)',
+              border: '1px solid rgba(214,198,178,0.2)',
+              borderRadius: 8,
+              color: '#D6C6B2',
+              fontSize: '0.9rem',
+              resize: 'vertical',
+              outline: 'none',
+              fontFamily: 'inherit',
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+          <button
+            onClick={handleSend}
+            disabled={sending || !text.trim()}
+            style={{
+              padding: '0.6rem 1.5rem',
+              background: sending || !text.trim() ? 'rgba(214,198,178,0.2)' : 'linear-gradient(135deg, #C96E4D, #E68863)',
+              border: 'none',
+              color: '#0D0C0A',
+              borderRadius: 8,
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              cursor: sending || !text.trim() ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {sending ? '...' : 'Отправить →'}
+          </button>
+        </div>
+        <div style={{ fontSize: '0.75rem', color: 'rgba(214,198,178,0.5)', textAlign: 'center' }}>
+          Enter — отправить, Shift+Enter — новая строка
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -1255,13 +1427,7 @@ export default function ClientDashboard() {
         )}
 
         {activeTab === 'chat' && (
-          <div style={{ maxWidth: 800, margin: '0 auto' }}>
-            <div style={{ padding: '1.5rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 16 }}>
-              <p style={{ color: 'rgba(214,198,178,0.75)', textAlign: 'center', padding: '3rem 0' }}>
-                💬 Чат с Исполнителем появится здесь после заполнения анкет.
-              </p>
-            </div>
-          </div>
+          <ProjectChat projectId={project.id} messages={project.chat || []} token={token} onSent={() => refreshProject()} />
         )}
 
         {activeTab === 'calendar' && (
