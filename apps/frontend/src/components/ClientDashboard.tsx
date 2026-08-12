@@ -342,12 +342,21 @@ export default function ClientDashboard() {
 
   // ── Расчёт прогресса ──
   const { percent, currentXP } = computeProgress(project.documents);
-  const circumference = 2 * Math.PI * 80;
-  const offset = circumference - (Math.min(percent, 100) / 100) * circumference;
 
-  // Определить тип проекта (Аудит устава или ПК под ключ)
-  // Аудит устава — если в документах есть anketa_audit или current_ustav
+  // Определить тип проекта (Аудит устава, консультация или ПК под ключ)
   const isAuditProject = project.documents.some(d => d.code === 'anketa_audit' || d.code === 'current_ustav');
+  const projectSlug = (typeof project.template === 'object' ? project.template?.slug : null) || project.templateSnapshot?.slug || '';
+  const isConsultationProject = projectSlug.startsWith('consultation-') || project.documents.some(d => d.code === 'consultation_brief');
+
+  // Для консультаций: 50% при заказе, 50% после оказания
+  const effectivePercent = isConsultationProject
+    ? (project.stage === 'completed' ? 100 : 50)
+    : percent;
+
+  const circumference = 2 * Math.PI * 80;
+  const offset = circumference - (Math.min(effectivePercent, 100) / 100) * circumference;
+
+  // (тип проекта определён выше)
 
   // Выбрать карту пути в зависимости от типа проекта
   const stagesToShow = isAuditProject ? AUDIT_STAGES : STAGES;
@@ -387,11 +396,15 @@ export default function ClientDashboard() {
     || (isAuditProject ? 'Аудит устава' : 'ПК под ключ');
 
   // Описание и срок по типу проекта
-  const serviceDescription = isAuditProject
+  const serviceDescription = isConsultationProject
+    ? '💬 Консультация по потребительской кооперации: разбор вашей ситуации, ответы на вопросы, рекомендации по дальнейшим шагам. Проводится онлайн (Telegram/Zoom).'
+    : isAuditProject
     ? '🔍 Правовой аудит Устава потребительского кооператива: проверка соответствия 215-ФЗ, выявление рисков, разработка рекомендаций. Письменное заключение + (для Расширенного тарифа) 1 час консультации.'
     : '💡 Заказано: создание потребительского кооператива «под ключ» — полный пакет: индивидуальный Устав редакции 27-5, 16 Положений, 100+ рабочих документов, 2 целевые программы.';
 
-  const serviceDuration = isAuditProject
+  const serviceDuration = isConsultationProject
+    ? '1 рабочий день'
+    : isAuditProject
     ? (project.documents.some(d => d.code === 'current_polozheniya') ? '≈ 7 рабочих дней' : '≈ 5 рабочих дней')
     : '≈ 25 рабочих дней';
 
@@ -489,10 +502,10 @@ export default function ClientDashboard() {
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
           {[
             { code: 'overview', label: '📊 Обзор' },
-            { code: 'documents', label: `📋 Документы (${totalDocs})` },
-            { code: 'achievements', label: `🏆 Достижения (${project.achievements.filter(a => a.unlocked).length}/${project.achievements.length})` },
+            ...(isConsultationProject ? [] : [{ code: 'documents', label: `📋 Документы (${totalDocs})` }]),
+            ...(isConsultationProject ? [] : [{ code: 'achievements', label: `🏆 Достижения (${project.achievements.filter(a => a.unlocked).length}/${project.achievements.length})` }]),
             { code: 'chat', label: '💬 Чат' },
-            { code: 'calendar', label: '📅 Календарь' },
+            ...(isConsultationProject ? [] : [{ code: 'calendar', label: '📅 Календарь' }]),
             { code: 'services', label: '🛒 Услуги' },
           ].map((tab) => (
             <button
@@ -578,7 +591,7 @@ export default function ClientDashboard() {
                   />
                 </svg>
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#E68863', transition: 'all 0.5s' }}>{percent}%</div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#E68863', transition: 'all 0.5s' }}>{effectivePercent}%</div>
                   <div style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.75)' }}>{currentXP} / {MAX_TOTAL_XP} XP</div>
                 </div>
               </div>
@@ -1371,9 +1384,13 @@ function ServiceCard({ service, token, onOrdered }: {
   // Иконка и цвет по типу услуги
   const isPkPodKlyuch = service.serviceType === 'pk_pod_klyuch' || service.slug.startsWith('pk-pod-klyuch');
   const isAudit = service.serviceType === 'audit_ustava' || service.slug.startsWith('audit-ustava');
-  const icon = isPkPodKlyuch ? '🚀' : isAudit ? '🔍' : '📋';
-  const color = isPkPodKlyuch ? '#C96E4D' : isAudit ? '#5B8DAA' : '#B8956A';
-  const typeLabel = isPkPodKlyuch ? 'Регистрация ПК' : isAudit ? 'Правовой аудит' : 'Услуга';
+  const icon = isPkPodKlyuch ? '🚀' : isAudit ? '🔍' : (service.serviceType === 'consultation' || service.slug.startsWith('consultation-')) ? '💬' : '📋';
+  const color = isPkPodKlyuch ? '#C96E4D' : isAudit ? '#5B8DAA' : (service.serviceType === 'consultation' || service.slug.startsWith('consultation-')) ? '#6DB89A' : '#B8956A';
+  const typeLabel = isPkPodKlyuch ? 'Регистрация ПК' : isAudit ? 'Правовой аудит' : (service.serviceType === 'consultation' || service.slug.startsWith('consultation-')) ? 'Консультация' : 'Услуга';
+  const isFreeExpress = service.slug === 'express-audit-free';
+  const isConsultation = service.serviceType === 'consultation' || service.slug.startsWith('consultation-');
+  const isFreeConsultation = service.slug === 'consultation-free';
+  const isPaidConsultation = service.slug === 'consultation-paid';
 
   const handleOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1415,6 +1432,7 @@ function ServiceCard({ service, token, onOrdered }: {
     setOrdering(false);
   };
 
+
   if (success) {
     return (
       <div style={{
@@ -1431,7 +1449,7 @@ function ServiceCard({ service, token, onOrdered }: {
         <p style={{ fontSize: '0.95rem', color: 'rgba(214,198,178,0.85)', marginBottom: '1rem' }}>
           Проект «{coopName}» создан.<br />
           Договор №{success.contractNumber}<br />
-          Сумма: {new Intl.NumberFormat('ru-RU').format(success.amount)} ₽
+          Сумма: {success.amount > 0 ? new Intl.NumberFormat('ru-RU').format(success.amount) + ' ₽' : 'Бесплатно'}
         </p>
         <p style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.6)' }}>
           Перенаправляем в личный кабинет...
@@ -1492,6 +1510,47 @@ function ServiceCard({ service, token, onOrdered }: {
 
       {/* Форма заказа */}
       {!showForm ? (
+        isFreeExpress ? (
+          <a
+            href={isFreeConsultation ? '/potrebitelskiy-kooperativ-konsultatsii' : '/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa#express-audit'}
+            style={{
+              display: 'block',
+              textAlign: 'center',
+              padding: '0.8rem 1.5rem',
+              background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+              color: '#fff',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              textDecoration: 'none',
+              transition: 'transform 0.2s',
+            }}
+          >
+            🚀 Начать бесплатный аудит
+          </a>
+        ) : (
+        isConsultation ? (
+          <a
+            href="/dashboard/consultation"
+            style={{
+              display: 'block',
+              textAlign: 'center',
+              padding: '0.8rem 1.5rem',
+              background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+              color: '#fff',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              textDecoration: 'none',
+            }}
+          >
+            {'💬 Выбрать время консультации'}
+          </a>
+        ) : (
         <button
           onClick={() => setShowForm(true)}
           style={{
@@ -1510,6 +1569,8 @@ function ServiceCard({ service, token, onOrdered }: {
         >
           🛒 Заказать эту услугу
         </button>
+        )
+        )
       ) : (
         <form onSubmit={handleOrder} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {error && (
