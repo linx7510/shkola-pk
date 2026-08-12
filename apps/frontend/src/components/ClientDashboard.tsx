@@ -753,45 +753,72 @@ export default function ClientDashboard() {
         {/* ─── Заголовок с переключателем проектов ─── */}
         <div style={{ marginBottom: '2rem' }}>
           {/* Переключатель проектов (если их больше 1) */}
-          {allProjects.length > 1 && (
-            <div style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {allProjects.map((p) => {
-                const isAudit = p.documents.some(d => d.code === 'anketa_audit' || d.code === 'current_ustav');
-                const pIcon = isAudit ? '🔍' : '🚀';
-                const pColor = isAudit ? '#5B8DAA' : '#C96E4D';
-                const isActive = p.id === project.id;
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      setProject(p);
-                      setActiveTab('overview');
-                    }}
-                    style={{
-                      padding: '0.5rem 1rem',
-                      borderRadius: 10,
-                      border: `1px solid ${isActive ? pColor : 'rgba(214,198,178,0.15)'}`,
-                      background: isActive ? `${pColor}20` : 'rgba(214,198,178,0.04)',
-                      color: isActive ? pColor : 'rgba(214,198,178,0.75)',
-                      cursor: 'pointer',
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.1rem' }}>{pIcon}</span>
-                    <span>{p.coopName}</span>
-                    <span style={{ fontSize: '0.75rem', color: isActive ? pColor : 'rgba(214,198,178,0.5)' }}>
-                      ({p.percent}%)
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          {/* Переключатель проектов — показываем всегда */}
+          <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.6)', marginRight: '0.25rem' }}>Проекты:</span>
+            {allProjects.map((p) => {
+              const pSlug = (typeof p.template === 'object' ? p.template?.slug : null) || p.templateSnapshot?.slug || '';
+              const pIsConsultation = pSlug.startsWith('consultation-');
+              const pIsAudit = p.documents.some(d => d.code === 'anketa_audit' || d.code === 'current_ustav');
+              const pIsPolozheniya = pSlug.startsWith('polozheniya') || pSlug === 'polozhenie-odno';
+              const pIcon = pIsConsultation ? '💬' : pIsAudit ? '🔍' : pIsPolozheniya ? '⚖️' : '🚀';
+              const pColor = pIsConsultation ? '#6DB89A' : pIsAudit ? '#5B8DAA' : pIsPolozheniya ? '#D4A856' : '#C96E4D';
+              const pServiceName = p.templateSnapshot?.name || (typeof p.template === 'object' ? p.template?.name : null) || (pIsConsultation ? 'Консультация' : pIsAudit ? 'Аудит' : pIsPolozheniya ? 'Положения' : 'ПК под ключ');
+              const isActive = p.id === project.id;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => {
+                    setProject(p);
+                    setActiveTab('overview');
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: 10,
+                    border: `1px solid ${isActive ? pColor : 'rgba(214,198,178,0.15)'}`,
+                    background: isActive ? `${pColor}20` : 'rgba(214,198,178,0.04)',
+                    color: isActive ? pColor : 'rgba(214,198,178,0.75)',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <span style={{ fontSize: '1.1rem' }}>{pIcon}</span>
+                  <span>{p.coopName}</span>
+                  <span style={{ fontSize: '0.7rem', color: isActive ? pColor : 'rgba(214,198,178,0.4)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {pServiceName}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: isActive ? pColor : 'rgba(214,198,178,0.5)' }}>
+                    {p.percent}%
+                  </span>
+                </button>
+              );
+            })}
+            {/* Кнопка «Заказать ещё» */}
+            <button
+              onClick={() => setActiveTab('services')}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: 10,
+                border: '1px dashed rgba(230,136,99,0.4)',
+                background: 'rgba(230,136,99,0.05)',
+                color: '#E68863',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}
+            >
+              <span style={{ fontSize: '1.1rem' }}>🛒</span>
+              <span>Заказать ещё</span>
+            </button>
+          </div>
           
           <h1 className="heading-sweep" data-text={`Проект «${project.coopName}»`} style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, color: '#D6C6B2', marginBottom: '0.5rem' }}>
             Проект «{project.coopName}»
@@ -1843,7 +1870,7 @@ function ServiceCard({ service, token, onOrdered }: {
           contractNumber: data.contractNumber,
           amount: data.amount,
         });
-        // Через 2 секунды перезагрузить страницу
+        // Через 2 секунды перезагрузить страницу — загрузятся все проекты
         setTimeout(() => onOrdered(), 2000);
       } else {
         setError(data.error || 'Не удалось создать заказ');
