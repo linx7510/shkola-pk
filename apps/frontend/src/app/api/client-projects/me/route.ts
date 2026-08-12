@@ -54,6 +54,36 @@ export async function GET(req: NextRequest) {
     }
 
     const projectsData = await projectsRes.json()
+
+    // Для консультационных проектов — подтянуть date/time из consultation_bookings
+    try {
+      const { Pool } = await import('pg')
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+      const bookingsRes = await pool.query(
+        `SELECT service_type, date, time, status FROM consultation_bookings 
+         WHERE user_id = $1 AND status NOT IN ('cancelled') 
+         ORDER BY date DESC`,
+        [userId]
+      )
+      
+      if (bookingsRes.rows.length > 0 && projectsData.docs) {
+        projectsData.docs = projectsData.docs.map((doc: any) => {
+          const slug = doc.templateSnapshot?.slug || (typeof doc.template === 'object' ? doc.template?.slug : '') || ''
+          if (slug.startsWith('consultation-')) {
+            const booking = bookingsRes.rows.find((b: any) => b.service_type === slug)
+            if (booking) {
+              doc.consultationDate = booking.date
+              doc.consultationTime = booking.time
+            }
+          }
+          return doc
+        })
+      }
+      await pool.end()
+    } catch (e) {
+      console.warn('[me] Failed to sync consultation bookings:', e)
+    }
+
     return NextResponse.json(projectsData)
   } catch (error) {
     console.error('[/api/client-projects/me] Error:', error)

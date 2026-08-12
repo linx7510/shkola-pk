@@ -697,10 +697,7 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              {/* Форма выбора даты консультации (если дата не выбрана) */}
-              {!project.consultationDate && (
-                <ConsultationDatePicker projectId={project.id} token={token} onBooked={() => { refreshProject(); }} />
-              )}
+
               <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(230,136,99,0.06)', borderRadius: 8, fontSize: '0.85rem', color: 'rgba(214,198,178,0.8)' }}>
                 {serviceDescription}
               </div>
