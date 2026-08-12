@@ -528,7 +528,121 @@ export default function ClientDashboard() {
         </div>
 
         {/* ═════════ ОБЗОР ═════════ */}
-        {activeTab === 'overview' && (
+        {activeTab === 'overview' && isConsultationProject && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            {/* ── Упрощённый обзор для консультаций ── */}
+            <div style={{ padding: '2rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 16, gridColumn: 'span 2' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#E7DCCF', marginBottom: '1.5rem' }}>
+                💬 {serviceName}
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Услуга</div>
+                  <div style={{ fontSize: '1rem', fontWeight: 700, color: '#E7DCCF' }}>{serviceName}</div>
+                </div>
+                <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Стоимость</div>
+                  <div style={{ fontSize: '1rem', fontWeight: 700, color: project.contract.amount > 0 ? '#E7DCCF' : '#6DB89A' }}>
+                    {project.contract.amount > 0 ? new Intl.NumberFormat('ru-RU').format(project.contract.amount) + ' ₽' : 'Бесплатно'}
+                  </div>
+                </div>
+                <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Срок</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#E7DCCF' }}>{serviceDuration}</div>
+                </div>
+                <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
+                  <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Статус</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: effectivePercent === 100 ? '#6DB89A' : '#D4A856' }}>
+                    {effectivePercent === 100 ? '✅ Завершено' : '⏳ Запланировано'}
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(230,136,99,0.06)', borderRadius: 8, fontSize: '0.85rem', color: 'rgba(214,198,178,0.8)' }}>
+                {serviceDescription}
+              </div>
+            </div>
+
+            {/* ── Прогресс (упрощённый) ── */}
+            <div style={{ padding: '2rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 16, textAlign: 'center' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#E7DCCF', marginBottom: '1.5rem' }}>Прогресс</h3>
+              <div style={{ position: 'relative', width: 200, height: 200, margin: '0 auto' }}>
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(214,198,178,0.1)" strokeWidth="12" />
+                  <circle
+                    cx="100" cy="100" r="80" fill="none" stroke="#6DB89A" strokeWidth="12"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={offset}
+                    strokeLinecap="round"
+                    transform="rotate(-90 100 100)"
+                    style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                  />
+                </svg>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 800, color: '#6DB89A' }}>{effectivePercent}%</div>
+                  <div style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.75)' }}>
+                    {effectivePercent === 100 ? 'Завершено' : 'Запланировано'}
+                  </div>
+                </div>
+              </div>
+              <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'rgba(214,198,178,0.8)' }}>
+                {effectivePercent === 100 ? '🎉 Консультация проведена!' : '⏳ Ожидает проведения'}
+              </p>
+            </div>
+
+            {/* ── Чат с исполнителем ── */}
+            <div style={{ padding: '2rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 16, gridColumn: 'span 2' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#E7DCCF' }}>💬 Связь с исполнителем</h3>
+                <button
+                  onClick={() => setActiveTab('chat')}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(230,136,99,0.1)',
+                    border: '1px solid rgba(230,136,99,0.3)',
+                    color: '#E68863',
+                    borderRadius: 8,
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Открыть чат →
+                </button>
+              </div>
+              <p style={{ fontSize: '0.9rem', color: 'rgba(214,198,178,0.75)', lineHeight: 1.6 }}>
+                Исполнитель свяжется с вами в ближайшее время для согласования удобного времени консультации.
+                Вы также можете задать вопрос через чат.
+              </p>
+            </div>
+
+            {/* ── Заказать ещё ── */}
+            <div style={{ padding: '2rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 16, gridColumn: 'span 3' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#E7DCCF', marginBottom: '0.5rem' }}>🛒 Другие услуги</h3>
+                  <p style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.7)' }}>Закажите дополнительные услуги для вашего кооператива</p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('services')}
+                  style={{
+                    padding: '0.7rem 1.5rem',
+                    background: 'linear-gradient(135deg, #C96E4D, #E68863)',
+                    border: 'none',
+                    color: '#0D0C0A',
+                    borderRadius: 8,
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🛒 Каталог услуг →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'overview' && !isConsultationProject && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
             {/* ── Заказанная услуга ── */}
             <div style={{ padding: '2rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 16, gridColumn: 'span 2' }}>
@@ -558,10 +672,11 @@ export default function ClientDashboard() {
                 </div>
                 <div style={{ padding: '1rem', background: 'rgba(214,198,178,0.05)', borderRadius: 10 }}>
                   <div style={{ fontSize: '0.8rem', color: 'rgba(214,198,178,0.7)', marginBottom: '0.4rem' }}>Оплата</div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: project.contract.paymentStatus === 'paid' ? '#6DB89A' : '#D4A856' }}>
-                    {project.contract.paymentStatus === 'paid' || project.contract.paymentStatus === 'paid_100' ? '✅ Оплачено' 
-                     : (project.contract.paymentStatus === 'prepaid_50' || project.contract.paymentStatus === 'partial') ? '⏸ Предоплата 50%' 
-                     : project.contract.paymentStatus === 'prepaid_100' ? '⏸ Предоплата 100%' 
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: project.contract.amount === 0 ? '#6DB89A' : (project.contract.paymentStatus === 'paid' || project.contract.paymentStatus === 'paid_100' ? '#6DB89A' : '#D4A856') }}>
+                    {project.contract.amount === 0 ? '✅ Бесплатно'
+                     : project.contract.paymentStatus === 'paid' || project.contract.paymentStatus === 'paid_100' ? '✅ Оплачено'
+                     : (project.contract.paymentStatus === 'prepaid_50' || project.contract.paymentStatus === 'partial') ? '⏸ Предоплата 50%'
+                     : project.contract.paymentStatus === 'prepaid_100' ? '⏸ Предоплата 100%'
                      : '⏳ Ожидает оплаты'}
                   </div>
                 </div>
