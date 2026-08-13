@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter'
 import { Pool } from 'pg'
 import { buildAuthCookieHeader } from '@/lib/api-middleware'
+import jwt from 'jsonwebtoken'
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
 
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email и пароль обязательны' }, { status: 400 })
     }
 
+    // Авторизация через Payload (проверка кредов)
     const res = await fetch(PAYLOAD_API_URL + "/api/users/login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,25 +88,45 @@ export async function POST(request: NextRequest) {
       console.error('[audit] Failed to log login success:', e)
     }
 
+    // ═══ ВЫПУСКАЕМ СОБСТВЕННЫЙ SESSION JWT ═══
+    // Подписываем frontend-секретом (PAYLOAD_SECRET из .env), чтобы
+    // getUserFromRequest (api-middleware) гарантированно верифицировал токен.
+    // Payload token напрямую не используем — его секрет может отличаться
+    // (runtime/config mismatch), что ломало все API-роуты (payment, projects и т.д.).
+    const sessionSecret = process.env.PAYLOAD_SECRET
+    if (!sessionSecret) {
+      console.error('[login] PAYLOAD_SECRET не задан — невозможно подписать session JWT')
+      return NextResponse.json({ error: 'Ошибка конфигурации сервера' }, { status: 500 })
+    }
+    const sessionToken = jwt.sign(
+      {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        role: data.user.role,
+        collection: 'users',
+      },
+      sessionSecret,
+      { expiresIn: '7d' }
+    )
+
     // ═══ УСТАНАВЛИВАЕМ httpOnly COOKIE ═══
-    // Token also returned in body for API clients, but browser will use cookie
     const response = NextResponse.json({
       user: { id: data.user.id, email: data.user.email, name: data.user.name, role: data.user.role, avatar: data.user.avatar },
-      token: data.token, // still return for API clients
+      token: sessionToken,
     }, {
       headers: {
         'X-RateLimit-Remaining': String(rateLimit.remaining),
       }
     })
-    
-    // Set httpOnly cookie properly via response.cookies.set()
+
     const isProduction = process.env.NODE_ENV === 'production'
-    response.cookies.set('auth_token', data.token, {
+    response.cookies.set('auth_token', sessionToken, {
       httpOnly: true,
-      secure: false,  // Temporarily disabled Secure for testing
+      secure: isProduction,
       sameSite: 'lax',
       path: '/',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60, // 7 дней
     })
 
     return response

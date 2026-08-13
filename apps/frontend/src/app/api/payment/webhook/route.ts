@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     // Найти order по payment_id
     const orderRes = await db.query(
-      'SELECT id, user_id, course_id, amount, status FROM orders WHERE payment_id = $1 LIMIT 1',
+      'SELECT id, user_id, course_id, amount, status, description FROM orders WHERE payment_id = $1 LIMIT 1',
       [paymentId]
     )
     const order = orderRes.rows[0]
@@ -124,6 +124,121 @@ export async function POST(request: NextRequest) {
       `UPDATE orders SET status = 'paid', yookassa_status = $1, payment_method = $2, updated_at = NOW() WHERE id = $3`,
       [status.status, paymentMethod, order.id]
     )
+
+    // === Пожертвование: уведомление админу (fire-and-forget) ===
+    if (object?.metadata?.type === 'donation' || /пожертвован/i.test(order.description || '')) {
+      void (async () => {
+        try {
+          const { sendEmail } = await import('@/lib/email')
+          const adminEmail = process.env.NOTIFY_EMAIL || 'boss@2980738.ru'
+          const amountStr = new Intl.NumberFormat('ru-RU').format(Number(order.amount) || 0)
+          await sendEmail({
+            to: adminEmail,
+            subject: `🎁 Поступило пожертвование — ${amountStr} ₽`,
+            html: `
+              <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background: #0D0C0A; color: #D6C6B2; padding: 2rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                  <h1 style="color: #E7DCCF; font-size: 1.5rem;">Школа ПК</h1>
+                  <p style="color: #A29587;">Уведомление о пожертвовании</p>
+                </div>
+                <h2 style="color: #6DB89A;">🎁 Поступило новое пожертвование</h2>
+                <table style="width: 100%; color: #BCA891; line-height: 2;">
+                  <tr><td style="color: #8A7F74; width: 160px;">Сумма:</td><td style="color: #6DB89A; font-weight: 700;">${amountStr} ₽</td></tr>
+                  <tr><td style="color: #8A7F74;">Заказ №:</td><td style="color: #F5F0E8;">${order.id}</td></tr>
+                  <tr><td style="color: #8A7F74;">Описание:</td><td style="color: #F5F0E8;">${order.description || 'Пожертвование'}</td></tr>
+                </table>
+                <p style="margin-top: 2rem; font-size: 0.85rem; color: #8A7F74;">Школа ПК — boss@2980738.ru · @Veles_ST</p>
+              </div>
+            `,
+          })
+          console.log(`[webhook] Donation admin email sent for order ${order.id}`)
+        } catch (e) {
+          console.error('[webhook] Donation email error:', e)
+        }
+      })()
+    }
+
+
+    // Обновить project, если платёж привязан к нему (consultation из ЛК)
+    const projRes = await db.query(
+      "UPDATE client_projects SET contract_payment_status = 'paid', contract_paid_at = NOW(), stage = CASE WHEN stage = 0 THEN 1 ELSE stage END, updated_at = NOW() WHERE payment_id = $1 RETURNING id, client_id",
+      [paymentId]
+    )
+    if (projRes.rows.length > 0) {
+      const proj = projRes.rows[0]
+      console.log(`[webhook] Project ${proj.id} paid`)
+
+      // ─── Email-уведомления после оплаты consultation-проекта (fire-and-forget) ───
+      void (async () => {
+        try {
+          const { sendEmail } = await import('@/lib/email')
+          const infoRes = await db.query(
+            'SELECT cp.coop_name, cp.contract_amount, cp.contract_number, u.email, u.name FROM client_projects cp JOIN users u ON cp.client_id = u.id WHERE cp.id = $1',
+            [proj.id]
+          )
+          const info = infoRes.rows[0]
+          if (!info) {
+            console.warn(`[webhook] No project/user info for project ${proj.id}`)
+            return
+          }
+
+          const amount = Number(info.contract_amount) || 0
+          const amountStr = new Intl.NumberFormat('ru-RU').format(amount)
+          const coopName = info.coop_name || 'Консультация'
+
+          // 1) Уведомление АДМИНУ
+          const adminEmail = process.env.NOTIFY_EMAIL || 'boss@2980738.ru'
+          await sendEmail({
+            to: adminEmail,
+            subject: `💰 Оплачена услуга: ${coopName}`,
+            html: `
+              <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background: #0D0C0A; color: #D6C6B2; padding: 2rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                  <h1 style="color: #E7DCCF; font-size: 1.5rem;">Школа ПК</h1>
+                  <p style="color: #A29587;">Уведомление об оплате консультации</p>
+                </div>
+                <h2 style="color: #6DB89A;">💰 Поступила оплата за услугу</h2>
+                <table style="width: 100%; color: #BCA891; line-height: 2;">
+                  <tr><td style="color: #8A7F74; width: 160px;">Услуга:</td><td style="color: #F5F0E8; font-weight: 600;">${coopName}</td></tr>
+                  <tr><td style="color: #8A7F74;">Клиент:</td><td style="color: #F5F0E8;">${info.name || '—'}</td></tr>
+                  <tr><td style="color: #8A7F74;">Email клиента:</td><td style="color: #F5F0E8;">${info.email || '—'}</td></tr>
+                  <tr><td style="color: #8A7F74;">Сумма:</td><td style="color: #6DB89A; font-weight: 700;">${amountStr} ₽</td></tr>
+                  <tr><td style="color: #8A7F74;">Договор №:</td><td style="color: #F5F0E8;">${info.contract_number || '—'}</td></tr>
+                  <tr><td style="color: #8A7F74;">ID проекта:</td><td style="color: #F5F0E8;">${proj.id}</td></tr>
+                </table>
+                <p style="margin-top: 2rem; font-size: 0.85rem; color: #8A7F74;">Школа ПК — boss@2980738.ru · @Veles_ST</p>
+              </div>
+            `,
+          })
+
+          // 2) Подтверждение КЛИЕНТУ
+          if (info.email) {
+            await sendEmail({
+              to: info.email,
+              subject: `✅ Оплата получена — ${coopName}`,
+              html: `
+                <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; background: #0D0C0A; color: #D6C6B2; padding: 2rem;">
+                  <div style="text-align: center; margin-bottom: 2rem;">
+                    <h1 style="color: #E7DCCF; font-size: 1.5rem;">Школа ПК</h1>
+                  </div>
+                  <h2 style="color: #6DB89A;">✅ Оплата получена</h2>
+                  <p>${info.name || 'Здравствуйте'}!</p>
+                  <p>Мы получили оплату за услугу <strong style="color: #E68863;">${coopName}</strong>.</p>
+                  <p style="font-size: 1.2rem; color: #E7DCCF;">Сумма: ${amountStr} ₽</p>
+                  <p>Консультация запланирована. Исполнитель свяжется с вами в ближайшее время для уточнения деталей и времени проведения.</p>
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 0.75rem 2rem; background: #4C9A7A; color: #F5F0E8; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 1rem 0;">Перейти в личный кабинет</a>
+                  <p style="color: #8A7F74; font-size: 0.85rem; margin-top: 2rem;">Школа ПК — boss@2980738.ru · @Veles_ST</p>
+                </div>
+              `,
+            })
+          }
+
+          console.log(`[webhook] Consultation payment emails sent for project ${proj.id}`)
+        } catch (emailErr) {
+          console.error('[webhook] Consultation payment email error:', emailErr)
+        }
+      })()
+    }
 
     // Создать enrollment для курса (если ещё нет)
     if (order.course_id) {

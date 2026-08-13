@@ -90,3 +90,22 @@ export function buildAuthCookieHeader(token: string | null): string {
     return `${AUTH_COOKIE_NAME}=; HttpOnly; ${isProduction ? 'Secure; ' : ''}SameSite=Lax; Path=/; Max-Age=0`
   }
 }
+
+
+/**
+ * Верифицирует session JWT локально (frontend секретом) и возвращает данные пользователя.
+ * НЕ проксирует token в Payload — работает с frontend-JWT, выпускаемым /api/auth/login.
+ * Возвращает { id, email, name, role } или null.
+ */
+export async function getVerifiedUser(request: NextRequest): Promise<{ id: number; email: string; name: string; role: string } | null> {
+  const user = getUserFromRequest(request)
+  if (!user) return null
+  const id = Number(user.userId)
+  if (!Number.isFinite(id)) return null
+  return {
+    id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  }
+}

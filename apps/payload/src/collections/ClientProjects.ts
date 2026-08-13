@@ -1,4 +1,5 @@
 import type { CollectionConfig, Field } from 'payload'
+import { sendClientChatReplyEmail } from '../lib/notify-email'
 
 /**
  * ClientProjects — проекты клиентов.
@@ -425,12 +426,117 @@ export const ClientProjects: CollectionConfig = {
     ],
 
     // ─── После изменения: авто-расчёт XP + проверка бейджей ──────────────
-    // ВНИМАНИЕ: afterChange хук отключён, потому что вызов req.payload.update
-    // внутри afterChange приводит к бесконечной рекурсии.
+    // ВНИМАНИЕ: вызов req.payload.update внутри afterChange приводит к
+    // бесконечной рекурсии, поэтому прогресс тут НЕ пересчитывается.
     // Расчёт XP и процентов выполняется:
     //   - при создании проекта: в /api/client-projects/order route
     //   - при загрузке документов: в /api/client-projects/upload route
     //   - при обновлении через админку: вручную или через /api/custom/update-progress
-    afterChange: [],
+    //
+    // Этот afterChange НЕ вызывает req.payload.update → рекурсии нет.
+    // Он только отправляет email клиенту при появлении нового сообщения
+    // исполнителя в чате (fire-and-forget, try/catch, не блокирует сохранение).
+    afterChange: [
+      // ─── Email клиенту при ответе исполнителя в чате ───────────────────
+      // Срабатывает ТОЛЬКО при сохранении проекта через Payload (админка):
+      //   исполнитель редактирует client_projects → добавляет chat message
+      //   с author='executor' → сохраняет → клиенту уходит email.
+      // Клиент пишет через /api/client-projects/chat (raw SQL INSERT в
+      //   client_projects_chat) — это НЕ обновляет документ client_projects
+      //   через Payload, поэтому хук на сообщения клиента не срабатывает
+      //   (что и требуется: клиенту незачем получать письмо на свой же ответ).
+      // Идемпотентность: сравнение chat до/после по id поддокумента массива
+      //   (только НОВЫЕ сообщения, не повторяем для старых / отредактированных).
+      async ({ doc, previousDoc, req, operation }: any) => {
+        try {
+          if (operation !== 'update') return doc
+          const newDoc: any = doc
+          const prev: any = previousDoc
+
+          const chatAfter: any[] = Array.isArray(newDoc.chat) ? newDoc.chat : []
+          const chatBefore: any[] = Array.isArray(prev?.chat) ? prev.chat : []
+
+          if (chatAfter.length === 0) return doc
+
+          // Стабильный ключ дедупликации: id поддокумента массива
+          // (Payload хранит id для каждой строки client_projects_chat),
+          // либо composite-ключ как fallback, если id отсутствует.
+          const keyOf = (m: any): string => {
+            if (!m) return ''
+            if (m.id) return `id:${m.id}`
+            return `${m.author || ''}|${m.message || ''}|${m.sentAt || ''}`
+          }
+          const beforeKeys = new Set(
+            chatBefore.map(keyOf).filter(Boolean),
+          )
+
+          // Новые сообщения от исполнителя (НЕ от клиента и НЕ системные).
+          // author === 'client' — пишет клиент (не уведомляем его же).
+          // author === 'system' — авто-сообщения (логи загрузки и т.п.),
+          //   у них своя логика уведомлений; чат-reply шлём только исполнителю.
+          const newExecutorMessages = chatAfter.filter((m) => {
+            if (!m) return false
+            if (!m.author || m.author === 'client' || m.author === 'system') return false
+            if (!m.message || !String(m.message).trim()) return false
+            const k = keyOf(m)
+            return k ? !beforeKeys.has(k) : false
+          })
+
+          if (newExecutorMessages.length === 0) return doc
+
+          // Email клиента: поле client = relationship → users (auth).
+          // Может прийти как ID (строка/число) либо как populated-объект.
+          const clientRef: any = newDoc.client
+          let clientEmail: string | undefined
+          if (clientRef && typeof clientRef === 'object' && clientRef.email) {
+            clientEmail = clientRef.email
+          } else if (clientRef) {
+            try {
+              const user: any = await req.payload.findByID({
+                collection: 'users',
+                id: String(clientRef),
+                depth: 0,
+              })
+              clientEmail = user?.email
+            } catch {
+              clientEmail = undefined
+            }
+          }
+
+          if (!clientEmail) {
+            console.warn(
+              '[client-projects chat] нет email клиента для уведомления, project:',
+              newDoc.id,
+            )
+            return doc
+          }
+
+          // Fire-and-forget: не блокируем ответ админки.
+          void (async () => {
+            for (const msg of newExecutorMessages) {
+              try {
+                await sendClientChatReplyEmail({
+                  payload: req.payload,
+                  to: clientEmail as string,
+                  message: String(msg.message || ''),
+                  projectName: newDoc.coopName || '',
+                })
+                console.log(
+                  `[client-projects chat] email клиенту ${clientEmail}: новое сообщение исполнителя`,
+                )
+              } catch (e) {
+                console.error(
+                  '[client-projects chat] ошибка отправки email клиенту:',
+                  e,
+                )
+              }
+            }
+          })()
+        } catch (e) {
+          console.error('[client-projects afterChange chat notify] error:', e)
+        }
+        return doc
+      },
+    ],
   },
 }

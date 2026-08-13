@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getVerifiedUser } from '@/lib/api-middleware'
 import { Pool } from 'pg'
 
 // shkola_pk БД (где audit_logs)
@@ -6,28 +7,9 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL || process.env.AUDIT_DATABASE_URL
 })
 
-const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
-
-// Проверка токена через Payload /api/users/me
-async function getAdminFromToken(authHeader: string | null): Promise<{ id: number; role: string; email: string } | null> {
-  if (!authHeader) return null
-  try {
-    const res = await fetch(`${PAYLOAD_API_URL}/api/users/me`, {
-      headers: { Authorization: authHeader },
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    if (!data.user) return null
-    return { id: data.user.id, role: data.user.role, email: data.user.email }
-  } catch {
-    return null
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const admin = await getAdminFromToken(authHeader)
+    const admin = await getVerifiedUser(request)
     
     if (!admin || (admin.role !== 'admin' && admin.role !== 'manager')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

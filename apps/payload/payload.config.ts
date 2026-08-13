@@ -130,7 +130,7 @@ export default buildConfig({
   })(),
   typescript: { outputFile: path.resolve(dirname, 'src/payload-types.ts') },
   graphQL: { disable: false },
-  cors: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'http://localhost:3000', 'http://frontend:3000'],
+  cors: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'https://xn--80adbka9ab1c.xn--p1acf', 'https://www.xn--80adbka9ab1c.xn--p1acf', 'http://localhost:3000', 'http://frontend:3000'],
   csrf: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'http://localhost:3000', 'http://frontend:3000'],
   endpoints: [
     updateProjectProgressEndpoint,

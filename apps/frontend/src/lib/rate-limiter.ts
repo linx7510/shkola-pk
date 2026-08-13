@@ -83,8 +83,10 @@ export function checkRateLimit(
  * Получить IP из NextRequest
  */
 export function getClientIp(request: { headers: { get: (name: string) => string | null } }): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  return request.headers.get('x-real-ip') || 'unknown';
+  // Приоритет x-real-ip: его ставит nginx из $remote_addr (не спуфится клиентом).
+  // x-forwarded-for клиент может подделать, поэтому используем только как fallback.
+  return request.headers.get('x-real-ip')
+    || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || 'unknown';
 }
 

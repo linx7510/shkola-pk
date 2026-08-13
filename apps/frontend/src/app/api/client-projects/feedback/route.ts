@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getVerifiedUser } from '@/lib/api-middleware'
+import { Pool } from 'pg'
 
-const PAYLOAD_API = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
+// После перевода аутентификации на frontend-JWT, Payload REST
+// отклоняет эти токены — работаем напрямую с PostgreSQL.
+
+let pool: Pool | null = null
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 5,
+    })
+  }
+  return pool
+}
 
 /**
  * Verify Cloudflare Turnstile token (anti-bot)
@@ -24,6 +38,8 @@ async function verifyTurnstile(token: string | null, ip: string): Promise<boolea
   }
 }
 
+const STAGE_NAMES = ['Бриф', 'Устав', 'Учреждение', 'Положения', 'Целевые программы', 'Образцы']
+
 /**
  * POST /api/client-projects/feedback
  * Client submits feedback for a stage or document
@@ -36,12 +52,15 @@ async function verifyTurnstile(token: string | null, ip: string): Promise<boolea
  */
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('JWT ', '').replace('Bearer ', '') || ''
-    if (!token) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
+    // ── 1. Локальная верификация (frontend JWT) ──
+    const authUser = await getVerifiedUser(request)
+    if (!authUser) {
+      return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
+    }
+    const userId = authUser.id
 
     const body = await request.json()
-    const { projectId, stage, feedback, documentCode, turnstileToken } = body
+    const { projectId, stage, feedback, turnstileToken } = body
 
     if (!projectId || !feedback) {
       return NextResponse.json({ error: 'Project ID и feedback обязательны' }, { status: 400 })
@@ -63,90 +82,75 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify user
-    const meRes = await fetch(`${PAYLOAD_API}/api/users/me`, {
-      headers: { Authorization: authHeader! },
-    })
-    if (!meRes.ok) {
-      return NextResponse.json({ error: 'Токен недействителен' }, { status: 401 })
-    }
-    const meData = await meRes.json()
-    const userId = meData.user?.id
-    if (!userId) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 401 })
-    }
+    const pg = getPool()
 
-    // Get project
-    const projectRes = await fetch(
-      `${PAYLOAD_API}/api/client-projects/${projectId}?depth=1`,
-      { headers: { 'Authorization': `JWT ${token}` } }
+    // ── 2. Найти проект и проверить владельца (SQL) ──
+    const projRes = await pg.query(
+      'SELECT id, client_id, coop_name FROM client_projects WHERE id = $1',
+      [projectId]
     )
-    
-    if (!projectRes.ok) {
+    if (projRes.rows.length === 0) {
       return NextResponse.json({ error: 'Проект не найден' }, { status: 404 })
     }
-    
-    const project = await projectRes.json()
-
-    // Verify ownership
-    if (project.client && String(project.client.id || project.client) !== String(userId)) {
+    const project = projRes.rows[0]
+    if (String(project.client_id) !== String(userId) && authUser.role !== 'admin') {
       return NextResponse.json({ error: 'Нет доступа к проекту' }, { status: 403 })
     }
 
-    // Rate limit check: max 10 feedback messages per hour
-    const now = Date.now()
-    const recentMessages = (project.chat || []).filter((m: any) => {
-      if (m.author !== 'client') return false
-      const sentAt = new Date(m.sentAt).getTime()
-      return (now - sentAt) < 60 * 60 * 1000 // last hour
-    })
-    if (recentMessages.length >= 10) {
+    // ── 3. Rate limit: max 10 client messages per hour ──
+    const recentRes = await pg.query(
+      `SELECT COUNT(*)::int AS cnt
+       FROM client_projects_chat
+       WHERE _parent_id = $1 AND author = 'client'
+         AND sent_at > NOW() - INTERVAL '1 hour'`,
+      [projectId]
+    )
+    if ((recentRes.rows[0]?.cnt || 0) >= 10) {
       return NextResponse.json(
         { error: 'Слишком много сообщений за час. Попробуйте позже.' },
         { status: 429 }
       )
     }
 
-    const stageNames = ['Бриф', 'Устав', 'Учреждение', 'Положения', 'Целевые программы', 'Образцы']
-    const stageName = stageNames[stage] || `Этап ${stage}`
-    
+    // ── 4. Сохранить отзыв в чат (SQL) ──
+    const stageName = STAGE_NAMES[stage] || `Этап ${stage}`
     const chatMessage = `💬 Отзыв клиента по этапу «${stageName}»:\n${feedback}`
-    
-    const updatedChat = [
-      ...(project.chat || []),
-      { author: 'client', message: chatMessage, sentAt: new Date().toISOString() }
-    ]
 
-    // Add admin notification
-    const updatedNotifications = [
-      ...(project.notifications || []),
-      {
-        type: 'client_feedback',
-        message: `Новый отзыв клиента по этапу «${stageName}» (проект ${projectId}).`,
-        sentAt: new Date().toISOString(),
-        channel: 'admin',
-      }
-    ]
-    
-    // Use custom endpoint (supports custom project IDs like proj-test-001)
-    await fetch(`${PAYLOAD_API}/api/custom/update-progress/${projectId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `JWT ${token}`,
-      },
-      body: JSON.stringify({
-        chat: updatedChat,
-        notifications: updatedNotifications,
-      }),
-    })
+    {
+      const orderRes = await pg.query(
+        `SELECT COALESCE(MAX(_order), -1) + 1 AS next_order
+         FROM client_projects_chat WHERE _parent_id = $1`,
+        [projectId]
+      )
+      const nextOrder = orderRes.rows[0].next_order
+      await pg.query(
+        `INSERT INTO client_projects_chat (_order, _parent_id, author, message, sent_at)
+         VALUES ($1, $2, 'client', $3, NOW())`,
+        [nextOrder, projectId, chatMessage]
+      )
+    }
 
-    // Telegram-уведомление
+    // ── 5. Уведомление исполнителю (SQL) ──
+    {
+      const orderRes = await pg.query(
+        `SELECT COALESCE(MAX(_order), -1) + 1 AS next_order
+         FROM client_projects_notifications WHERE _parent_id = $1`,
+        [projectId]
+      )
+      const nextOrder = orderRes.rows[0].next_order
+      await pg.query(
+        `INSERT INTO client_projects_notifications (_order, _parent_id, type, message, sent_at, channel)
+         VALUES ($1, $2, 'client_feedback', $3, NOW(), 'admin')`,
+        [nextOrder, projectId, `Новый отзыв клиента по этапу «${stageName}» (проект ${projectId}).`]
+      )
+    }
+
+    // ── 6. Telegram-уведомление ──
     try {
       const { notifyNewFeedback } = await import('@/lib/telegram-notify')
       await notifyNewFeedback({
-        clientEmail: meData.user?.email || '',
-        clientName: meData.user?.name || 'Клиент',
+        clientEmail: authUser.email || '',
+        clientName: authUser.name || 'Клиент',
         stage: stage || 0,
         stageName,
         feedback,

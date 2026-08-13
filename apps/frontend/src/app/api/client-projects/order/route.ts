@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getVerifiedUser } from '@/lib/api-middleware'
 import { Pool } from 'pg'
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
@@ -49,24 +50,11 @@ interface ServiceTemplateInfo {
  */
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('JWT ', '').replace('Bearer ', '') || ''
-    if (!token) {
+    const authUser = await getVerifiedUser(request)
+    if (!authUser) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
-
-    // 1. Verify user via Payload
-    const meRes = await fetch(`${PAYLOAD_API}/api/users/me`, {
-      headers: { Authorization: authHeader! },
-    })
-    if (!meRes.ok) {
-      return NextResponse.json({ error: 'Токен недействителен' }, { status: 401 })
-    }
-    const meData = await meRes.json()
-    const userId = meData.user?.id
-    if (!userId) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 401 })
-    }
+    const userId = authUser.id
 
     // 2. Парсим тело
     const body = await request.json()
@@ -273,8 +261,8 @@ export async function POST(request: NextRequest) {
     try {
       const { notifyNewOrder } = await import('@/lib/telegram-notify')
       await notifyNewOrder({
-        clientEmail: meData.user?.email || '',
-        clientName: meData.user?.name || 'Клиент',
+        clientEmail: authUser.email || '',
+        clientName: authUser.name || 'Клиент',
         serviceName: tpl.name,
         amount,
         contractNumber,
@@ -305,9 +293,8 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('JWT ', '').replace('Bearer ', '') || ''
-    if (!token) {
+    const authUser = await getVerifiedUser(request)
+    if (!authUser) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
 

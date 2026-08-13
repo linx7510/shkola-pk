@@ -653,7 +653,7 @@ export default function ClientDashboard() {
 
   // Для консультаций: 50% при заказе, 50% после оказания
   const effectivePercent = isConsultationProject
-    ? (project.stage === 'completed' ? 100 : 50)
+    ? (Number(project.stage) >= 2 ? 100 : Number(project.stage) >= 1 ? 50 : 0)
     : percent;
 
   const circumference = 2 * Math.PI * 80;
@@ -900,6 +900,64 @@ export default function ClientDashboard() {
               <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(230,136,99,0.06)', borderRadius: 8, fontSize: '0.85rem', color: 'rgba(214,198,178,0.8)' }}>
                 {serviceDescription}
               </div>
+
+              {/* Кнопка оплаты для неоплаченной платной консультации */}
+              {project.contract.amount > 0 && project.contract.paymentStatus !== 'paid' && project.contract.paymentStatus !== 'paid_100' && (
+                <div style={{ marginTop: '1rem' }}>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem('auth_token') || ''
+                        const res = await fetch('/api/payment/create', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', Authorization: `JWT ${token}` },
+                          body: JSON.stringify({ projectId: project.id, serviceSlug: 'consultation-paid' }),
+                        })
+                        const data = await res.json()
+                        if (res.ok && data.confirmationUrl) {
+                          window.location.href = data.confirmationUrl
+                        } else {
+                          alert(data.error || 'Не удалось создать платёж')
+                        }
+                      } catch (e) { alert('Ошибка соединения') }
+                    }}
+                    style={{
+                      padding: '0.9rem 2rem',
+                      background: 'linear-gradient(135deg, #6DB89A, #4CAF50)',
+                      border: 'none',
+                      color: '#0D0C0A',
+                      borderRadius: 10,
+                      fontSize: '1rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      width: '100%',
+                    }}
+                  >
+                    💳 Оплатить {new Intl.NumberFormat('ru-RU').format(project.contract.amount)} ₽
+                  </button>
+                </div>
+              )}
+
+              {/* Баннер: услуга оплачена (альтернативное состояние для оплаченной консультации) */}
+              {project.contract.amount > 0 && (project.contract.paymentStatus === 'paid' || project.contract.paymentStatus === 'paid_100') && (
+                <div style={{
+                  marginTop: '1rem', padding: '1.25rem',
+                  background: 'rgba(107, 184, 154, 0.1)',
+                  border: '1px solid rgba(107, 184, 154, 0.35)',
+                  borderRadius: 12,
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                }}>
+                  <span style={{ fontSize: '1.5rem' }}>✅</span>
+                  <div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#6DB89A' }}>Услуга оплачена</div>
+                    <div style={{ fontSize: '0.85rem', color: 'rgba(214,198,178,0.8)', marginTop: '0.25rem' }}>
+                      {project.consultationDate
+                        ? <>Консультация запланирована на <strong>{new Date(project.consultationDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}{project.consultationTime ? ' в ' + project.consultationTime : ''}</strong>. Исполнитель свяжется с вами.</>
+                        : 'Консультация запланирована. Исполнитель свяжется с вами для уточнения времени.'}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* ── Прогресс (упрощённый) ── */}

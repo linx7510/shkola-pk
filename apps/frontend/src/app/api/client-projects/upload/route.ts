@@ -1,7 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getVerifiedUser } from '@/lib/api-middleware'
+import { Pool } from 'pg'
+import fs from 'fs/promises'
+import path from 'path'
 
-const PAYLOAD_API = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
-const DATABASE_URL = process.env.PAYLOAD_DATABASE_URL || process.env.DATABASE_URL || ''
+// ════════════════════════════════════════════════════════════
+// После перевода аутентификации на frontend-JWT, Payload REST
+// отклоняет эти токены. Поэтому работаем напрямую с PostgreSQL
+// (проекты, документы, прогресс, чат, уведомления) и сохраняем
+// файлы в локальную директорию media (S3-плагин отключён).
+// ════════════════════════════════════════════════════════════
+
+let pool: Pool | null = null
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      max: 5,
+    })
+  }
+  return pool
+}
+
+// Директория хранения media-файлов (та же, что использует Payload).
+// S3-плагин отключён, файлы лежат локально и раздаются через
+// /api/media/file/{filename} (nginx → payload :3001).
+const MEDIA_DIR = process.env.PAYLOAD_MEDIA_DIR || '/var/www/shkola-pk/apps/payload/media'
 
 // ════════════════════════════════════════════════════════════
 // SECURITY: File upload validation
@@ -102,6 +126,54 @@ function getClientIP(req: NextRequest): string {
          'unknown'
 }
 
+/**
+ * Сохранить файл на диск и создать запись в таблице media.
+ * Возвращает id новой media-записи.
+ *
+ * (Payload REST /api/media требует авторизации, а frontend-JWT
+ * Payload'ом не принимается — поэтому делаем то же самое вручную:
+ * пишем файл в MEDIA_DIR и INSERT в media.)
+ */
+async function createMediaRecord(
+  fileBuf: ArrayBuffer,
+  originalName: string,
+  mime: string
+): Promise<{ id: number, filename: string }> {
+  const ext = getExtension(originalName) || ''
+  const base = path.basename(originalName, ext).slice(0, 80) || 'upload'
+  // Гарантируем уникальность имени (в media.filename UNIQUE-индекс)
+  const filename = `${base}-${Date.now().toString(36)}${ext}`
+  const absPath = path.join(MEDIA_DIR, filename)
+
+  await fs.mkdir(MEDIA_DIR, { recursive: true })
+  await fs.writeFile(absPath, Buffer.from(fileBuf))
+
+  const url = `/api/media/file/${filename}`
+  const filesize = fileBuf.byteLength
+
+  const pg = getPool()
+  const res = await pg.query(
+    `INSERT INTO media (filename, mime_type, filesize, url, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, NOW(), NOW())
+     RETURNING id`,
+    [filename, mime, filesize, url]
+  )
+  return { id: res.rows[0].id, filename }
+}
+
+// Веса статусов для расчёта прогресса (как в ClientDashboard).
+const PROGRESS_WEIGHTS: Record<string, number> = {
+  ready: 1, approved: 1, submitted: 1, registered: 1,
+  review: 0.5,
+  in_progress: 0.3,
+  available: 0,
+  pending: 0,
+}
+const REGISTRATION_BONUS_XP = 2
+const MAX_TOTAL_XP = 100
+
+const STAGE_NAMES = ['Бриф', 'Устав', 'Учреждение', 'Положения', 'Целевые программы', 'Образцы']
+
 // ════════════════════════════════════════════════════════════
 // MAIN HANDLER
 // ════════════════════════════════════════════════════════════
@@ -122,9 +194,12 @@ function getClientIP(req: NextRequest): string {
  */
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('JWT ', '').replace('Bearer ', '') || ''
-    if (!token) return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
+    // ── 1. Локальная верификация (frontend JWT) ──
+    const authUser = await getVerifiedUser(request)
+    if (!authUser) {
+      return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
+    }
+    const userId = authUser.id
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
@@ -136,7 +211,7 @@ export async function POST(request: NextRequest) {
 
     if (!projectId) return NextResponse.json({ error: 'Project ID обязателен' }, { status: 400 })
 
-    // ── 1. Turnstile anti-bot verification ──
+    // ── 2. Turnstile anti-bot verification ──
     const clientIP = getClientIP(request)
     const isHuman = await verifyTurnstile(turnstileToken, clientIP)
     if (!isHuman) {
@@ -146,38 +221,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ── 2. Validate user via Payload ──
-    const meRes = await fetch(`${PAYLOAD_API}/api/users/me`, {
-      headers: { Authorization: authHeader! },
-    })
-    if (!meRes.ok) {
-      return NextResponse.json({ error: 'Токен недействителен' }, { status: 401 })
-    }
-    const meData = await meRes.json()
-    const userId = meData.user?.id
-    if (!userId) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 401 })
-    }
+    const pg = getPool()
 
-    // ── 3. Get all user's projects (Payload access control filters by client) ──
-    // Then find the requested projectId client-side
-    const projCheckRes = await fetch(
-      `${PAYLOAD_API}/api/client-projects?depth=2&limit=100`,
-      { headers: { Authorization: authHeader! } }
+    // ── 3. Найти проект и проверить владельца (SQL) ──
+    const projRes = await pg.query(
+      'SELECT id, client_id, coop_name FROM client_projects WHERE id = $1',
+      [projectId]
     )
-    const projCheckData = await projCheckRes.json()
-    const allProjects = projCheckData.docs || []
-    const project = allProjects.find((p: any) => String(p.id) === String(projectId))
-    if (!project) {
+    if (projRes.rows.length === 0) {
       return NextResponse.json({ error: 'Проект не найден или нет доступа' }, { status: 404 })
     }
-    // Verify ownership (defense in depth)
-    const projectClientId = project.client?.id || project.client
-    if (projectClientId && String(projectClientId) !== String(userId)) {
+    const project = projRes.rows[0]
+    if (String(project.client_id) !== String(userId) && authUser.role !== 'admin') {
       return NextResponse.json({ error: 'Нет доступа к проекту' }, { status: 403 })
     }
 
-    let fileId = null
+    let fileId: number | null = null
     let uploadedFileName = ''
 
     // ── 4. File validation ──
@@ -230,22 +289,12 @@ export async function POST(request: NextRequest) {
       // 4e. Sanitize filename
       uploadedFileName = sanitizeFilename(file.name)
 
-      // 4f. Upload to Payload Media with sanitized name
-      const sanitizedNameFile = new File([fileBuf], uploadedFileName, { type: cleanMagicMime || magicMime })
-      const uploadFormData = new FormData()
-      uploadFormData.append('file', sanitizedNameFile)
-
-      const uploadRes = await fetch(`${PAYLOAD_API}/api/media`, {
-        method: 'POST',
-        headers: { 'Authorization': `JWT ${token}` },
-        body: uploadFormData,
-      })
-
-      if (uploadRes.ok) {
-        const mediaData = await uploadRes.json()
-        fileId = mediaData.doc?.id
-      } else {
-        console.error('[upload] Payload media upload failed:', await uploadRes.text())
+      // 4f. Сохраняем файл + создаём media-запись (SQL + диск)
+      try {
+        const media = await createMediaRecord(fileBuf, uploadedFileName, cleanMagicMime || magicMime)
+        fileId = media.id
+      } catch (e) {
+        console.error('[upload] Media save failed:', e)
         return NextResponse.json(
           { error: 'Не удалось сохранить файл. Попробуйте позже.' },
           { status: 500 }
@@ -255,96 +304,76 @@ export async function POST(request: NextRequest) {
 
     // ── 5. Update document status + recompute percent ──
     // Если документ с таким code существует — обновляем его.
-    // Если нет (например, anketa_filled — загруженная клиентом анкета) —
-    // добавляем новый документ-файл в массив documents с кодом '<code>_filled_<timestamp>'.
+    // Если нет — добавляем новый документ-файл с кодом '<code>_<timestamp>'.
     if (documentCode) {
-      const docs = project.documents || []
-      const docIdx = docs.findIndex((d: any) => d.code === documentCode)
+      const docsRes = await pg.query(
+        `SELECT id, code, xp, status FROM client_projects_documents
+         WHERE _parent_id = $1 ORDER BY _order`,
+        [projectId]
+      )
+      const existing = docsRes.rows.find((d: any) => d.code === documentCode)
 
-      let updatedDocs: any[]
-      if (docIdx >= 0) {
+      if (existing) {
         // Обновляем существующий документ
-        const updateData: any = {
-          status: 'review',
-          clientComment: feedback,
-        }
-        if (fileId) updateData.file = fileId
-
-        updatedDocs = docs.map((d: any, i: number) =>
-          i === docIdx ? { ...d, ...updateData } : d
+        await pg.query(
+          `UPDATE client_projects_documents
+           SET status = 'review',
+               client_comment = $1,
+               file_id = COALESCE($2, file_id),
+               ready_at = COALESCE(ready_at, NOW())
+           WHERE id = $3`,
+          [feedback || null, fileId, existing.id]
         )
       } else {
-        // Создаём новую запись — клиент загрузил свою анкету
-        // Это даёт +XP к прогрессу (по 5 XP за каждую загруженную анкету)
-        const newDoc: any = {
-          code: `${documentCode}_${Date.now()}`,
-          name: `Загружено клиентом: ${uploadedFileName || documentCode}`,
-          stage: parseInt(stageNum) || 0,
-          stageName: ['Бриф', 'Устав', 'Учреждение', 'Положения', 'Целевые программы', 'Образцы'][parseInt(stageNum) || 0] || `Этап ${stageNum}`,
-          stageIcon: '📤',
-          xp: 5, // +5 XP за каждую загрузку
-          estimatedDays: 0,
-          description: `Загружено клиентом: ${uploadedFileName || 'документ'}. ${feedback || ''}`.trim(),
-          status: 'review',
-          readyAt: new Date().toISOString(),
-          file: fileId,
-          clientComment: feedback,
-        }
-        updatedDocs = [...docs, newDoc]
+        // Создаём новую запись — клиент загрузил свою анкету (+5 XP за загрузку)
+        const stageInt = parseInt(stageNum) || 0
+        const orderRes = await pg.query(
+          `SELECT COALESCE(MAX(_order), -1) + 1 AS next_order
+           FROM client_projects_documents WHERE _parent_id = $1`,
+          [projectId]
+        )
+        const nextOrder = orderRes.rows[0].next_order
+        await pg.query(
+          `INSERT INTO client_projects_documents
+            (_order, _parent_id, code, name, stage, stage_name, stage_icon,
+             xp, estimated_days, description, status, ready_at, file_id, client_comment)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, 5, 0, $8, 'review', NOW(), $9, $10)`,
+          [
+            nextOrder,
+            projectId,
+            `${documentCode}_${Date.now()}`,
+            `Загружено клиентом: ${uploadedFileName || documentCode}`,
+            stageInt,
+            STAGE_NAMES[stageInt] || `Этап ${stageInt}`,
+            '📤',
+            `Загружено клиентом: ${uploadedFileName || 'документ'}. ${feedback || ''}`.trim(),
+            fileId,
+            feedback || null,
+          ]
+        )
       }
 
       // ── 6. Recompute total_x_p and percent ──
-      // Система весов:
-      //   - Регистрация в ЛК = 2 XP (базовый бонус)
-      //   - ready/approved/submitted/registered = 1.0 (полный XP)
-      //   - review (клиент загрузил) = 0.5 (половина XP)
-      //   - in_progress = 0.3
-      //   - pending = 0
-      //   - Max = 100 XP = 100%
-      const REGISTRATION_BONUS_XP = 2
-      const MAX_TOTAL_XP = 100
-      const WEIGHTS: Record<string, number> = {
-        ready: 1, approved: 1, submitted: 1, registered: 1,
-        review: 0.5,
-        in_progress: 0.3,
-        available: 0,  // Доступен к скачиванию — но клиент ещё не загрузил. XP = 0
-        pending: 0,
-      }
+      // Перечитываем документы и считаем по весам статусов.
+      const recomputeRes = await pg.query(
+        `SELECT xp, status FROM client_projects_documents WHERE _parent_id = $1`,
+        [projectId]
+      )
       let currentXP = REGISTRATION_BONUS_XP
-      for (const d of updatedDocs) {
-        const w = WEIGHTS[d.status] ?? 0
-        currentXP += (d.xp || 0) * w
+      for (const d of recomputeRes.rows) {
+        const w = PROGRESS_WEIGHTS[d.status] ?? 0
+        currentXP += (Number(d.xp) || 0) * w
       }
       currentXP = Math.min(MAX_TOTAL_XP, currentXP)
       const newPercent = Math.round(currentXP)
       const newTotalXP = Math.round(currentXP)
 
-      // Update project via custom Payload endpoint (supports custom IDs like proj-test-001)
-      const updatePayload: any = {
-        documents: updatedDocs,
-        totalXP: newTotalXP,
-        percent: newPercent,
-      }
+      await pg.query(
+        `UPDATE client_projects SET total_x_p = $1, percent = $2, updated_at = NOW() WHERE id = $3`,
+        [newTotalXP, newPercent, projectId]
+      )
 
-      const updateRes = await fetch(`${PAYLOAD_API}/api/custom/update-progress/${projectId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `JWT ${token}`,
-        },
-        body: JSON.stringify(updatePayload),
-      }).catch(err => {
-        console.error('[upload] Update progress failed:', err)
-      })
-
-      if (!updateRes?.ok) {
-        console.warn('[upload] Update progress endpoint failed, will still save chat separately')
-      } else {
-        const updateData = await updateRes!.json().catch(() => ({}))
-        console.log(`[upload] Project ${projectId} updated:`, updateData)
-      }
-
-      console.log(`[upload] Project ${projectId}: docs=${updatedDocs.length}, XP=${newTotalXP}, %=${newPercent}`)
+      console.log(`[upload] Project ${projectId}: XP=${newTotalXP}, %=${newPercent}`)
     }
 
     // ── 7. Add chat message + notification ──
@@ -352,43 +381,40 @@ export async function POST(request: NextRequest) {
       ? `📄 Клиент загрузил документ: ${uploadedFileName || 'без файла'}\n💬 Комментарий: ${feedback}`
       : `📄 Клиент загрузил документ: ${uploadedFileName || 'без файла'}`
 
-    const updatedChat = [
-      ...(project.chat || []),
-      { author: 'client', message: chatMessage, sentAt: new Date().toISOString() }
-    ]
+    {
+      const orderRes = await pg.query(
+        `SELECT COALESCE(MAX(_order), -1) + 1 AS next_order
+         FROM client_projects_chat WHERE _parent_id = $1`,
+        [projectId]
+      )
+      const nextOrder = orderRes.rows[0].next_order
+      await pg.query(
+        `INSERT INTO client_projects_chat (_order, _parent_id, author, message, sent_at)
+         VALUES ($1, $2, 'client', $3, NOW())`,
+        [nextOrder, projectId, chatMessage]
+      )
+    }
 
-    // Add admin notification
-    const updatedNotifications = [
-      ...(project.notifications || []),
-      {
-        type: 'document_uploaded',
-        message: `Клиент загрузил документ: ${uploadedFileName}. Этап ${stageNum}.`,
-        sentAt: new Date().toISOString(),
-        channel: 'admin',
-      }
-    ]
-
-    // Save chat + notifications via custom endpoint (handles custom IDs)
-    await fetch(`${PAYLOAD_API}/api/custom/update-progress/${projectId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `JWT ${token}`,
-      },
-      body: JSON.stringify({
-        chat: updatedChat,
-        notifications: updatedNotifications,
-      }),
-    }).catch(err => {
-      console.error('[upload] Save chat failed:', err)
-    })
+    {
+      const orderRes = await pg.query(
+        `SELECT COALESCE(MAX(_order), -1) + 1 AS next_order
+         FROM client_projects_notifications WHERE _parent_id = $1`,
+        [projectId]
+      )
+      const nextOrder = orderRes.rows[0].next_order
+      await pg.query(
+        `INSERT INTO client_projects_notifications (_order, _parent_id, type, message, sent_at, channel)
+         VALUES ($1, $2, 'document_uploaded', $3, NOW(), 'admin')`,
+        [nextOrder, projectId, `Клиент загрузил документ: ${uploadedFileName}. Этап ${stageNum}.`]
+      )
+    }
 
     // ── 8. Telegram-уведомление ──
     try {
       const { notifyDocumentUploaded } = await import('@/lib/telegram-notify')
       await notifyDocumentUploaded({
-        clientEmail: meData.user?.email || '',
-        clientName: meData.user?.name || 'Клиент',
+        clientEmail: authUser.email || '',
+        clientName: authUser.name || 'Клиент',
         fileName: uploadedFileName,
         documentCode: documentCode || '',
         feedback: feedback || '',

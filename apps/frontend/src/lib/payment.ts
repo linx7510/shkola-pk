@@ -12,6 +12,7 @@ interface PaymentCreateParams {
   orderId: string;
   metadata?: Record<string, string>;
   customerEmail?: string;
+  paymentSubject?: string;
 }
 
 interface PaymentResult {
@@ -22,7 +23,7 @@ interface PaymentResult {
 
 const isTestMode = !process.env.YOOKASSA_SHOP_ID || process.env.YOOKASSA_SHOP_ID === 'test_shop_id';
 
-export async function createPayment({ amount, description, orderId, metadata, customerEmail }: PaymentCreateParams): Promise<PaymentResult> {
+export async function createPayment({ amount, description, orderId, metadata, customerEmail, paymentSubject }: PaymentCreateParams): Promise<PaymentResult> {
   if (isTestMode) {
     // Simulate payment in test mode
     const testPaymentId = `test_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
@@ -72,7 +73,7 @@ export async function createPayment({ amount, description, orderId, metadata, cu
           quantity: '1',
           amount: { value: amount.toFixed(2), currency: 'RUB' },
           vat_code: 1, // 20% НДС
-          payment_subject: 'service', // признак предмета расчёта (услуга) — 54-ФЗ
+          payment_subject: paymentSubject || 'service', // признак предмета расчёта (услуга) — 54-ФЗ
           payment_mode: 'full_payment', // признак способа расчёта (полная оплата)
         },
       ],
@@ -105,7 +106,11 @@ export async function createPayment({ amount, description, orderId, metadata, cu
 
 export async function checkPaymentStatus(paymentId: string): Promise<{ status: string; paid: boolean }> {
   if (paymentId.startsWith('test_')) {
-    // In test mode, mark as paid after a short delay
+    // Тестовые платежи разрешены только в тестовом режиме (isTestMode).
+    // В production test_-id — это бэкдор, поэтому выбрасываем ошибку.
+    if (!isTestMode) {
+      throw new Error('Тестовые платежи запрещены в боевом режиме')
+    }
     return { status: 'succeeded', paid: true };
   }
 

@@ -21,10 +21,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password, name, phone, captchaToken } = body
 
-    // Yandex SmartCaptcha — клиентская проверка (фронтенд блокирует ботов)
-    // Серверная валидация временно отключена: ключ ysc2_... невалиден
-    // (Authentication failed. Invalid secret) — нужно получить новый в кабинете Яндекса.
-    // Клиентская капча всё равно защищает от автоматических регистраций.
+    // Yandex SmartCaptcha — серверная валидация токена. Клиентскую капчу можно
+    // обойти, отправив запрос напрямую к API, поэтому токен проверяется на сервере.
     if (!captchaToken) {
       return NextResponse.json(
         { error: 'Подтвердите, что вы не робот' },
@@ -32,12 +30,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TODO: когда будет новый SMARTCAPTCHA_SERVER_KEY — раскомментировать блок ниже
-    /*
     const captchaServerKey = process.env.SMARTCAPTCHA_SERVER_KEY
     if (captchaServerKey) {
       try {
-        const captchaRes = await fetch('https://captcha-api.yandex.ru/validate', {
+        const captchaRes = await fetch('https://smartcaptcha.yandexcloud.net/validate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
@@ -50,7 +46,7 @@ export async function POST(request: NextRequest) {
         if (!captchaData.status || captchaData.status !== 'ok') {
           return NextResponse.json(
             { error: 'Проверка капчи не пройдена. Попробуйте снова.' },
-            { status: 403 }
+            { status: 400 }
           )
         }
       } catch (e) {
@@ -60,8 +56,11 @@ export async function POST(request: NextRequest) {
           { status: 500 }
         )
       }
+    } else {
+      // SMARTCAPTCHA_SERVER_KEY не задан — серверная валидация невозможна.
+      // Клиентская капча всё равно работает. Получить ключ в кабинете Яндекса.
+      console.warn('[register] SMARTCAPTCHA_SERVER_KEY не задан — серверная валидация капчи отключена')
     }
-    */
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'Email, пароль и имя обязательны' }, { status: 400 })

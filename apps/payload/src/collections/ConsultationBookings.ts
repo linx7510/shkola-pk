@@ -1,13 +1,37 @@
 import type { CollectionConfig } from 'payload'
 
+// Helper: Payload REST cookie-auth сломан (user:null для /api/ с cookie),
+// поэтому bulk-операции из админки падали с 403. Проверяем cookie payload-token
+// (JWT-формат) как fallback к req.user.
+// Безопасная проверка: верифицирует cookie-токен через сам Payload API
+// (Payload знает свой секрет подписи) + требует роль admin/manager.
+// Закрывает уязвимость format-only проверки (подделка cookie).
+async function canManage(req: any): Promise<boolean> {
+  if (req.user?.role === 'admin' || req.user?.role === 'manager') return true
+  const cookieHeader = req.headers?.get?.('cookie') || req.headers?.cookie || ''
+  const match = cookieHeader.match(/payload-token=([^;]+)/)
+  const token = match?.[1]
+  if (!token || token.length < 50) return false
+  try {
+    const r = await fetch((process.env.PAYLOAD_API_URL || 'http://localhost:3001') + '/api/users/me', {
+      headers: { Authorization: 'JWT ' + token },
+    })
+    if (!r.ok) return false
+    const d = await r.json()
+    return d.user?.role === 'admin' || d.user?.role === 'manager'
+  } catch {
+    return false
+  }
+}
+
 export const ConsultationBookings: CollectionConfig = {
   slug: 'consultation-bookings',
   labels: { singular: 'Консультация', plural: 'Расписание консультаций' },
   access: {
-    read: ({ req: { user } }) => Boolean(user),
+    read: ({ req }) => canManage(req),
     create: () => true,
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    update: ({ req }) => canManage(req),
+    delete: ({ req }) => canManage(req),
   },
   admin: {
     useAsTitle: 'clientName',

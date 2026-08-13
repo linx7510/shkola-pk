@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import CursorLightLazy from '@/components/CursorLightLazy'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import { breadcrumbJsonLd } from '@/components/Breadcrumbs'
+import DonateForm from '@/components/DonateForm'
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL
                || process.env.NEXT_PUBLIC_PAYLOAD_URL
@@ -213,6 +214,11 @@ export default async function SlugPage({ params }: Props) {
               </section>
             )}
           </>
+        )}
+        {slug === 'pomosch-proektu' && (
+          <section style={{ padding: '3rem 1.5rem 4rem' }}>
+            <DonateForm />
+          </section>
         )}
             <Footer />
     </main>

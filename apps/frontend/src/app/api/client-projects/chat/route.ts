@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getVerifiedUser } from '@/lib/api-middleware'
 import { Pool } from 'pg'
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
@@ -9,24 +10,11 @@ const pool = new Pool({
 
 export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('JWT ', '').replace('Bearer ', '') || ''
-    if (!token) {
+    const authUser = await getVerifiedUser(request)
+    if (!authUser) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
-
-    // Проверить токен через Payload
-    const meRes = await fetch(`${PAYLOAD_API_URL}/api/users/me`, {
-      headers: { Authorization: `JWT ${token}` },
-    })
-    if (!meRes.ok) {
-      return NextResponse.json({ error: 'Токен недействителен' }, { status: 401 })
-    }
-    const meData = await meRes.json()
-    const userId = meData.user?.id
-    if (!userId) {
-      return NextResponse.json({ error: 'Пользователь не найден' }, { status: 401 })
-    }
+    const userId = authUser.id
 
     const body = await request.json()
     const { projectId, message } = body
@@ -45,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const project = projectRes.rows[0]
-    if (String(project.client_id) !== String(userId) && meData.user?.role !== "admin") {
+    if (String(project.client_id) !== String(userId) && authUser.role !== "admin") {
       return NextResponse.json({ error: 'Нет доступа' }, { status: 403 })
     }
 

@@ -1,40 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getUserFromRequest } from '@/lib/api-middleware'
+import { Pool } from 'pg'
 
-const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
+let pool: Pool | null = null
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 3 })
+  }
+  return pool
+}
 
+/**
+ * GET /api/auth/me
+ *
+ * Верифицирует session JWT локально (frontend секретом через getUserFromRequest),
+ * затем подтягивает полные данные пользователя из БД.
+ *
+ * НЕ проксирует token в Payload — это позволяет работать с frontend-JWT
+ * (выпускаемым /api/auth/login), даже если секрет Payload runtime отличается.
+ */
 export async function GET(request: NextRequest) {
   try {
-    // Get token from Authorization header or cookie
-    const authHeader = request.headers.get('authorization') || ''
-    let token = ''
-    if (authHeader.startsWith('JWT ')) token = authHeader.substring(4)
-    else if (authHeader.startsWith('Bearer ')) token = authHeader.substring(7)
-    
-    // Also check x-auth-token header (forwarded by middleware)
-    if (!token) {
-      token = request.headers.get('x-auth-token') || ''
-    }
-    
-    // Also check cookie
-    if (!token) {
-      token = request.cookies.get('auth_token')?.value || ''
-    }
-    
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    // Verify token via Payload API
-    const res = await fetch(`${PAYLOAD_API_URL}/api/users/me`, {
-      headers: { 'Authorization': `JWT ${token}` },
-      cache: 'no-store',
-    })
-
-    if (!res.ok) {
+    const user = getUserFromRequest(request)
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const data = await res.json()
-    // Payload returns { user: { id, email, name, ... } }
-    const u = data.user || data
+    const db = getPool()
+    const res = await db.query(
+      'SELECT id, email, name, phone, role, bio, is_active, created_at FROM users WHERE id = $1',
+      [user.userId]
+    )
+    const u = res.rows[0]
+    if (!u) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     return NextResponse.json({
       user: {
@@ -43,11 +43,10 @@ export async function GET(request: NextRequest) {
         name: u.name,
         phone: u.phone,
         role: u.role,
-        avatar: u.avatar,
         bio: u.bio,
-        isActive: u.isActive,
-        createdAt: u.createdAt,
-        enrollments: u.enrollments || [],
+        isActive: u.is_active,
+        createdAt: u.created_at,
+        enrollments: [],
       },
     })
   } catch (error) {

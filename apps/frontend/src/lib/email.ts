@@ -87,7 +87,7 @@ export function enrollmentEmail(name: string, courseTitle: string): { subject: s
         <h2 style="color: #6DB89A;">${name}, вы успешно записались!</h2>
         <p>Курс: <strong style="color: #E68863;">${courseTitle}</strong></p>
         <p>Начните обучение прямо сейчас — первые уроки уже доступны в вашем кабинете.</p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 0.75rem 2rem; background: #4C9A7A; color: #F5F0E8; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 1rem 0;">Перейти к обучению</a>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 0.75rem 2rem; background: #4C9A7A; color: #F5F0E8; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 1rem 0;">Перейти к услугам</a>
         <p style="color: #8A7F74; font-size: 0.85rem; margin-top: 2rem;">Школа ПК — boss@2980738.ru · @Veles_ST</p>
       </div>
     `,
