@@ -7,6 +7,7 @@ import CursorLightLazy from '@/components/CursorLightLazy'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import { breadcrumbJsonLd } from '@/components/Breadcrumbs'
 import DonateForm from '@/components/DonateForm'
+import { cookies } from 'next/headers'
 
 const PAYLOAD_API = process.env.PAYLOAD_API_URL
                || process.env.NEXT_PUBLIC_PAYLOAD_URL
@@ -14,13 +15,13 @@ const PAYLOAD_API = process.env.PAYLOAD_API_URL
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://велеслав.рус'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic' // ISR отключён: нужен cookies() для video-gating
 
 async function fetchPage(slug: string) {
   try {
     const res = await fetch(
       `${PAYLOAD_API}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&depth=2&limit=1`,
-      { next: { revalidate: 300 } }
+      { cache: 'no-store' }
     )
     if (!res.ok) return null
     const data = await res.json()
@@ -142,6 +143,29 @@ export default async function SlugPage({ params }: Props) {
   const hasBlocks = Array.isArray(blocks) && blocks.length > 0
   const pageContent = (page as any).content
   const hasContent = typeof pageContent === 'string' && pageContent.length > 0
+
+  // GATING: вырезать videoUrl из steps-блоков для НЕзалогиненных.
+  // Ловим лидов — видео доступно только после регистрации в ЛК.
+  // cookies() автоматически делает роут dynamic (отказ от ISR) — это
+  // намеренно: videoUrl не должен утекать в HTML/payload незалогиненным.
+  const cookieStore = await cookies()
+  const isAuthed = !!cookieStore.get('auth_token')?.value
+  // Рекурсивно вырезать videoUrl из ЛЮБОГО блока (steps, video, cards и т.д.)
+  function stripVideoUrls(obj: any): void {
+    if (!obj || typeof obj !== "object") return
+    if (Array.isArray(obj)) { obj.forEach(stripVideoUrls); return }
+    if ("videoUrl" in obj) obj.videoUrl = undefined
+    if ("thumbnailUrl" in obj) obj.thumbnailUrl = undefined
+    // Ссылки-карточки на видео тоже gated (иначе videoUrl утекает через <a href>)
+    if (typeof obj.link === "string" && /vkvideo\.ru/i.test(obj.link)) obj.link = undefined
+    if (typeof obj.href === "string" && /vkvideo\.ru/i.test(obj.href)) obj.href = undefined
+    for (const k of Object.keys(obj)) {
+      if (obj[k] && typeof obj[k] === "object") stripVideoUrls(obj[k])
+    }
+  }
+  if (!isAuthed && Array.isArray(blocks)) {
+    stripVideoUrls(blocks)
+  }
 
   // Для about-us: встраиваем контент из админки (page.content) ПЕРЕД блоком
   // "Моя философия". Ищем этот блок по заголовку.

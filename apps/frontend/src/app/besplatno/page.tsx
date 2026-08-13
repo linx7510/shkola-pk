@@ -5,16 +5,17 @@ import Footer from "@/components/Footer";
 import { BlockRenderer } from "@/components/BlockRenderer";
 import AIConsultantLazy from "@/components/AIConsultantLazy";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { cookies } from "next/headers";
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || "http://localhost:3001";
 
-export const revalidate = 300; // ISR: revalidate every 5 minutes
+export const dynamic = "force-dynamic"; // ISR отключён: нужен cookies() для video-gating
 
 async function fetchPage(slug: string) {
   try {
     const res = await fetch(
       `${PAYLOAD_API_URL}/api/pages?where[slug][equals]=${encodeURIComponent(slug)}&where[isPublished][equals]=true&depth=2&limit=1`,
-      { next: { revalidate: 300 } }
+      { cache: "no-store" }
     );
     if (!res.ok) return null;
     const data = await res.json();
@@ -52,6 +53,24 @@ export default async function BesplatnoPage() {
   const page = await fetchPage("besplatno");
   if (!page) notFound();
   const blocks = (page as any).blocks || (page as any).layout || [];
+  // GATING: videoUrl только для залогиненных (ловим лидов). Незалогиненные видят CTA.
+  const cookieStore = await cookies()
+  const isAuthed = !!cookieStore.get("auth_token")?.value
+  function stripVideoUrls(obj: any): void {
+    if (!obj || typeof obj !== "object") return
+    if (Array.isArray(obj)) { obj.forEach(stripVideoUrls); return }
+    if ("videoUrl" in obj) obj.videoUrl = undefined
+    if ("thumbnailUrl" in obj) obj.thumbnailUrl = undefined
+    // Ссылки-карточки на видео тоже gated (иначе videoUrl утекает через <a href>)
+    if (typeof obj.link === "string" && /vkvideo\.ru/i.test(obj.link)) obj.link = undefined
+    if (typeof obj.href === "string" && /vkvideo\.ru/i.test(obj.href)) obj.href = undefined
+    for (const k of Object.keys(obj)) {
+      if (obj[k] && typeof obj[k] === "object") stripVideoUrls(obj[k])
+    }
+  }
+  if (!isAuthed && Array.isArray(blocks)) {
+    stripVideoUrls(blocks)
+  }
   return (
     <>
       <Header />
