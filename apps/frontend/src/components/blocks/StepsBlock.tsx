@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Reveal from "@/components/Reveal"
 
 export interface StepsBlockData {
@@ -9,7 +9,9 @@ export interface StepsBlockData {
 
 function getEmbedUrl(url: string): string | null {
   if (!url) return null
-  if (url.includes("vk.com/video_ext") || url.includes("vk.ru/video_ext")) return url
+  // VK embed URL (video_ext.php) — уже готов для iframe (vkvideo.ru, vk.com, vk.ru)
+  if (url.includes("video_ext.php")) return url
+  if (url.includes("vk.com/video_ext") || url.includes("vk.ru/video_ext") || url.includes("vkvideo.ru/video_ext")) return url
   const vk = url.match(/(?:vk\.com\/video|vkvideo\.ru\/video)(-?\d+)_(\d+)/)
   if (vk) {
     const oid = vk[1].startsWith("-") ? vk[1].substring(1) : vk[1]
@@ -23,14 +25,94 @@ function getEmbedUrl(url: string): string | null {
   return null
 }
 
+/**
+ * Gated CTA: показывается НЕзалогиненным пользователям.
+ * Цель — поймать лида: пользователь регистрируется в ЛК, чтобы смотреть видео.
+ */
+function GatedVideoCTA() {
+  return (
+    <div
+      style={{
+        marginTop: "1rem",
+        padding: "1.25rem",
+        background: "linear-gradient(135deg, rgba(230,136,99,0.08), rgba(201,110,77,0.05))",
+        border: "1px solid rgba(230,136,99,0.25)",
+        borderRadius: 12,
+        textAlign: "center",
+        maxWidth: 560,
+        margin: "1rem auto 0",
+      }}
+    >
+      <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>🔒</div>
+      <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#E7DCCF", marginBottom: "0.35rem" }}>
+        Видео доступно в личном кабинете
+      </div>
+      <div style={{ fontSize: "0.82rem", color: "rgba(214,198,178,0.7)", marginBottom: "0.85rem", lineHeight: 1.5 }}>
+        Зарегистрируйтесь бесплатно — и смотрите все уроки не уходя с сайта
+      </div>
+      <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", flexWrap: "wrap" }}>
+        <a
+          href="/register"
+          style={{
+            display: "inline-block",
+            padding: "0.55rem 1.25rem",
+            background: "linear-gradient(135deg, #C96E4D, #E68863)",
+            color: "#0D0C0A",
+            borderRadius: 8,
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            textDecoration: "none",
+          }}
+        >
+          Регистрация →
+        </a>
+        <a
+          href="/login"
+          style={{
+            display: "inline-block",
+            padding: "0.55rem 1.25rem",
+            background: "transparent",
+            border: "1px solid rgba(214,198,178,0.25)",
+            color: "#D6C6B2",
+            borderRadius: 8,
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            textDecoration: "none",
+          }}
+        >
+          Войти
+        </a>
+      </div>
+    </div>
+  )
+}
+
 function VideoEmbed({ url, thumbnail }: { url: string; thumbnail?: string }) {
+  const [authed, setAuthed] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const [clicked, setClicked] = useState(false)
   const embedUrl = getEmbedUrl(url)
 
+  // Проверка авторизации (localStorage auth_token — наш session JWT)
+  useEffect(() => {
+    setAuthed(!!localStorage.getItem("auth_token"))
+    setMounted(true)
+  }, [])
+
+  // SSR: до монтирования не показываем ничего лишнего (избегаем гидрации)
+  if (!mounted) return null
+
+  // GATING: только залогиненные видят встроенный iframe.
+  // Незалогиненные → CTA регистрация (ловим лида).
+  if (!authed) {
+    return <GatedVideoCTA />
+  }
+
+  // Залогинен, но URL не распознан как embed — fallback на новую вкладку
   if (!embedUrl) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: "0.5rem", color: "#E68863", fontSize: "0.85rem" }}>
-        Открыть видео
+        Открыть видео в новой вкладке →
       </a>
     )
   }
@@ -92,7 +174,7 @@ function VideoEmbed({ url, thumbnail }: { url: string; thumbnail?: string }) {
     )
   }
 
-  // После клика — загружаем iframe
+  // После клика — загружаем iframe (встроенный, не новая вкладка)
   return (
     <div style={{ marginTop: "1rem", borderRadius: 12, overflow: "hidden", maxWidth: 560, margin: "1rem auto 0" }}>
       <iframe
