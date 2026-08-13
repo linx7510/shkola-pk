@@ -1,7 +1,7 @@
 /**
  * YooKassa Payment Integration
  * API docs: https://yookassa.ru/developers/api
- * 
+ *
  * In test mode: payments are simulated
  * In production: real YooKassa API calls
  */
@@ -11,6 +11,7 @@ interface PaymentCreateParams {
   description: string;
   orderId: string;
   metadata?: Record<string, string>;
+  customerEmail?: string;
 }
 
 interface PaymentResult {
@@ -21,12 +22,12 @@ interface PaymentResult {
 
 const isTestMode = !process.env.YOOKASSA_SHOP_ID || process.env.YOOKASSA_SHOP_ID === 'test_shop_id';
 
-export async function createPayment({ amount, description, orderId, metadata }: PaymentCreateParams): Promise<PaymentResult> {
+export async function createPayment({ amount, description, orderId, metadata, customerEmail }: PaymentCreateParams): Promise<PaymentResult> {
   if (isTestMode) {
     // Simulate payment in test mode
     const testPaymentId = `test_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
     console.log(`💳 Test payment created: ${testPaymentId}, amount: ${amount} ₽, order: ${orderId}`);
-    
+
     return {
       id: testPaymentId,
       status: 'pending',
@@ -39,7 +40,44 @@ export async function createPayment({ amount, description, orderId, metadata }: 
   const secretKey = process.env.YOOKASSA_SECRET_KEY!;
   const apiUrl = process.env.YOOKASSA_API_URL || 'https://api.yookassa.ru/v3';
 
-  const idempotenceKey = `${orderId}_${Date.now()}`;
+  // Детерминированный ключ идемпотентности (без Date.now()) — ретраи
+  // возвращают тот же платёж, а не создают дубликат.
+  const idempotenceKey = `order_${orderId}`;
+
+  const paymentBody: Record<string, unknown> = {
+    amount: {
+      value: amount.toFixed(2),
+      currency: 'RUB',
+    },
+    confirmation: {
+      type: 'redirect',
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?orderId=${orderId}`,
+    },
+    capture: true,
+    description,
+    metadata: {
+      orderId,
+      ...metadata,
+    },
+  };
+
+  // Магазин с включённой фискализацией требует receipt (чек 54-ФЗ).
+  // Без него YooKassa отдаёт 400 "Receipt is missing or illegal".
+  if (customerEmail) {
+    paymentBody.receipt = {
+      customer: { email: customerEmail },
+      items: [
+        {
+          description,
+          quantity: '1',
+          amount: { value: amount.toFixed(2), currency: 'RUB' },
+          vat_code: 1, // 20% НДС
+          payment_subject: 'service', // признак предмета расчёта (услуга) — 54-ФЗ
+          payment_mode: 'full_payment', // признак способа расчёта (полная оплата)
+        },
+      ],
+    };
+  }
 
   const response = await fetch(`${apiUrl}/payments`, {
     method: 'POST',
@@ -48,22 +86,7 @@ export async function createPayment({ amount, description, orderId, metadata }: 
       'Authorization': `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString('base64')}`,
       'Idempotence-Key': idempotenceKey,
     },
-    body: JSON.stringify({
-      amount: {
-        value: amount.toFixed(2),
-        currency: 'RUB',
-      },
-      confirmation: {
-        type: 'redirect',
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?orderId=${orderId}`,
-      },
-      capture: true,
-      description,
-      metadata: {
-        orderId,
-        ...metadata,
-      },
-    }),
+    body: JSON.stringify(paymentBody),
   });
 
   if (!response.ok) {

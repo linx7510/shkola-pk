@@ -1,0 +1,78 @@
+import type { CollectionConfig } from 'payload'
+
+export const ConsultationBookings: CollectionConfig = {
+  slug: 'consultation-bookings',
+  labels: { singular: 'Консультация', plural: 'Расписание консультаций' },
+  access: {
+    read: ({ req: { user } }) => Boolean(user),
+    create: () => true,
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
+  },
+  admin: {
+    useAsTitle: 'clientName',
+    defaultColumns: ['clientName', 'serviceType', 'date', 'time', 'status', 'amount'],
+    group: 'Клиенты',
+  },
+  fields: [
+    { name: 'clientName', type: 'text', required: true, label: 'Имя клиента' },
+    { name: 'clientEmail', type: 'email', required: true, label: 'Email' },
+    { name: 'clientPhone', type: 'text', label: 'Телефон' },
+    { name: 'userId', type: 'number', label: 'ID пользователя (ЛК)', admin: { position: 'sidebar' } },
+    {
+      name: 'serviceType',
+      type: 'select',
+      required: true,
+      label: 'Услуга',
+      options: [
+        { label: 'Бесплатная консультация (30 мин)', value: 'consultation-free' },
+        { label: 'Индивидуальная консультация (1 час)', value: 'consultation-paid' },
+      ],
+    },
+    {
+      name: 'date',
+      type: 'date',
+      required: true,
+      label: 'Дата',
+      admin: { date: { displayFormat: 'dd.MM.yyyy' } },
+    },
+    {
+      name: 'time',
+      type: 'select',
+      required: true,
+      label: 'Время',
+      options: [
+        { label: '07:00', value: '07:00' },
+        { label: '08:00', value: '08:00' },
+        { label: '09:00', value: '09:00' },
+        { label: '10:00', value: '10:00' },
+        { label: '11:00', value: '11:00' },
+        { label: '12:00', value: '12:00' },
+        { label: '13:00', value: '13:00' },
+        { label: '14:00', value: '14:00' },
+        { label: '15:00', value: '15:00' },
+        { label: '16:00', value: '16:00' },
+        { label: '17:00', value: '17:00' },
+        { label: '18:00', value: '18:00' },
+      ],
+    },
+    { name: 'amount', type: 'number', label: 'Сумма, ₽', defaultValue: 0 },
+    {
+      name: 'status',
+      type: 'select',
+      required: true,
+      label: 'Статус',
+      defaultValue: 'pending',
+      options: [
+        { label: 'Ожидает оплаты', value: 'pending' },
+        { label: 'Оплачено', value: 'paid' },
+        { label: 'Запланировано', value: 'scheduled' },
+        { label: 'Проведено', value: 'completed' },
+        { label: 'Отменено', value: 'cancelled' },
+      ],
+    },
+    { name: 'paymentId', type: 'text', label: 'ID платежа YooKassa', admin: { position: 'sidebar' } },
+    { name: 'notes', type: 'textarea', label: 'Заметки' },
+  ],
+  timestamps: true,
+}

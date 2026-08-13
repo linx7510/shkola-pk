@@ -30,6 +30,7 @@ import { Settings } from './src/collections/Settings'
 import { Header } from './src/collections/Header'
 import { Footer } from './src/collections/Footer'
 import { AuditLogs } from './src/collections/AuditLogs'
+import { ConsultationBookings } from './src/collections/ConsultationBookings'
 
 // === Custom endpoints ===
 import { updateProjectProgressEndpoint } from './src/endpoints/update-project-progress'
@@ -103,7 +104,7 @@ export default buildConfig({
     fallbackLanguage: 'ru',
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects, AuditLogs],
+  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects, AuditLogs, ConsultationBookings],
   globals: [Settings, Header, Footer],
   // === 20 BLOCKS ===
   blocks: [

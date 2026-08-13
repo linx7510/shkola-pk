@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkPaymentStatus } from '@/lib/payment'
-import { sendEmail, enrollmentEmail, paymentSuccessEmail } from '@/lib/email'
-
-const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3001'
+import { Pool } from 'pg'
 
 // YooKassa webhook source IP ranges (official)
 // https://yookassa.ru/developers/using-api/webhooks
@@ -15,8 +13,16 @@ const YOOKASSA_IP_RANGES = [
   '77.75.154.128/25',
 ]
 
-// Test mode bypass — when YooKassa not configured, allow localhost
+// Боевой режим определяется явно: YooKassa настроен и это НЕ test_shop_id.
 const isTestMode = !process.env.YOOKASSA_SHOP_ID || process.env.YOOKASSA_SHOP_ID === 'test_shop_id'
+
+let pool: Pool | null = null
+function getPool(): Pool {
+  if (!pool) {
+    pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 3 })
+  }
+  return pool
+}
 
 function isIpInCidr(ip: string, cidr: string): boolean {
   const [range, bitsStr] = cidr.split('/')
@@ -32,24 +38,24 @@ function isIpInCidr(ip: string, cidr: string): boolean {
 }
 
 function isYooKassaIp(ip: string): boolean {
-  // Strip IPv6 prefix if present (nginx usually forwards ::ffff:IPv4)
   const cleanIp = ip.replace(/^::ffff:/, '')
   return YOOKASSA_IP_RANGES.some(range => isIpInCidr(cleanIp, range))
 }
 
-async function payloadApi(path: string, options: RequestInit = {}) {
-  const res = await fetch(`${PAYLOAD_API_URL}/api${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-  })
-  if (!res.ok) throw new Error(`Payload API error: ${res.status}`)
-  return res.json()
-}
-
+/**
+ * POST /api/payment/webhook
+ *
+ * Обработка уведомлений YooKassa. Безопасность:
+ *   1. Проверка source IP по официальным CIDR YooKassa.
+ *   2. Whitelist событий.
+ *   3. RE-VERIFY статуса через YooKassa API (не доверяем payload).
+ *   4. Идемпотентность (не обрабатываем уже оплаченные order'ы).
+ *
+ * Все операции с БД — прямым SQL (Payload API требует admin/manager).
+ */
 export async function POST(request: NextRequest) {
   try {
     // === SECURITY CHECK 1: Source IP verification ===
-    // In test mode allow any IP (for local dev/testing)
     if (!isTestMode) {
       const clientIp =
         request.headers.get('x-real-ip') ||
@@ -57,7 +63,6 @@ export async function POST(request: NextRequest) {
         ''
       if (!clientIp || !isYooKassaIp(clientIp)) {
         console.warn(`[webhook] Rejected: IP ${clientIp} not in YooKassa ranges`)
-        // Return 200 to avoid YooKassa retries, but don't process
         return NextResponse.json({ received: true, ignored: true })
       }
     }
@@ -65,7 +70,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { event, object } = body
 
-    // === SECURITY CHECK 2: Validate event & paymentId format ===
+    // === SECURITY CHECK 2: Validate event ===
     if (!event || !['payment.succeeded', 'payment.waiting_for_capture', 'payment.canceled'].includes(event)) {
       console.warn(`[webhook] Unknown event: ${event}`)
       return NextResponse.json({ error: 'Unknown event' }, { status: 400 })
@@ -76,77 +81,76 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment ID' }, { status: 400 })
     }
 
-    console.log(`Webhook: ${event}, payment: ${paymentId}`)
+    console.log(`[webhook] ${event}, payment: ${paymentId}`)
+
+    const db = getPool()
 
     if (event === 'payment.canceled') {
-      const ordersData = await payloadApi(`/orders?where[paymentId][equals]=${paymentId}&limit=10`)
-      for (const order of ordersData.docs || []) {
-        await payloadApi(`/orders/${order.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'cancelled', yookassaStatus: 'canceled' }),
-        })
-      }
+      await db.query(
+        "UPDATE orders SET status = 'cancelled', yookassa_status = 'canceled', updated_at = NOW() WHERE payment_id = $1",
+        [paymentId]
+      )
       return NextResponse.json({ received: true })
     }
 
-    // === SECURITY CHECK 3: Re-verify payment status via YooKassa API ===
-    // NEVER trust webhook payload alone — always fetch authoritative status from YooKassa
+    // === SECURITY CHECK 3: Re-verify payment via YooKassa API ===
     const status = await checkPaymentStatus(paymentId)
     if (!status.paid || status.status !== 'succeeded') {
-      console.warn(`[webhook] Payment ${paymentId} not actually paid (status=${status.status}, paid=${status.paid})`)
+      console.warn(`[webhook] Payment ${paymentId} not actually paid (status=${status.status})`)
       return NextResponse.json({ received: true, ignored: true })
     }
 
-    // Find order by paymentId
-    const ordersData = await payloadApi(`/orders?where[paymentId][equals]=${paymentId}&limit=1&depth=1`)
-    const order = ordersData.docs?.[0]
+    // Найти order по payment_id
+    const orderRes = await db.query(
+      'SELECT id, user_id, course_id, amount, status FROM orders WHERE payment_id = $1 LIMIT 1',
+      [paymentId]
+    )
+    const order = orderRes.rows[0]
 
     if (!order) {
       console.error(`[webhook] Order not found for payment: ${paymentId}`)
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // === SECURITY CHECK 4: Idempotency — don't re-process already paid orders ===
+    // === SECURITY CHECK 4: Idempotency ===
     if (order.status === 'paid') {
-      console.log(`[webhook] Order ${order.id} already paid, skipping (idempotent)`)
+      console.log(`[webhook] Order ${order.id} already paid, skipping`)
       return NextResponse.json({ received: true, alreadyProcessed: true })
     }
 
-    // Update order status
-    await payloadApi(`/orders/${order.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        status: 'paid',
-        yookassaStatus: status.status,
-        paymentMethod: object?.payment_method?.type || 'unknown',
-      }),
-    })
+    // Обновить статус order
+    const paymentMethod = object?.payment_method?.type || 'unknown'
+    await db.query(
+      `UPDATE orders SET status = 'paid', yookassa_status = $1, payment_method = $2, updated_at = NOW() WHERE id = $3`,
+      [status.status, paymentMethod, order.id]
+    )
 
-    // Create enrollment if not exists (only for course orders)
-    if (order.course) {
-      const courseId = typeof order.course === 'object' ? order.course.id : order.course
-      const userId = typeof order.user === 'object' ? order.user.id : order.user
+    // Создать enrollment для курса (если ещё нет)
+    if (order.course_id) {
+      const existingEnroll = await db.query(
+        'SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2 LIMIT 1',
+        [order.user_id, order.course_id]
+      )
+      if (existingEnroll.rows.length === 0) {
+        await db.query(
+          'INSERT INTO enrollments (user_id, course_id, progress, created_at, updated_at) VALUES ($1, $2, 0, NOW(), NOW())',
+          [order.user_id, order.course_id]
+        )
 
-      const existing = await payloadApi(`/enrollments?where[user][equals]=${userId}&where[course][equals]=${courseId}&limit=1`)
-      if (existing.docs?.length === 0) {
-        await payloadApi('/enrollments', {
-          method: 'POST',
-          body: JSON.stringify({ user: userId, course: courseId, progress: 0 }),
-        })
-
-        const courseData = await payloadApi(`/courses/${courseId}`)
-        const userData = await payloadApi(`/users/${userId}`)
-        if (userData?.email && courseData?.title) {
-          sendEmail({ to: userData.email, ...enrollmentEmail(userData.name, courseData.title) }).catch(console.error)
+        // Email-уведомление о зачислении (fire-and-forget)
+        try {
+          const { sendEmail, enrollmentEmail, paymentSuccessEmail } = await import('@/lib/email')
+          const userRes = await db.query('SELECT email, name FROM users WHERE id = $1', [order.user_id])
+          const courseRes = await db.query('SELECT title FROM courses WHERE id = $1', [order.course_id])
+          const u = userRes.rows[0]
+          const c = courseRes.rows[0]
+          if (u?.email && c?.title) {
+            await sendEmail({ to: u.email, ...enrollmentEmail(u.name, c.title) })
+            await sendEmail({ to: u.email, ...paymentSuccessEmail(u.name, c.title, order.amount) })
+          }
+        } catch (emailErr) {
+          console.error('[webhook] Email error:', emailErr)
         }
-      }
-
-      // Send payment success email
-      const userData = await payloadApi(`/users/${typeof order.user === 'object' ? order.user.id : order.user}`)
-      const courseData = await payloadApi(`/courses/${courseId}`)
-      if (userData?.email && courseData?.title) {
-        const paymentEmail = paymentSuccessEmail(userData.name, courseData.title, order.amount)
-        sendEmail({ to: userData.email, ...paymentEmail }).catch(console.error)
       }
     }
 
