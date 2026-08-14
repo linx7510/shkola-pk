@@ -4,7 +4,7 @@ export const StepsBlock: Block = {
   slug: 'steps',
   labels: { singular: 'Шаги', plural: 'Шаги' },
   fields: [
-    { name: 'title', type: 'text', label: 'Заголовок' },
+      { name: 'title', type: 'text', label: 'Заголовок' },
     {
       name: 'steps',
       type: 'array',

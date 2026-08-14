@@ -219,6 +219,11 @@
       "source": "/video-answers/what-is-a-consumer-cooperative",
       "destination": "/glossary/potrebitelskiy-kooperativ",
       "statusCode": 301
+    },
+    {
+      "source": "/uslugi/celevie-potrebitelskie-programmy",
+      "destination": "/uslugi-dlya-potrebitelskih-kooperativov/celevie-potrebitelskie-programmy",
+      "permanent": true
     }
   ]
 }
