@@ -4,6 +4,7 @@ import Reveal from "@/components/Reveal"
 
 export interface StepsBlockData {
   title?: string
+  gated?: boolean
   steps: Array<{ title: string; description: string; videoUrl?: string; thumbnailUrl?: string }>
 }
 
@@ -87,7 +88,7 @@ function GatedVideoCTA() {
   )
 }
 
-function VideoEmbed({ url, thumbnail }: { url: string; thumbnail?: string }) {
+function VideoEmbed({ url, thumbnail, freeAccess }: { url: string; thumbnail?: string; freeAccess?: boolean }) {
   const [authed, setAuthed] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [clicked, setClicked] = useState(false)
@@ -104,7 +105,8 @@ function VideoEmbed({ url, thumbnail }: { url: string; thumbnail?: string }) {
 
   // GATING: только залогиненные видят встроенный iframe.
   // Незалогиненные → CTA регистрация (ловим лида).
-  if (!authed) {
+  // Если freeAccess=true — видео доступно всем без регистрации.
+  if (!authed && !freeAccess) {
     return <GatedVideoCTA />
   }
 
@@ -237,7 +239,7 @@ export function StepsBlock({ data }: { data: StepsBlockData }) {
                   {s.description}
                 </p>
                 {s.videoUrl ? (
-                  <VideoEmbed url={s.videoUrl} thumbnail={s.thumbnailUrl} />
+                  <VideoEmbed url={s.videoUrl} thumbnail={s.thumbnailUrl} freeAccess={(data.gated === false) || (data.title || "").toLowerCase().includes("открыт")} />
                 ) : (
                   <a
                     href="/register"
