@@ -7,7 +7,7 @@ const serviceLinks = [
   { label: "Кооператив под ключ", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
   { label: "Пакет документов для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov#expertise" },
   { label: "Разработка Положений для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov/sozdanie-polnogo-komplekta-polozheniy" },
-  { label: "Целевые программы", href: "/uslugi-dlya-potrebitelskih-kooperativov#target-programs" },
+  { label: "Целевые программы (ЦПП)", href: "/uslugi-dlya-potrebitelskih-kooperativov/celevie-potrebitelskie-programmy" },
   { label: "Налоговая и судебная практика", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
   { label: "Сопровождение при проверках", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
   { label: "Готовый ПК «под ключ»", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
