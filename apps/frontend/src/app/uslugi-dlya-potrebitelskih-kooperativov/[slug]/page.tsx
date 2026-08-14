@@ -116,7 +116,13 @@ export default async function UslugiPodSlugPage({ params }: Props) {
     return (
       <>
         <Header />
+        <style>{`.uslugi-scope{max-width:1280px;margin:0 auto;width:100%}
+.uslugi-scope img{max-width:350px;height:auto}
+@media(max-width:1320px){.uslugi-scope{padding:0 1rem}}
+`}</style>
+        <div className="uslugi-scope">
         <KooperativPodKlyuchLanding />
+        </div>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       </>
     )
@@ -151,7 +157,13 @@ export default async function UslugiPodSlugPage({ params }: Props) {
     return (
       <>
         <Header />
+        <style>{`.uslugi-scope{max-width:1280px;margin:0 auto;width:100%}
+.uslugi-scope img{max-width:350px;height:auto}
+@media(max-width:1320px){.uslugi-scope{padding:0 1rem}}
+`}</style>
+        <div className="uslugi-scope">
         <AuditUstavaLanding />
+        </div>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       </>
     )
@@ -174,6 +186,12 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         { label: (page as any).title || "" }
       ]} />
       <main style={{ paddingTop: "0", minHeight: "60vh" }}>
+        <style>{`.uslugi-scope{max-width:1280px;margin:0 auto;width:100%}
+.uslugi-scope img{max-width:350px;height:auto}
+.uslugi-scope .article-content img{max-width:350px;height:auto;border-radius:10px}
+@media(max-width:1320px){.uslugi-scope{padding:0 1rem}}
+`}</style>
+        <div className="uslugi-scope">
         {hasBlocks ? (
           <BlockRenderer blocks={blocks} />
         ) : hasContent ? (
@@ -188,6 +206,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
             <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2" }}>{(page as any).title}</h1>
           </section>
         )}
+        </div>
             <Footer />
     </main>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
