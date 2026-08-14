@@ -325,7 +325,7 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
               }}
             >
               <a
-                href={`https://vkvideo.ru/video545683434_${(data.videoUrl.match(/id=(\d+)/) || [])[1] || ""}`}
+                href={`https://vkvideo.ru/video545683434_${(data.videoUrl.match(/[?&]id=(\d+)/) || [])[1] || ""}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "rgba(230,136,99,0.85)", fontSize: "0.8rem", textDecoration: "none" }}
