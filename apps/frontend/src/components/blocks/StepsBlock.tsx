@@ -162,7 +162,7 @@ function VideoEmbed({ url, thumbnail, freeAccess }: { url: string; thumbnail?: s
     return (
       <div style={{ marginTop: "1rem", borderRadius: 12, overflow: "hidden", maxWidth: 560, margin: "1rem auto 0" }}>
         <iframe
-          src={(embedUrl || "") + ((embedUrl || "").includes("?") ? "&" : "?") + "autoplay=1"}
+          src={embedUrl || ""}
           width="100%"
           height="315"
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
@@ -253,7 +253,7 @@ function VideoEmbed({ url, thumbnail, freeAccess }: { url: string; thumbnail?: s
   return (
     <div style={{ marginTop: "1rem", borderRadius: 12, overflow: "hidden", maxWidth: 560, margin: "1rem auto 0" }}>
       <iframe
-        src={(embedUrl || "") + ((embedUrl || "").includes("?") ? "&" : "?") + "autoplay=1"}
+        src={embedUrl || ""}
         width="100%"
         height="315"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"

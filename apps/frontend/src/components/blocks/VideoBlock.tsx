@@ -92,7 +92,7 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
             }}
           >
             <iframe
-              src={embedUrl + "&autoplay=1"}
+              src={embedUrl}
               style={{
                 position: "absolute",
                 top: 0,
