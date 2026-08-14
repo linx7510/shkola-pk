@@ -100,13 +100,86 @@ function VideoEmbed({ url, thumbnail, freeAccess }: { url: string; thumbnail?: s
     setMounted(true)
   }, [])
 
-  // SSR: до монтирования не показываем ничего лишнего (избегаем гидрации)
+  // Для freeAccess видео — рендерим превью сразу (без проверки авторизации)
+  if (freeAccess) {
+    // Lazy: показываем превью, iframe грузится только при клике
+    if (!clicked) {
+      return (
+        <div
+          onClick={() => setClicked(true)}
+          style={{
+            marginTop: "1rem",
+            position: "relative",
+            paddingBottom: "56.25%",
+            height: 0,
+            borderRadius: 12,
+            overflow: "hidden",
+            background: "linear-gradient(135deg, rgba(13,12,10,0.95), rgba(24,22,19,0.95))",
+            border: "1px solid rgba(214,198,178,0.12)",
+            cursor: "pointer",
+            maxWidth: 560,
+            margin: "1rem auto 0",
+            transition: "border-color 0.3s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(230,136,99,0.4)" }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(214,198,178,0.12)" }}
+        >
+          {thumbnail && (
+            <img
+              src={thumbnail}
+              alt="Видео превью"
+              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 1 }}
+            />
+          )}
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #C96E4D, #E68863)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1.6rem",
+              color: "#fff",
+              boxShadow: "0 0 30px rgba(230,136,99,0.4)",
+              zIndex: 3,
+            }}
+          >
+            ▶
+          </div>
+          <div style={{ position: "absolute", bottom: "0.75rem", left: 0, right: 0, textAlign: "center", color: "rgba(214,198,178,0.7)", fontSize: "0.85rem", zIndex: 3 }}>
+            Нажмите, чтобы посмотреть
+          </div>
+        </div>
+      )
+    }
+    // После клика — загружаем iframe
+    return (
+      <div style={{ marginTop: "1rem", borderRadius: 12, overflow: "hidden", maxWidth: 560, margin: "1rem auto 0" }}>
+        <iframe
+          src={(embedUrl || "") + ((embedUrl || "").includes("?") ? "&" : "?") + "autoplay=1"}
+          width="100%"
+          height="315"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowFullScreen
+          frameBorder="0"
+          title="Видео урок"
+          style={{ borderRadius: 12, display: "block" }}
+        />
+      </div>
+    )
+  }
+
+  // Для gated видео — ждём монтирования (проверка localStorage)
   if (!mounted) return null
 
   // GATING: только залогиненные видят встроенный iframe.
-  // Незалогиненные → CTA регистрация (ловим лида).
-  // Если freeAccess=true — видео доступно всем без регистрации.
-  if (!authed && !freeAccess) {
+  if (!authed) {
     return <GatedVideoCTA />
   }
 
@@ -180,7 +253,7 @@ function VideoEmbed({ url, thumbnail, freeAccess }: { url: string; thumbnail?: s
   return (
     <div style={{ marginTop: "1rem", borderRadius: 12, overflow: "hidden", maxWidth: 560, margin: "1rem auto 0" }}>
       <iframe
-        src={embedUrl + (embedUrl.includes("?") ? "&" : "?") + "autoplay=1"}
+        src={(embedUrl || "") + ((embedUrl || "").includes("?") ? "&" : "?") + "autoplay=1"}
         width="100%"
         height="315"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"

@@ -56,6 +56,7 @@ export default async function BesplatnoPage() {
   // GATING: videoUrl только для залогиненных (ловим лидов). Незалогиненные видят CTA.
   const cookieStore = await cookies()
   const isAuthed = !!cookieStore.get("auth_token")?.value
+  // GATING: удаляем videoUrl только для gated блоков (не «Открытые»)
   function stripVideoUrls(obj: any): void {
     if (!obj || typeof obj !== "object") return
     if (Array.isArray(obj)) { obj.forEach(stripVideoUrls); return }
@@ -68,8 +69,20 @@ export default async function BesplatnoPage() {
       if (obj[k] && typeof obj[k] === "object") stripVideoUrls(obj[k])
     }
   }
+  // Для блоков steps с заголовком «Открытые» — НЕ удаляем videoUrl
+  function stripGatedVideoUrls(blocksArr: any[]): void {
+    for (const block of blocksArr) {
+      if (block.blockType === "steps") {
+        const title = (block.title || "").toLowerCase()
+        if (title.includes("открыт")) {
+          continue // Пропускаем — видео открыты для всех
+        }
+      }
+      stripVideoUrls(block)
+    }
+  }
   if (!isAuthed && Array.isArray(blocks)) {
-    stripVideoUrls(blocks)
+    stripGatedVideoUrls(blocks)
   }
   return (
     <>
