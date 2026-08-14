@@ -10,9 +10,11 @@ export interface StepsBlockData {
 
 function getEmbedUrl(url: string): string | null {
   if (!url) return null
-  // VK embed URL (video_ext.php) — уже готов для iframe (vkvideo.ru, vk.com, vk.ru)
-  if (url.includes("video_ext.php")) return url
-  if (url.includes("vk.com/video_ext") || url.includes("vk.ru/video_ext") || url.includes("vkvideo.ru/video_ext")) return url
+  // VK embed URL (video_ext.php): домен всегда vk.com —
+  // vkvideo.ru/video_ext отдаёт 302 на login.vk.ru (X-Frame-Options: deny)
+  if (url.includes("video_ext.php")) {
+    return url.replace("//vkvideo.ru/", "//vk.com/").replace("//vk.ru/", "//vk.com/")
+  }
   const vk = url.match(/(?:vk\.com\/video|vkvideo\.ru\/video)(-?\d+)_(\d+)/)
   if (vk) {
     const oid = vk[1].startsWith("-") ? vk[1].substring(1) : vk[1]

@@ -34,9 +34,9 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
     // Rutube: rutube.ru/video/HASH
     const ru = url.match(/rutube\.ru\/video\/([a-f0-9]+)/)
     if (ru) return `https://rutube.ru/play/embed/${ru[1]}`
-    // VK: vk.com/video_ext.php?oid=X&id=Y
-    if (url.includes("vk.com/video_ext") || url.includes("vk.ru/video_ext")) {
-      return url
+    // VK: video_ext.php — домен всегда vk.com (vkvideo.ru отдаёт 302 на логин с XFO deny)
+    if (url.includes("video_ext.php")) {
+      return url.replace("//vkvideo.ru/", "//vk.com/").replace("//vk.ru/", "//vk.com/")
     }
     // VK обычная ссылка: vk.com/videoOWNER_VIDEO
     const vk = url.match(/vk\.com\/video(-?\d+)_(\d+)/)
