@@ -343,7 +343,12 @@ export default async function BlogPostPage({ params }: Props) {
         ]} />
         <BlogParticles />
       <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "0", paddingBottom: "4rem" }}>
-        <article style={{ maxWidth: 1280, margin: "0 auto", padding: "0 var(--container-px)" }}>
+        <article className="blog-article" style={{ maxWidth: 1280, margin: "0 auto", padding: "0 var(--container-px)" }}>
+          <style>{`.blog-article img{max-width:350px;height:auto;border-radius:10px}
+.blog-article .article-content img{max-width:350px;height:auto}
+.blog-article figure.cpp-img{max-width:350px}
+.blog-article figure.cpp-img img{max-width:100%}
+`}</style>
           <Link
             href="/blog"
             style={{
