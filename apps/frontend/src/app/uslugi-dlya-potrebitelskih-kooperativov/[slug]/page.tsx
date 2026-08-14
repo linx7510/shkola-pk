@@ -30,12 +30,23 @@ export async function generateMetadata({ params }: Props) {
   const page = await fetchPage(`uslugi-dlya-potrebitelskih-kooperativov/${slug}`)
   if (!page) return { title: "Страница не найдена" }
   
-  const title = (page as any).meta?.title || (page as any).title || "Школа ПК"
-  const description = (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
+  // meta_title и meta_description есть в БД, но Payload API их не возвращает
+  // (нет полей в схеме Pages). Используем title + кастомный description.
+  const title = (page as any).title || "Школа ПК"
+  const fullSlug = `uslugi-dlya-potrebitelskih-kooperativov/${slug}`
+  const isCpp = slug === "celevie-potrebitelskie-programmy"
+  const description = isCpp
+    ? "Разработка целевых потребительских программ (ЦПП): защита от проверок ФНС, переквалификации и доначислений. 4 тарифа: от 5 000 до 65 000 ₽. Практика с 2015 года, 120+ кооперативов."
+    : (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
   
   const BASE_URL = "https://велеслав.рус"
-  const finalTitle = `${title} | велеслав.рус`
-  const ogImage = `${BASE_URL}/images/og-preview.webp`
+  const finalTitle = isCpp
+    ? "Целевые потребительские программы (ЦПП) для ПК — разработка под проверку ФНС"
+    : `${title} | велеслав.рус`
+  // Тематическая og:image для ЦПП
+  const ogImage = isCpp
+    ? `${BASE_URL}/api/media/file/cpp-cover.webp`
+    : `${BASE_URL}/images/og-preview.webp`
 
   return {
     title: { absolute: finalTitle },
