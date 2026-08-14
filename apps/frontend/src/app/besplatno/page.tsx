@@ -72,6 +72,10 @@ export default async function BesplatnoPage() {
   // Для блоков steps с заголовком «Открытые» — НЕ удаляем videoUrl
   function stripGatedVideoUrls(blocksArr: any[]): void {
     for (const block of blocksArr) {
+      // Видео-введение (самопрезентация) — маркетинговое, открыто всем
+      if (block.blockType === "video" && /введение/i.test(block.title || "")) {
+        continue
+      }
       if (block.blockType === "steps") {
         const title = (block.title || "").toLowerCase()
         if (title.includes("открыт")) {
