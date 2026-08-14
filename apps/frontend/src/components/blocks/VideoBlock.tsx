@@ -316,6 +316,23 @@ export function VideoBlock({ data }: { data: VideoBlockData }) {
                 title={data.title || "Видео"}
               />
             </div>
+            {/* Запасная ссылка: если плеер заблокирован расширением/антивирусом */}
+            <div
+              style={{
+                padding: "0.5rem 1.5rem",
+                textAlign: "right",
+                background: "rgba(0,0,0,0.35)",
+              }}
+            >
+              <a
+                href={`https://vkvideo.ru/video545683434_${(data.videoUrl.match(/id=(\d+)/) || [])[1] || ""}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "rgba(230,136,99,0.85)", fontSize: "0.8rem", textDecoration: "none" }}
+              >
+                Не воспроизводится? Открыть в VK Видео ↗
+              </a>
+            </div>
             {/* Описание под видео */}
             {data.description && (
               <div
