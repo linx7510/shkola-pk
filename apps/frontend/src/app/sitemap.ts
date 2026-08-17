@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const [postsData, termsData, servicesData, uslugiPagesData] = await Promise.all([
-    payloadApi("/blog-posts?where[isPublished][equals]=true&limit=100"),
+    payloadApi("/blog-posts?where[isPublished][equals]=true&sort=-publishedAt&limit=500"),
     payloadApi("/glossary-terms?where[isPublished][equals]=true&limit=100"),
     payloadApi("/services?where[isPublished][equals]=true&limit=100"),
     payloadApi("/pages?where[slug][like]=uslugi-dlya-potrebitelskih-kooperativov%25&where[isPublished][equals]=true&limit=100"),
