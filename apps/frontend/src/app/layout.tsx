@@ -99,9 +99,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <meta name="twitter:data1" content="+7 (902) 472-07-38" />
         <meta name="twitter:label2" content="Telegram" />
         <meta name="twitter:data2" content="@Veles_ST" />
-        {/* Ускорение Метрики: раннее соединение (не блокирует рендер) */}
-        <link rel="preconnect" href="https://mc.yandex.ru" />
-        <link rel="dns-prefetch" href="https://mc.yandex.ru" />
       </head>
       <body className="antialiased"><script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
@@ -148,13 +145,25 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <LazyAIChatButton />
         {/* Yandex.Metrika counter — strategy="afterInteractive" для немедленного запуска */}
         <Script id="yandex-metrika-init" strategy="afterInteractive">
-          {`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-          ym(${METRIKA_ID}, "init", {
-            clickmap:true,
-            trackLinks:true,
-            accurateTrackBounce:true,
-            webvisor:true
-          });`}
+          {`(function(){
+            var started = false;
+            function startMetrika() {
+              if (started) return; started = true;
+              (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+              ym(${METRIKA_ID}, "init", {
+                clickmap:true,
+                trackLinks:true,
+                accurateTrackBounce:true,
+                webvisor:true
+              });
+            }
+            // Тяжёлый скрипт Метрики стартует по первому действию посетителя
+            // или через 4с после load — не мешает LCP/TBT, но фиксирует визит
+            var evts = ["pointerdown","keydown","touchstart","scroll","wheel"];
+            evts.forEach(function(e){ addEventListener(e, startMetrika, {once:true, passive:true}); });
+            addEventListener("load", function(){ setTimeout(startMetrika, 4000); });
+            setTimeout(startMetrika, 10000);
+          })();`}
         </Script>
         <noscript>
           <div>
