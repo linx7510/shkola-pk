@@ -99,6 +99,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <meta name="twitter:data1" content="+7 (902) 472-07-38" />
         <meta name="twitter:label2" content="Telegram" />
         <meta name="twitter:data2" content="@Veles_ST" />
+        {/* Ускорение Метрики: раннее соединение (не блокирует рендер) */}
+        <link rel="preconnect" href="https://mc.yandex.ru" />
+        <link rel="dns-prefetch" href="https://mc.yandex.ru" />
       </head>
       <body className="antialiased"><script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
