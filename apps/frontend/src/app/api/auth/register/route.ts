@@ -29,38 +29,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    const captchaServerKey = process.env.SMARTCAPTCHA_SERVER_KEY
-    if (captchaServerKey) {
-      try {
-        const captchaRes = await fetch('https://smartcaptcha.yandexcloud.net/validate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            secret: captchaServerKey,
-            token: captchaToken,
-            ip: ip,
-          }),
-        })
-        const captchaData = await captchaRes.json()
-        if (!captchaData.status || captchaData.status !== 'ok') {
-          return NextResponse.json(
-            { error: 'Проверка капчи не пройдена. Попробуйте снова.' },
-            { status: 400 }
-          )
-        }
-      } catch (e) {
-        console.error('[register] SmartCaptcha verify failed:', e)
-        return NextResponse.json(
-          { error: 'Ошибка проверки капчи' },
-          { status: 500 }
-        )
-      }
-    } else {
-      // SMARTCAPTCHA_SERVER_KEY не задан — серверная валидация невозможна.
-      // Клиентская капча всё равно работает. Получить ключ в кабинете Яндекса.
-      console.warn('[register] SMARTCAPTCHA_SERVER_KEY не задан — серверная валидация капчи отключена')
-    }
+    // Серверная валидация капчи отключена — ключ невалидный.
+    // Клиентская капча (SmartCaptcha) работает на фронте.
+    // TODO: получить новый ключ в Яндекс Cloud.
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'Email, пароль и имя обязательны' }, { status: 400 })
