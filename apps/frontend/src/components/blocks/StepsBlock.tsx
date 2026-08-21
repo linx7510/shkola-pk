@@ -96,10 +96,16 @@ function VideoEmbed({ url, thumbnail, freeAccess }: { url: string; thumbnail?: s
   const [clicked, setClicked] = useState(false)
   const embedUrl = getEmbedUrl(url)
 
-  // Проверка авторизации (localStorage auth_token — наш session JWT)
+  // Проверка авторизации — единый источник правды с SSR: httpOnly cookie auth_token.
+  // localStorage не используется: его рассинхрон с cookie ломал уроки
+  // (SSR вырезал videoUrl, а клиент считал пользователя залогиненным).
   useEffect(() => {
-    setAuthed(!!localStorage.getItem("auth_token"))
-    setMounted(true)
+    let alive = true
+    fetch("/api/auth/me", { credentials: "include" })
+      .then(r => { if (alive) setAuthed(r.ok) })
+      .catch(() => { if (alive) setAuthed(false) })
+      .finally(() => { if (alive) setMounted(true) })
+    return () => { alive = false }
   }, [])
 
   // Для freeAccess видео — рендерим превью сразу (без проверки авторизации)
