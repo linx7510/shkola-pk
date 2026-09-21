@@ -30,10 +30,12 @@ export const Leads: CollectionConfig = {
       label: 'Источник',
       options: [
         { label: 'Главная форма', value: 'homepage' },
+        { label: 'Главная CTA', value: 'home_cta' },
         { label: 'Консультация', value: 'consultation' },
         { label: 'Бесплатный урок', value: 'free-lesson' },
         { label: 'Контактная форма', value: 'contact' },
         { label: 'Регистрация ПК', value: 'registration' },
+        { label: 'ИИ-аудит устава', value: 'ai-audit' },
       ],
     },
     { name: 'courseSlug', type: 'text', label: 'Слаг курса', admin: { position: 'sidebar' } },
@@ -47,11 +49,49 @@ export const Leads: CollectionConfig = {
         { label: 'В обработке', value: 'processing' },
         { label: 'Связались', value: 'contacted' },
         { label: 'Квалифицирована', value: 'qualified' },
+        { label: 'Консультация', value: 'consultation' },
+        { label: 'КП отправлено', value: 'proposal' },
+        { label: 'Думает', value: 'thinking' },
+        { label: 'Спящий', value: 'sleeping' },
         { label: 'Конвертирована', value: 'converted' },
         { label: 'Закрыта', value: 'closed' },
       ],
       admin: { position: 'sidebar' },
     },
+    // CRM v4.2 — скоринг и воронка (Этап A)
+    { name: 'leadScore', type: 'number', label: 'Lead Score (0–100)', admin: { position: 'sidebar', readOnly: true, description: 'Рассчитывается автоматически при создании' } },
+    { name: 'riskScore', type: 'number', label: 'Risk Score (0–100)', admin: { position: 'sidebar', readOnly: true, description: 'Критичность ситуации пайщика' } },
+    {
+      name: 'segment',
+      type: 'select',
+      label: 'Сегмент',
+      options: [
+        { label: 'Изучает тему', value: 'researcher' },
+        { label: 'Хочет создать ПК', value: 'create_pc' },
+        { label: 'Снизить налоги', value: 'tax_save' },
+        { label: 'Обучение', value: 'education' },
+        { label: 'Председатель ПК с проблемой', value: 'chairman_problem' },
+        { label: 'Другое', value: 'other' },
+      ],
+      admin: { position: 'sidebar' },
+    },
+    {
+      name: 'objection',
+      type: 'select',
+      label: 'Возражение',
+      options: [
+        { label: 'Нет бюджета', value: 'no_budget' },
+        { label: 'Нет времени', value: 'no_time' },
+        { label: 'Не доверяет', value: 'no_trust' },
+        { label: 'Подумает', value: 'thinking' },
+        { label: 'Изучает', value: 'studying' },
+        { label: 'Другое', value: 'other' },
+      ],
+      admin: { position: 'sidebar' },
+    },
+    { name: 'objectionNotes', type: 'textarea', label: 'Детали возражения', admin: { position: 'sidebar' } },
+    { name: 'nextAction', type: 'text', label: 'Следующее действие', admin: { position: 'sidebar' } },
+    { name: 'sleepUntil', type: 'date', label: 'Спящий до', admin: { position: 'sidebar' } },
     { name: 'notes', type: 'textarea', label: 'Заметки', admin: { position: 'sidebar' } },
     { name: 'assignedTo', type: 'relationship', relationTo: 'users', label: 'Ответственный', admin: { position: 'sidebar' } },
     // 152-ФЗ: согласие на обработку персональных данных
@@ -92,6 +132,48 @@ export const Leads: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeChange: [
+      async ({ data, operation }: any) => {
+        // CRM v4.2 (Этап A): Rule-based Lead Score + Risk Score + авто-сегмент
+        if (operation === 'create') {
+          const text = `${data.message || ''}`
+          // — Lead Score 0–100: заполненность (0-20) + источник (0-25) + интент (0-20) + срочность (0-20) + бонус за контакт (0-15)
+          let lead = 0
+          lead += [data.name, data.phone, data.email, data.message].filter(Boolean).length * 5
+          const srcW: Record<string, number> = { consultation: 25, 'free-lesson': 20, registration: 15, 'ai-audit': 18, contact: 12, home_cta: 12, homepage: 10 }
+          lead += srcW[data.source] ?? 10
+          const intents: [RegExp, number][] = [
+            [/блокиров|фнс|проверк|штраф|доначисл/i, 20],
+            [/создат|открыт|зарегистрир/i, 18],
+            [/налог|ндс|снизит|экономи/i, 16],
+            [/курс|обучен|урок/i, 12],
+          ]
+          lead += intents.find(([re]) => re.test(text))?.[1] ?? 8
+          lead += /срочн|сегодня|как можно|немедленн/i.test(text) ? 20 : 10
+          data.leadScore = Math.min(100, lead)
+          // — Risk Score 0–100: критические ситуации пайщика
+          let risk = 0
+          const riskRules: [RegExp, number][] = [
+            [/блокиров|115[- ]?фз|арест|счёт|счет.{0,15}(закр|блок)/i, 35],
+            [/фнс|проверк|доначисл|требован|выездн/i, 30],
+            [/устав.{0,25}(стар|не соответ)|редакц.{0,12}201[0-9]/i, 25],
+            [/конфликт|пайщик.{0,20}(выход|конфликт|ссор)|исключ/i, 20],
+            [/долг|пени|недоимк|доначисл/i, 15],
+          ]
+          riskRules.forEach(([re, w]) => { if (re.test(text)) risk += w })
+          data.riskScore = Math.min(100, risk)
+          // — Авто-сегмент
+          if (!data.segment) {
+            if (/создат|открыт|зарегистрир/i.test(text)) data.segment = 'create_pc'
+            else if (/налог|ндс|снизит|экономи/i.test(text)) data.segment = 'tax_save'
+            else if (/курс|обучен|урок/i.test(text)) data.segment = 'education'
+            else if (/блокиров|фнс|проверк|конфликт|устав|пайщик/i.test(text)) data.segment = 'chairman_problem'
+            else data.segment = 'researcher'
+          }
+        }
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }: any) => {
         if (operation === 'create') {

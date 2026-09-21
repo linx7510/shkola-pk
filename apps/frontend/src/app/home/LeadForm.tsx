@@ -26,6 +26,9 @@ export function LeadForm() {
         }),
       });
       if (res.ok) {
+        // Яндекс.Метрика: цель «Заявка отправлена» (в Метрике создать цель типа JavaScript-событие, идентификатор lead_form)
+        const w = window as any;
+        if (typeof w.ym === 'function') { try { w.ym(53164504, 'reachGoal', 'lead_form'); } catch {} }
         setStatus({ type: 'success', message: 'Заявка отправлена! Мы свяжемся с вами в ближайшее время.' });
         setForm({ name: '', phone: '', message: '', consentAccepted: false });
       } else {

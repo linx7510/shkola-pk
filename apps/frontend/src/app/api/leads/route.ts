@@ -81,6 +81,11 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Lead] New lead created: ${name} from ${source || 'homepage'}, ip_hash=${hashIp(rawIp)?.slice(0, 16)}...`)
 
+    // CRM v4.2: скоринг посчитан хуком коллекции — добавляем в карточку для менеджера
+    const leadScore = lead.doc?.leadScore
+    const riskScore = lead.doc?.riskScore
+    const scoreLine = leadScore != null ? `\n🎯 Lead Score: ${leadScore}/100` + (riskScore ? ` · ⚠ Risk: ${riskScore}/100` + (riskScore >= 61 ? ' — CRITICAL/HIGH: связаться ≤1 часа!' : '') : '') : ''
+
     // Telegram-уведомление
     try {
       const { notifyNewLead } = await import('@/lib/telegram-notify')
@@ -88,7 +93,7 @@ export async function POST(request: NextRequest) {
         name,
         email: email || '',
         phone: phone || '',
-        message: message || '',
+        message: (message || '') + scoreLine,
         source: source || 'homepage',
       })
     } catch (e) {

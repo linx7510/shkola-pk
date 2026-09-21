@@ -35,6 +35,7 @@ import { ConsultationBookings } from './src/collections/ConsultationBookings'
 // === Custom endpoints ===
 import { updateProjectProgressEndpoint } from './src/endpoints/update-project-progress'
 import { sendTestEmailEndpoint } from './src/endpoints/send-test-email'
+import { crmDashboardEndpoint } from './src/endpoints/crm-dashboard'
 
 // === Стандартные 9 блоков ===
 import { HeroBlock } from './src/blocks/HeroBlock'
@@ -135,6 +136,7 @@ export default buildConfig({
   endpoints: [
     updateProjectProgressEndpoint,
     sendTestEmailEndpoint,
+    crmDashboardEndpoint,
   ],
   // === Email (SMTP через mail.ru) ===
   // Используется для отправки verification emails при регистрации,
