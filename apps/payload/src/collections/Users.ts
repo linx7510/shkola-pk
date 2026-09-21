@@ -149,9 +149,22 @@ export const Users: CollectionConfig = {
     { name: 'avatar', type: 'upload', relationTo: 'media', label: 'Аватар' },
     { name: 'bio', type: 'textarea', label: 'О себе' },
     { name: 'isActive', type: 'checkbox', defaultValue: true, label: 'Активен' },
+    // 2FA (TOTP) — Этап безопасности 21.09.2026; управляется через /api/mfa/*
+    { name: 'mfaEnabled', type: 'checkbox', defaultValue: false, label: '2FA включена', admin: { position: 'sidebar', description: 'Управление — /api/mfa/setup' } },
+    { name: 'mfaSecret', type: 'text', label: 'MFA Secret', admin: { hidden: true }, access: { update: () => false, create: () => false } },
+    { name: 'mfaPendingSecret', type: 'text', label: 'MFA Pending', admin: { hidden: true } },
   ],
   hooks: {
     ...createAuditHooks('user'),
+    // 2FA: если включена — обычный логин запрещён, вход через /api/mfa (email+пароль+код)
+    beforeLogin: [
+      async ({ user, req }: any) => {
+        if (user?.mfaEnabled && !(req as any)?.mfaBypass) {
+          const { APIError } = await import('payload')
+          throw new APIError('Для этого аккаунта включена двухфакторная аутентификация. Войдите на странице /api/mfa (email, пароль и код из приложения).', 401)
+        }
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }) => {
         // Send verification email only on create (new registration)

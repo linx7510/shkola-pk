@@ -36,6 +36,7 @@ import { ConsultationBookings } from './src/collections/ConsultationBookings'
 import { updateProjectProgressEndpoint } from './src/endpoints/update-project-progress'
 import { sendTestEmailEndpoint } from './src/endpoints/send-test-email'
 import { crmDashboardEndpoint } from './src/endpoints/crm-dashboard'
+import { mfaLoginPageEndpoint, mfaLoginEndpoint, mfaSetupEndpoint, mfaConfirmEndpoint, mfaDisableEndpoint } from './src/endpoints/mfa'
 
 // === Стандартные 9 блоков ===
 import { HeroBlock } from './src/blocks/HeroBlock'
@@ -137,6 +138,11 @@ export default buildConfig({
     updateProjectProgressEndpoint,
     sendTestEmailEndpoint,
     crmDashboardEndpoint,
+    mfaLoginPageEndpoint,
+    mfaLoginEndpoint,
+    mfaSetupEndpoint,
+    mfaConfirmEndpoint,
+    mfaDisableEndpoint,
   ],
   // === Email (SMTP через mail.ru) ===
   // Используется для отправки verification emails при регистрации,
