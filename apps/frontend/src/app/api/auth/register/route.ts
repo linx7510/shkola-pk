@@ -29,9 +29,21 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    // Серверная валидация капчи отключена — ключ невалидный.
-    // Клиентская капча (SmartCaptcha) работает на фронте.
-    // TODO: получить новый ключ в Яндекс Cloud.
+    // Серверная валидация Yandex SmartCaptcha (когда задан секрет — строгий режим)
+    const captchaSecret = process.env.SMART_CAPTCHA_SECRET
+    if (captchaSecret) {
+      const vRes = await fetch('https://smartcaptcha.yandexcloud.net/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret: captchaSecret, token: captchaToken }),
+      })
+      const vData = await vRes.json().catch(() => ({}))
+      if (vRes.status !== 200 || vData.status !== 'ok') {
+        return NextResponse.json({ error: 'Проверка «я не робот» не пройдена' }, { status: 400 })
+      }
+    } else {
+      console.warn('[register] SMART_CAPTCHA_SECRET не задан — серверная валидация капчи пропущена (защита: honeypot + rate limit)')
+    }
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: 'Email, пароль и имя обязательны' }, { status: 400 })

@@ -27,10 +27,24 @@ function anonymizeIp(ip: string | null): string | null {
 }
 
 // SHA-256 хеш IP с солью (152-ФЗ — для анонимной аналитики без возможности деанонимизации)
+// Соль — единая на процесс (не на вызов!), чтобы хеш одного IP был стабилен
+const IP_SALT = process.env.IP_HASH_SALT || 'pk-ip-salt-set-in-env'
 function hashIp(ip: string | null): string | null {
   if (!ip) return null
-  const salt = process.env.IP_HASH_SALT || crypto.randomBytes(16).toString("hex")
-  return crypto.createHash('sha256').update(ip + salt).digest('hex')
+  return crypto.createHash('sha256').update(ip + IP_SALT).digest('hex')
+}
+
+// Доверенный IP клиента: x-real-ip ставит nginx ($remote_addr — последним hop).
+// X-Forwarded-For ненадёжен (клиент может прислать поддельный первым элементом) — используем только как fallback, беря ПОСЛЕДНИЙ элемент
+function trustedIp(request: NextRequest): string | null {
+  const real = request.headers.get('x-real-ip')
+  if (real && /^\d+\.\d+\.\d+\.\d+$/.test(real.trim())) return real.trim()
+  const xff = request.headers.get('x-forwarded-for')
+  if (xff) {
+    const parts = xff.split(',').map(s => s.trim()).filter(Boolean)
+    if (parts.length) return parts[parts.length - 1]
+  }
+  return null
 }
 
 // POST /api/leads — приём заявки с формы
@@ -55,10 +69,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true }) // тихо отвечаем OK, но не сохраняем
     }
 
-    // Извлекаем IP и User-Agent
-    const forwarded = request.headers.get('x-forwarded-for')
-    const rawIp = forwarded ? forwarded.split(',')[0].trim() : (request.headers.get('x-real-ip') || null)
+    // Жёсткие ограничения полей (schema-валидация уровня приложения)
+    if (name.length > 120 || (phone && phone.length > 40) || (email && email.length > 254) || (message && message.length > 5000)) {
+      return NextResponse.json({ error: 'Превышена длина полей' }, { status: 400 })
+    }
+
+    // Извлекаем доверенный IP и User-Agent
+    const rawIp = trustedIp(request)
     const userAgent = request.headers.get('user-agent') || ''
+    const clientHash = hashIp(rawIp)
+
+    // App-level rate limit: не более 5 заявок в час с одного IP (защита от спама лидов поверх nginx-лимита)
+    try {
+      const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+      const cnt = await payloadApi(`/leads?where[ipHash][equals]=${clientHash}&where[createdAt][greater_than]=${hourAgo}&limit=100&depth=0`, { method: 'GET' })
+      if (cnt?.totalDocs >= 5) {
+        return NextResponse.json({ error: 'Слишком много заявок. Позвоните нам: +7 (902) 472-07-38' }, { status: 429 })
+      }
+    } catch { /* лимит не должен блокировать приём при сбое счётчика */ }
 
     // Создаём лид в Payload
     const lead = await payloadApi('/leads', {
@@ -79,7 +107,7 @@ export async function POST(request: NextRequest) {
       }),
     })
 
-    console.log(`[Lead] New lead created: ${name} from ${source || 'homepage'}, ip_hash=${hashIp(rawIp)?.slice(0, 16)}...`)
+    console.log(`[Lead] New lead created: ${name} from ${source || 'homepage'}, ip_hash=${clientHash?.slice(0, 16)}...`)
 
     // CRM v4.2: скоринг посчитан хуком коллекции — добавляем в карточку для менеджера
     const leadScore = lead.doc?.leadScore

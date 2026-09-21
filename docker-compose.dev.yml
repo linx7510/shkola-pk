@@ -50,7 +50,7 @@ services:
       PAYLOAD_SECRET: "dev-secret-not-for-production"
       NODE_ENV: development
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     volumes:
       - ./apps/payload:/app
       - /app/node_modules  # исключить node_modules из монтирования
@@ -73,7 +73,7 @@ services:
       NEXT_PUBLIC_PAYLOAD_URL: "http://localhost:3001"
       NODE_ENV: development
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - ./apps/frontend:/app
       - /app/node_modules

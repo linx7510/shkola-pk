@@ -133,9 +133,17 @@ export const Leads: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      async ({ data, operation }: any) => {
+      async ({ data, operation, req }: any) => {
         // CRM v4.2 (Этап A): Rule-based Lead Score + Risk Score + авто-сегмент
         if (operation === 'create') {
+          // SPAM LIMIT: не более 5 лидов в час с одного ipHash (app-level, поверх nginx)
+          if (data.ipHash) {
+            const hourAgo = new Date(Date.now() - 60 * 60 * 1000)
+            const existing = await req.payload.db.count({ collection: 'leads', where: { and: [ { ipHash: { equals: data.ipHash } }, { createdAt: { greater_than: hourAgo } } ] } } as any)
+            if ((existing?.totalDocs ?? 0) >= 5) {
+              throw new (await import('payload')).ValidationError({ collection: 'leads', errors: [{ message: 'Слишком много заявок с вашего адреса. Позвоните: +7 (902) 472-07-38', path: 'name' }] })
+            }
+          }
           const text = `${data.message || ''}`
           // — Lead Score 0–100: заполненность (0-20) + источник (0-25) + интент (0-20) + срочность (0-20) + бонус за контакт (0-15)
           let lead = 0

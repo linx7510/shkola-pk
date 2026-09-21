@@ -16,11 +16,11 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: shkola_pk
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-Shk0laPK2026}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
       POSTGRES_DB: shkola_pk_payload
       POSTGRES_MULTIPLE_DATABASES: shkola_pk,shkola_pk_payload,shkola_pk_audit
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
@@ -43,8 +43,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://shkola_pk:${DB_PASSWORD:-Shk0laPK2026}@postgres:5432/shkola_pk_payload
-      PAYLOAD_SECRET: ${PAYLOAD_SECRET:-sk-pk-2026-payload-secret-key-secure}
+      DATABASE_URL: postgresql://shkola_pk:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/shkola_pk_payload
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?PAYLOAD_SECRET is required}
       NODE_ENV: production
       PORT: 3001
       # S3 Storage (REG.RU)
@@ -54,7 +54,7 @@ services:
       S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
       S3_REGION: ${S3_REGION:-ru-1}
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     volumes:
       - cms_media:/var/www/shkola-pk/payload-cms/media
       - ./apps/payload:/app
@@ -80,11 +80,11 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY}
       DEEPSEEK_API_URL: https://api.deepseek.com/v1
       # Auth
-      JWT_SECRET: ${JWT_SECRET:-sk-pk-2026-jwt-key-secure}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       # Audit logs (отдельная БД)
-      DATABASE_URL: postgresql://shkola_pk:${DB_PASSWORD:-Shk0laPK2026}@postgres:5432/shkola_pk
+      DATABASE_URL: postgresql://shkola_pk:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/shkola_pk
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - ./apps/frontend:/app
       - /app/node_modules
