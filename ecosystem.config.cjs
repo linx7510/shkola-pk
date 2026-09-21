@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "shkola-pk-cms",
       script: "node_modules/next/dist/bin/next",
-      args: "start --port 3001",
+      args: "start --port 3001 --hostname 127.0.0.1",
       cwd: "/var/www/shkola-pk/apps/payload",
       env: {
         NODE_ENV: "production",
@@ -20,7 +20,7 @@ module.exports = {
     {
       name: "shkola-pk-frontend",
       script: "node_modules/next/dist/bin/next",
-      args: "start --port 3000",
+      args: "start --port 3000 --hostname 127.0.0.1",
       cwd: "/var/www/shkola-pk/apps/frontend",
       env: {
         NODE_ENV: "production",
