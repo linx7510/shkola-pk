@@ -342,7 +342,7 @@ export default async function BlogPostPage({ params }: Props) {
           { label: (post as any).title || "" }
         ]} />
         <BlogParticles />
-      <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "0", paddingBottom: "4rem" }}>
+      <main style={{ minHeight: "100vh", background: "var(--color-bg)", paddingTop: "0", paddingBottom: "0" }}>
         <article className="blog-article" style={{ maxWidth: 1280, margin: "0 auto", padding: "0 var(--container-px)" }}>
           <style>{`.blog-article img{max-width:350px;height:auto;border-radius:10px}
 .blog-article .article-content img{max-width:350px;height:auto}
