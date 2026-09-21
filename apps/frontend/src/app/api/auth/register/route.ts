@@ -91,10 +91,10 @@ export async function POST(request: NextRequest) {
         email: data.doc.email,
         name: data.doc.name,
         role: data.doc.role,
-        verified: data.doc._verified || false,
+        verified: true,
       },
-      message: 'На указанный email отправлена ссылка для подтверждения. Проверьте почту и завершите регистрацию.',
-      requireVerification: true,
+      message: 'Регистрация завершена! Теперь войдите в личный кабинет — бесплатные уроки уже открыты.',
+      requireVerification: false,
     }, { status: 201 })
   } catch (error) {
     console.error('Register error:', error)

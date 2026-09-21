@@ -165,6 +165,17 @@ export const Users: CollectionConfig = {
         }
       },
     ],
+    // Автоверификация (решение владельца 21.09): студенты, регистрирующиеся через сайт,
+    // подтверждаются сразу — письма теряются в спаме у 50% провайдеров и блокировали вход в ЛК.
+    // Строгая верификация сохраняется для админ-аккаунтов, создаваемых вручную (роль не student).
+    beforeChange: [
+      async ({ data, operation }: any) => {
+        if (operation === 'create' && (data.role === undefined || data.role === 'student')) {
+          data._verified = true
+        }
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }) => {
         // Send verification email only on create (new registration)
