@@ -34,10 +34,11 @@ export async function POST(request: NextRequest) {
     if (captchaSecret) {
       const vRes = await fetch('https://smartcaptcha.yandexcloud.net/validate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: captchaSecret, token: captchaToken }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ secret: captchaSecret, token: captchaToken }),
       })
       const vData = await vRes.json().catch(() => ({}))
+      console.log('[CAPTCHA-DEBUG] yandex status:', vRes.status, 'body:', JSON.stringify(vData).slice(0,200))
       if (vRes.status !== 200 || vData.status !== 'ok') {
         return NextResponse.json({ error: 'Проверка «я не робот» не пройдена' }, { status: 400 })
       }
