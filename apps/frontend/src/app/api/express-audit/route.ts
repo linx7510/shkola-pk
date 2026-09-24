@@ -245,25 +245,25 @@ async function notifyExpressAudit(params: {
       )
       .join('\n\n')
 
-    const text = `🔍 <b>Экспресс-аудит устава!</b>
+    const text = `🔍 ЭКСПРЕСС-АУДИТ УСТАВА
 
-👤 <b>Клиент:</b> ${params.name}
-📧 <b>Email:</b> ${params.email || '—'}
-📞 <b>Телефон:</b> ${params.phone || '—'}
-📄 <b>Файл:</b> ${params.fileName}
+👤 Клиент: ${params.name}
+📧 Email: ${params.email || '—'}
+📞 Телефон: ${params.phone || '—'}
+📄 Файл: ${params.fileName}
 
-⭐ <b>Балл соответствия:</b> ${params.score}/100
-⚠️ <b>Проблем найдено:</b> ${params.issuesCount} (критичных: ${highRisks.length}, средних: ${medRisks.length})
+⭐ Балл соответствия: ${params.score}/100
+⚠️ Проблем найдено: ${params.issuesCount} (критичных: ${highRisks.length}, средних: ${medRisks.length})
 
-<b>Резюме:</b>
+── РЕЗЮМЕ ──
 ${params.full.summary || '—'}
 
-<b>Риски:</b>
+── РИСКИ ──
 ${risksList || '—'}
 
-${params.full.missing_sections?.length ? `<b>Отсутствуют разделы:</b>\n${params.full.missing_sections.map((s) => '• ' + s).join('\n')}` : ''}
+${params.full.missing_sections?.length ? `── ОТСУТСТВУЮТ РАЗДЕЛЫ ──\n${params.full.missing_sections.map((s) => '• ' + s).join('\n')}` : ''}
 
-👉 <b>Действие:</b> связаться с клиентом, предложить полный аудит с готовыми правками. Email: ${params.email}`
+👉 Действие: связаться с клиентом, предложить полный аудит с готовыми правками. Email: ${params.email}`
 
     await sendTelegramMessage(text)
 
@@ -275,7 +275,6 @@ ${params.full.missing_sections?.length ? `<b>Отсутствуют раздел
         subject: `🔍 Экспресс-аудит устава: ${params.score}/100 — ${params.name}`,
         html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #f5f5f5; padding: 20px;">
           <div style="background: white; border-radius: 8px; padding: 24px; border-left: 4px solid #C96E4D;">
-            <h2 style="margin: 0 0 16px; color: #333;">🔍 Экспресс-аудит устава</h2>
             <pre style="white-space: pre-wrap; font-family: sans-serif; color: #333; line-height: 1.6;">${text.replace(/</g, '&lt;')}</pre>
           </div>
         </div>`,
@@ -358,6 +357,18 @@ export async function POST(request: NextRequest) {
     // Ограничиваем длину для LLM
     const docText = extraction.text.slice(0, MAX_USTAV_CHARS)
 
+    /* ─── Локальная эвристика: документ вообще похож на устав? ─── */
+    // Отсекаем стихи/романы/инструкции ДО вызова LLM (экономия токенов + гарантия).
+    const charterMarkers = ['устав', 'пайщик', 'кооператив', 'общее собрание', 'паевой', 'взнос', 'правление', 'совет', 'ревизионн', 'ликвидаци']
+    const headLower = docText.slice(0, 6000).toLowerCase()
+    const markerHits = charterMarkers.filter((m) => headLower.includes(m)).length
+    if (docText.trim().length < 1500 || markerHits < 3) {
+      console.log(`[express-audit] Локальный отсев: маркеров ${markerHits}/10, длина ${docText.length}`)
+      return NextResponse.json({
+        error: 'Загруженный документ не похож на устав потребительского кооператива (в нём нет уставных признаков: паевых взносов, органов управления, порядка членства). Загрузите именно устав ПК — файл Word или PDF.',
+      }, { status: 422 })
+    }
+
     /* ─── LLM-анализ ─── */
     let full: FullAuditResult
     try {
@@ -430,6 +441,24 @@ export async function POST(request: NextRequest) {
       }, { status: 422 })
     }
 
+    // Вердикт LLM по типу документа: не-устав или чужой тип кооператива →
+    // отдаём клиенту человеческое объяснение (422), лид и письма не создаём.
+    const docVerdict = (full as any).doc_verdict as string | undefined
+    if (docVerdict === 'not_a_charter') {
+      console.log('[express-audit] LLM verdict: not_a_charter →', (full.summary || '').slice(0, 120))
+      return NextResponse.json({
+        error: (full.summary || 'Загруженный документ не является уставом потребительского кооператива.') +
+          ' Загрузите устав ПК — файл Word или PDF. Если документа в Word нет — закажите полный аудит, юрист проверит вручную.',
+      }, { status: 422 })
+    }
+    if (docVerdict === 'other_type') {
+      console.log('[express-audit] LLM verdict: other_type →', (full.summary || '').slice(0, 120))
+      return NextResponse.json({
+        error: full.summary ||
+          'Это устав кооператива другого типа (гаражный, жилищный, кредитный и т.п.). Наш экспресс-аудит предназначен для потребительских кооперативов по Закону № 3085-1. Напишите нам — разберём ваш устав индивидуально: boss@2980738.ru',
+      }, { status: 422 })
+    }
+
     /* ─── Превью для клиента (без конкретики) ─── */
     const preview: AuditPreview = buildPreview(full)
 
@@ -449,7 +478,7 @@ export async function POST(request: NextRequest) {
           phone: phone || null,
           email,
           message: leadMessage,
-          source: 'consultation', // ближайшая доступная опция из select в коллекции Leads
+          source: 'ai-audit', // лид-магнит 1.3: экспресс-аудит устава
           status: 'new',
           consentAccepted: true,
           consentAt: new Date().toISOString(),
@@ -463,6 +492,29 @@ export async function POST(request: NextRequest) {
       // Лид не создался — не блокируем отдачу результата клиенту
       console.error('[express-audit] Lead creation failed:', leadErr)
     }
+
+    /* --- CLIENT-EMAIL 1.3: письмо клиенту с кратким разбором --- */
+    try {
+      const { sendEmail } = await import('@/lib/email')
+      const riskWord = preview.complianceScore >= 60 ? 'критическое' : preview.complianceScore >= 30 ? 'существенное' : 'незначительное'
+      const html = '<!doctype html><html><body style="margin:0;background:#0a0908"><div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;background:#14110d;border:1px solid #2a2520;border-radius:12px;overflow:hidden">' +
+        '<div style="padding:24px;text-align:center;border-bottom:1px solid #2a2520"><h2 style="color:#F5E6D3;margin:0">Школа ПК — экспресс-аудит устава</h2></div>' +
+        '<div style="padding:28px;color:#D6C6B2;font-size:15px;line-height:1.7">' +
+        '<p>Здравствуйте, ' + name + '!</p>' +
+        '<p>Мы проанализировали файл <b>' + fileName + '</b>. Результат:</p>' +
+        '<p style="text-align:center;font-size:42px;color:#E68863;margin:10px 0"><b>' + preview.complianceScore + '/100</b></p>' +
+        '<p>Отклонений от эталона: <b>' + preview.totalIssuesFound + '</b>, отсутствующих разделов: <b>' + preview.missingSectionsCount + '</b>. Это ' + riskWord + ' отставание от редакции, которая проходит проверки ФНС без доначислений.</p>' +
+        '<p>Полный отчёт (по каждому пункту, с готовыми формулировками) разберём на консультации — по итогам вы получите план правок устава.</p>' +
+        '<p style="text-align:center;margin:28px 0"><a href="https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" style="display:inline-block;padding:14px 34px;background:#C96E4D;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Записаться на полный аудит</a></p>' +
+        '<p style="color:#8B7E6B;font-size:13px">Школа потребительской кооперации · велеслав.рус · 8 902 472-07-38</p>' +
+        '</div></div></body></html>'
+      await sendEmail({
+        to: email,
+        subject: 'Экспресс-аудит вашего устава: ' + preview.complianceScore + '/100 баллов',
+        html,
+      })
+      console.log('[express-audit] client email sent to', email)
+    } catch (e) { console.warn('[express-audit] client email failed:', e) }
 
     /* ─── Telegram с полным результатом (для Велеслава) ─── */
     await notifyExpressAudit({
