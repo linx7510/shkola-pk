@@ -7,7 +7,7 @@ export const GlossaryTerms: CollectionConfig = {
   admin: {
     useAsTitle: 'term',
     defaultColumns: ['term', 'slug', 'category', 'order'],
-    group: 'Контент',
+    group: 'Справочники',
     listSearchableFields: ['term', 'slug'],
   },
   access: { read: () => true },

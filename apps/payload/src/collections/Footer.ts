@@ -6,6 +6,7 @@ import type { GlobalConfig } from 'payload'
 export const Footer: GlobalConfig = {
   slug: 'footer',
   label: 'Подвал сайта',
+  admin: { group: 'Сайт' },
   access: {
     read: () => true,
     update: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'editor' || req.user?.role === 'manager',

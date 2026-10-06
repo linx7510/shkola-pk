@@ -118,7 +118,7 @@ export const ClientProjects: CollectionConfig = {
     plural: 'Проекты клиентов',
   },
   admin: {
-    group: 'Личный кабинет',
+    group: 'Веб-студия',
     useAsTitle: 'coopName',
     defaultColumns: ['coopName', 'client', 'template', 'stage', 'totalXP', 'contract'],
     description: 'Проекты клиентов по договорам. Каждый проект ссылается на шаблон услуги (ServiceTemplate) и наследует его структуру.',

@@ -7,7 +7,7 @@ export const Leads: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'phone', 'email', 'source', 'status', 'createdAt'],
-    group: 'Продажи',
+    group: 'CRM',
     listSearchableFields: ['name', 'email', 'phone'],
   },
   access: {

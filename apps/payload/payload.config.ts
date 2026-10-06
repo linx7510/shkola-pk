@@ -31,6 +31,7 @@ import { Header } from './src/collections/Header'
 import { Footer } from './src/collections/Footer'
 import { AuditLogs } from './src/collections/AuditLogs'
 import { ConsultationBookings } from './src/collections/ConsultationBookings'
+import { BlockTemplates } from './src/collections/BlockTemplates'
 
 // === Custom endpoints ===
 import { updateProjectProgressEndpoint } from './src/endpoints/update-project-progress'
@@ -100,13 +101,25 @@ export default buildConfig({
     user: Users.slug,
     meta: { titleSuffix: ' — Школа ПК', description: 'Панель управления платформой Школа ПК' },
     dateFormat: 'dd.MM.yyyy',
+    components: {
+      beforeDashboard: ['/src/components/Dashboard#Dashboard'],
+      afterNavLinks: ['/src/components/CrmNavLink#CrmNavLink'],
+      views: {
+        crm: {
+          path: '/crm',
+          exact: true,
+          Component: '/src/components/CrmView#CrmView',
+          meta: { title: 'CRM — Заявки' },
+        },
+      },
+    },
   },
   i18n: {
     supportedLanguages: { ru, en },
     fallbackLanguage: 'ru',
   },
   editor: lexicalEditor(),
-  collections: [Users, Media, Categories, Pages, BlogPosts, GlossaryTerms, FaqItems, Courses, Modules, Lessons, Leads, Orders, Services, Enrollments, LessonProgress, ServiceTemplates, ClientProjects, AuditLogs, ConsultationBookings],
+  collections: [Pages, Media, BlockTemplates, BlogPosts, Categories, Courses, Modules, Lessons, Enrollments, LessonProgress, Leads, Orders, ConsultationBookings, Services, ServiceTemplates, ClientProjects, GlossaryTerms, FaqItems, Users, AuditLogs],
   globals: [Settings, Header, Footer],
   // === 20 BLOCKS ===
   blocks: [
@@ -133,7 +146,18 @@ export default buildConfig({
   typescript: { outputFile: path.resolve(dirname, 'src/payload-types.ts') },
   graphQL: { disable: false },
   cors: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'https://xn--80adbka9ab1c.xn--p1acf', 'https://www.xn--80adbka9ab1c.xn--p1acf', 'http://localhost:3000', 'http://frontend:3000'],
-  csrf: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'http://localhost:3000', 'http://frontend:3000'],
+  csrf: ['http://2980738.ru', 'https://2980738.ru', 'https://велеслав.рус', 'https://www.велеслав.рус', 'https://xn--80adbka9ab1c.xn--p1acf', 'https://www.xn--80adbka9ab1c.xn--p1acf', 'http://xn--80adbka9ab1c.xn--p1acf', 'http://localhost:3000', 'http://frontend:3000'],
+  // КРИТИЧНО: карта компонентов админки должна быть на инстансе ДО первого построения
+  // клиентского конфига — иначе _payload_clientConfigs кэшируется пустым (ломаются
+  // удаление заявок и кастомные компоненты до следующего рестарта).
+  onInit: async (payload) => {
+    try {
+      const mod = await import('./src/app/(payload)/importMap.js')
+      payload.importMap = mod.importMap
+    } catch (e: any) {
+      payload.logger.error({ err: e, msg: 'onInit: не удалось установить importMap' })
+    }
+  },
   endpoints: [
     updateProjectProgressEndpoint,
     sendTestEmailEndpoint,

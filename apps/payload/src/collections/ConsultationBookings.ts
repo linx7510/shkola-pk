@@ -36,7 +36,7 @@ export const ConsultationBookings: CollectionConfig = {
   admin: {
     useAsTitle: 'clientName',
     defaultColumns: ['clientName', 'serviceType', 'date', 'time', 'status', 'amount'],
-    group: 'Клиенты',
+    group: 'CRM',
   },
   fields: [
     { name: 'clientName', type: 'text', required: true, label: 'Имя клиента' },

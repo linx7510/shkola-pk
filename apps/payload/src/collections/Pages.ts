@@ -28,7 +28,7 @@ export const Pages: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'isPublished', 'updatedAt'],
-    group: 'Контент',
+    group: 'Сайт',
     listSearchableFields: ['title', 'slug'],
   },
   access: { read: () => true },
@@ -267,6 +267,11 @@ export const Pages: CollectionConfig = {
       name: 'blocks',
       type: 'blocks',
       label: 'Блоки страницы (гибкая компоновка)',
+      admin: {
+        components: {
+          Description: '/src/components/BlocksLibraryButton#BlocksLibraryButton',
+        },
+      },
       blocks: [
         HeroBlock, FeaturesBlock, CtaBlock, ContentBlock, FaqBlock,
         GalleryBlock, PricingBlock, TestimonialsBlock, StatsBlock,

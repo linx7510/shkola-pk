@@ -68,7 +68,7 @@ export const Media: CollectionConfig = {
   },
   admin: {
     defaultColumns: ['filename', 'alt', 'mimeType', 'filesize', 'createdAt'],
-    group: 'Контент',
+    group: 'Сайт',
   },
   access: { read: () => true },
   fields: [

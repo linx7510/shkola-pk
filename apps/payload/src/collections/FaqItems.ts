@@ -7,7 +7,7 @@ export const FaqItems: CollectionConfig = {
   admin: {
     useAsTitle: 'question',
     defaultColumns: ['question', 'category', 'order'],
-    group: 'Контент',
+    group: 'Справочники',
   },
   access: { read: () => true },
   fields: [

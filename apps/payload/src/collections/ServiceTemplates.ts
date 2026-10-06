@@ -172,7 +172,7 @@ export const ServiceTemplates: CollectionConfig = {
     plural: 'Шаблоны услуг',
   },
   admin: {
-    group: 'Конструктор услуг',
+    group: 'Веб-студия',
     useAsTitle: 'name',
     defaultColumns: ['name', 'serviceType', 'priceMin', 'priceMax', 'totalXP', 'isActive'],
     description: 'Шаблоны пакетов услуг. Каждый шаблон = набор этапов, документов, XP, бейджей. Используется для создания ClientProject.',

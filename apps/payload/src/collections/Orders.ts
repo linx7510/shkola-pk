@@ -6,7 +6,7 @@ export const Orders: CollectionConfig = {
   admin: {
     useAsTitle: 'id',
     defaultColumns: ['id', 'user', 'course', 'amount', 'status', 'createdAt'],
-    group: 'Продажи',
+    group: 'CRM',
   },
   access: {
     read: ({ req }) => {

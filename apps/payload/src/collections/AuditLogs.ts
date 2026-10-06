@@ -17,7 +17,7 @@ export const AuditLogs: CollectionConfig = {
   admin: {
     useAsTitle: 'action',
     defaultColumns: ['createdAt', 'user', 'action', 'entity', 'entityId', 'ip'],
-    group: 'Система',
+    group: 'Настройки',
     listSearchableFields: ['action', 'entity', 'entityId'],
     description: 'Журнал всех действий пользователей (создание, редактирование, удаление, вход). Заполняется автоматически. Read-only.',
   },

@@ -7,7 +7,7 @@ export const BlogPosts: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'category', 'isPublished', 'publishedAt'],
-    group: 'Контент',
+    group: 'Блог',
     listSearchableFields: ['title', 'slug'],
   },
   access: {

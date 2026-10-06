@@ -119,7 +119,7 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     defaultColumns: ['name', 'email', 'role', 'isActive', '_verified', 'createdAt'],
-    group: 'Управление',
+    group: 'Настройки',
   },
   access: {
     read: ({ req }) => {

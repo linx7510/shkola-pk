@@ -7,7 +7,7 @@ export const Services: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'price', 'isPublished', 'order'],
-    group: 'Контент',
+    group: 'Веб-студия',
     listSearchableFields: ['title', 'slug'],
   },
   access: { read: () => true },
