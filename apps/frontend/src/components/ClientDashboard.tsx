@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import DashboardTopBar from "@/components/DashboardTopBar";
 
 /**
  * ClientDashboard — главная страница Личного кабинета клиента.
@@ -727,6 +728,7 @@ export default function ClientDashboard() {
   return (
     <>
       <Header />
+      <DashboardTopBar />
       <div style={{ minHeight: '100vh', background: '#0D0C0A', color: '#D6C6B2', paddingTop: 'calc(var(--header-h, 72px) + 2rem)', paddingBottom: '4rem' }}>
       <div style={{ maxWidth: 'var(--container-max, 1400px)', margin: '0 auto', padding: '0 var(--container-px, clamp(1rem, 4vw, 4rem))' }}>
         {/* ─── Кнопка «Выйти» ─── */}

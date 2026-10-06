@@ -63,7 +63,7 @@ function verifyPassword(password: string, salt: string, hash: string): Promise<b
 }
 
 const APP = 'https://велеслав.рус'
-const TOKEN_TTL = 60 * 60 * 8 // 8 часов
+const TOKEN_TTL = 60 * 60 * 24 * 30 // 30 дней (сессия админки)
 
 function page(title: string, body: string, extra = ''): Response {
   const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} — Школа ПК</title>

@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,14 +89,25 @@ export default function LoginPage() {
               >
                 Пароль
               </label>
-              <input
-                type="password"
-                className="form-field"
-                placeholder="••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-field"
+                  placeholder="••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  style={{ paddingRight: "3rem" }}
+                />
+                <button
+                  type="button"
+                  aria-label="Показать пароль"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: "1.15rem", color: "#8B7E6B" }}
+                >
+                  {showPassword ? "🙈" : "👁"}
+                </button>
+              </div>
             </div>
 
             <button
@@ -111,6 +123,10 @@ export default function LoginPage() {
               {loading ? "Входим..." : "Войти"}
             </button>
           </form>
+
+          <p style={{ textAlign: "center", marginTop: "1rem" }}>
+            <Link href="/auth/forgot-password" prefetch={false} className="auth-link" style={{ fontSize: "0.95rem" }}>Забыли пароль?</Link>
+          </p>
 
           <div className="auth-divider">или</div>
 
