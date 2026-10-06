@@ -8,15 +8,15 @@ const nextConfig: NextConfig = {
   // === Performance optimizations ===
   compress: true,
   images: {
-    formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      { protocol: 'https', hostname: '**' },
-      { protocol: 'http', hostname: 'localhost' },
-    ],
+    // Аудит 06.10.2026: AVIF убран (GHSA-2xp9-vwfh-vxw4, RCE в AVIF-оптимизации Next <16.3.3),
+    // remotePatterns убран целиком (CVE-2026-94483 SSRF + RCE-усиление) — next/image в проекте
+    // не используется, все изображения локальные webp по стандарту проекта.
+    formats: ['image/webp'],
     minimumCacheTTL: 86400,
   },
+  // Next 16: ключ верхнего уровня (раньше лежал в experimental — было предупреждение)
+  serverExternalPackages: ["pdf-parse", "mammoth"],
   experimental: {
-    serverExternalPackages: ["pdf-parse", "mammoth"],
     optimizePackageImports: [
       'react',
       'react-dom',

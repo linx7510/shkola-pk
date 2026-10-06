@@ -83,3 +83,8 @@ apps/frontend/public/images/_originals_backup/
 *~
 .idea/
 .vscode/
+
+# Аудит 06.10.2026: рабочие бэкап-копии файлов (не для git)
+*.auditbak
+*.auditbak.*
+*.pre-rotate*

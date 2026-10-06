@@ -37,6 +37,7 @@ import { BlockTemplates } from './src/collections/BlockTemplates'
 import { updateProjectProgressEndpoint } from './src/endpoints/update-project-progress'
 import { sendTestEmailEndpoint } from './src/endpoints/send-test-email'
 import { crmDashboardEndpoint } from './src/endpoints/crm-dashboard'
+import { leadCountEndpoint } from './src/endpoints/lead-count'
 import { mfaLoginPageEndpoint, mfaLoginEndpoint, mfaSetupEndpoint, mfaConfirmEndpoint, mfaDisableEndpoint } from './src/endpoints/mfa'
 
 // === Стандартные 9 блоков ===
@@ -162,6 +163,7 @@ export default buildConfig({
     updateProjectProgressEndpoint,
     sendTestEmailEndpoint,
     crmDashboardEndpoint,
+    leadCountEndpoint,
     mfaLoginPageEndpoint,
     mfaLoginEndpoint,
     mfaSetupEndpoint,

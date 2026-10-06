@@ -185,7 +185,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       site: "@Veles_ST",
       creator: "@Veles_ST",
     },
-    other: (post as any)?.headCode ? { 'custom-head': (post as any).headCode } : undefined,
+    // Аудит 06.10.2026: 'other' с сырым headCode убран — кириллица из него попадала
+    // в HTTP-заголовок ответа (TypeError: Cannot convert argument to a ByteString),
+    // а SEO-эффекта не было: весь HTML запирался в content одного meta-тега.
+    // headCode теперь рендерится скрытым блоком в теле страницы (ниже, рядом с JSON-LD).
   };
 }
 
@@ -330,9 +333,21 @@ export default async function BlogPostPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(authorJsonLd) }} />
+      {/* headCode из админки (JSON-LD FAQPage и др.) — рендерим в теле: Google читает
+          application/ld+json из body; ранее уходил в meta content и не работал вовсе */}
+      {(post as any)?.headCode ? (
+        <div hidden dangerouslySetInnerHTML={{ __html: (post as any).headCode }} />
+      ) : null}
       {/* Preload LCP-обложки статьи для ускорения Largest Contentful Paint */}
+      {/* preload — только путь без домена: Next 16.3 копирует preload в HTTP-заголовок Link,
+          кириллический домен в href ронял ответ (Invalid character in header content) */}
       {coverUrl && (
-        <link rel="preload" as="image" href={coverUrl} fetchPriority="high" />
+        <link
+          rel="preload"
+          as="image"
+          href={coverUrl.startsWith("http") ? new URL(coverUrl).pathname + new URL(coverUrl).search : coverUrl}
+          fetchPriority="high"
+        />
       )}
       <Header />
         <CursorLightLazy />

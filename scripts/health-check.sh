@@ -47,16 +47,34 @@ CURRENT_DISK="ok"
 CURRENT_MEM="ok"
 CURRENT_SSL="ok"
 CURRENT_LOAD="ok"
+CURRENT_FAIL2BAN="ok"
 
 # ─── Check Frontend (:3000) ───
-if ! curl -sf http://localhost:3000/ > /dev/null 2>&1; then
+# v3 (аудит 06.10.2026): curl с --max-time + 3 ретрая до вердикта down (медленный старт ≠ падение)
+check_url() {
+    local url="$1" i
+    for i in 1 2 3; do
+        curl -sf --max-time 10 "$url" > /dev/null 2>&1 && return 0
+        [ "$i" -lt 3 ] && sleep 5
+    done
+    return 1
+}
+
+if ! check_url http://localhost:3000/; then
     echo "$DATE [CRITICAL] Frontend (:3000) is down! Restarting..." >> $LOG
     pm2_as_shkola restart shkola-pk-frontend > /dev/null 2>&1
-    sleep 3
-    if curl -sf http://localhost:3000/ > /dev/null 2>&1; then
+    sleep 10
+    if check_url http://localhost:3000/; then
         echo "$DATE [OK] Frontend recovered after restart" >> $LOG
     else
-        echo "$DATE [CRITICAL] Frontend still down after restart" >> $LOG
+        # вторая попытка рестарта (раньше сдавались слишком рано)
+        pm2_as_shkola restart shkola-pk-frontend > /dev/null 2>&1
+        sleep 15
+        if check_url http://localhost:3000/; then
+            echo "$DATE [OK] Frontend recovered after second restart" >> $LOG
+        else
+            echo "$DATE [CRITICAL] Frontend still down after restart" >> $LOG
+        fi
     fi
     CURRENT_FRONTEND="down"
     if [ "$PREV_FRONTEND" = "ok" ]; then
@@ -69,14 +87,20 @@ else
 fi
 
 # ─── Check Payload CMS (:3001) ───
-if ! curl -sf http://localhost:3001/admin > /dev/null 2>&1; then
+if ! check_url http://localhost:3001/admin; then
     echo "$DATE [CRITICAL] Payload CMS (:3001) is down! Restarting..." >> $LOG
     pm2_as_shkola restart shkola-pk-cms > /dev/null 2>&1
-    sleep 5
-    if curl -sf http://localhost:3001/admin > /dev/null 2>&1; then
+    sleep 10
+    if check_url http://localhost:3001/admin; then
         echo "$DATE [OK] CMS recovered after restart" >> $LOG
     else
-        echo "$DATE [CRITICAL] CMS still down after restart" >> $LOG
+        pm2_as_shkola restart shkola-pk-cms > /dev/null 2>&1
+        sleep 15
+        if check_url http://localhost:3001/admin; then
+            echo "$DATE [OK] CMS recovered after second restart" >> $LOG
+        else
+            echo "$DATE [CRITICAL] CMS still down after restart" >> $LOG
+        fi
     fi
     CURRENT_CMS="down"
     if [ "$PREV_CMS" = "ok" ]; then
@@ -158,6 +182,27 @@ if [ "$LOAD_INT" -ge "$LOAD_THRESHOLD" ]; then
     fi
 fi
 
+# ─── Check system units: fail2ban (умирал незамеченным 6 дней — аудит 06.10.2026) ───
+if ! systemctl is-active --quiet fail2ban; then
+    echo "$DATE [CRITICAL] fail2ban is NOT active! Trying restart..." >> $LOG
+    systemctl restart fail2ban > /dev/null 2>&1
+    sleep 2
+    if systemctl is-active --quiet fail2ban; then
+        echo "$DATE [OK] fail2ban recovered after restart" >> $LOG
+    else
+        echo "$DATE [CRITICAL] fail2ban still down — check /etc/fail2ban/jail.local" >> $LOG
+    fi
+    if [ "${PREV_FAIL2BAN:-ok}" = "ok" ]; then
+        send_telegram "🔴 <b>Школа ПК: fail2ban упал</b>%0A%0AПопытка рестарта выполнена автоматически."
+    fi
+    CURRENT_FAIL2BAN="down"
+else
+    CURRENT_FAIL2BAN="ok"
+    if [ "${PREV_FAIL2BAN:-ok}" = "down" ]; then
+        send_telegram "✅ <b>Школа ПК: fail2ban восстановлен</b>"
+    fi
+fi
+
 # ─── Check PM2 process count (sanity) ───
 PM2_PROCS=$(pm2_as_shkola jlist 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))" 2>/dev/null || echo 0)
 if [ "$PM2_PROCS" -lt 2 ]; then
@@ -177,6 +222,7 @@ PREV_DISK="$CURRENT_DISK"
 PREV_MEM="$CURRENT_MEM"
 PREV_SSL="$CURRENT_SSL"
 PREV_LOAD="$CURRENT_LOAD"
+PREV_FAIL2BAN="$CURRENT_FAIL2BAN"
 EOF
 
 # Log summary line

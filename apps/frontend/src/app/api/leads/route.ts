@@ -80,13 +80,18 @@ export async function POST(request: NextRequest) {
     const clientHash = hashIp(rawIp)
 
     // App-level rate limit: не более 5 заявок в час с одного IP (защита от спама лидов поверх nginx-лимита)
+    // Аудит 06.10.2026: раньше счётчик ходил в GET /api/leads?where[ipHash]… — а read лидов закрыт
+    // для анонимов (403), исключение молча глоталось и лимит НЕ РАБОТАЛ. Теперь специальный
+    // публичный эндпоинт-счётчик /api/lead-count в CMS (Local API, отдаёт только число).
+    // Сбой счётчика по-прежнему не блокирует приём заявки, но теперь ЛОГИРУЕТСЯ, а не молчит.
     try {
-      const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
-      const cnt = await payloadApi(`/leads?where[ipHash][equals]=${clientHash}&where[createdAt][greater_than]=${hourAgo}&limit=100&depth=0`, { method: 'GET' })
-      if (cnt?.totalDocs >= 5) {
+      const cnt = await payloadApi(`/lead-count?ipHash=${clientHash}`, { method: 'GET' })
+      if (cnt?.count >= 5) {
         return NextResponse.json({ error: 'Слишком много заявок. Позвоните нам: +7 (902) 472-07-38' }, { status: 429 })
       }
-    } catch { /* лимит не должен блокировать приём при сбое счётчика */ }
+    } catch (e) {
+      console.error('[leads] rate-limit counter failed (заявка принята без лимита):', e)
+    }
 
     // Создаём лид в Payload
     const lead = await payloadApi('/leads', {

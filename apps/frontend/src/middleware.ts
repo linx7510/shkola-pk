@@ -21,13 +21,15 @@ export function middleware(request: NextRequest) {
   const reportUri = '/api/csp-report'
 
   // === Enforced CSP — blocks violations, reports them ===
+  // Аудит 06.10.2026: 'unsafe-eval' убран — report-only версия жила без него
+  // (нарушений в /api/csp-report не было), продакшн-код Next 16 eval не использует.
   const cspEnforced = [
     `default-src 'self'`,
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `script-src 'self' 'unsafe-inline' https://mc.yandex.ru https://yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
-    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `connect-src 'self' https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `frame-src 'self' https://challenges.cloudflare.com https://vk.com https://vkvideo.ru https://www.youtube.com https://rutube.ru https://captcha-api.yandex.ru`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
@@ -45,7 +47,7 @@ export function middleware(request: NextRequest) {
     `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `font-src 'self' data:`,
     `img-src 'self' data: https: blob:`,
-    `connect-src 'self' https://api.deepseek.com https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
+    `connect-src 'self' https://mc.yandex.ru https://yandex.ru wss://mc.yandex.ru https://challenges.cloudflare.com https://captcha-api.yandex.ru`,
     `frame-src 'self' https://challenges.cloudflare.com https://vk.com https://vkvideo.ru https://www.youtube.com https://rutube.ru https://captcha-api.yandex.ru`,
     `frame-ancestors 'self'`,
     `base-uri 'self'`,
