@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
+import CursorLightLazy from "@/components/CursorLightLazy"
+import BlogParticles from "@/components/BlogParticles"
 import Footer from "@/components/Footer";
 import { BlockRenderer } from "@/components/BlockRenderer";
 import AIConsultantLazy from "@/components/AIConsultantLazy";
@@ -100,6 +102,8 @@ export default async function UslugiPage() {
   return (
     <>
       <Header />
+      <BlogParticles />
+      <CursorLightLazy />
       <Breadcrumbs items={[
         { label: "Главная", href: "/" },
         { label: "Услуги для ПК" }

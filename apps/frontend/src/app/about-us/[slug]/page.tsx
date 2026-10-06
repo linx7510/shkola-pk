@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import { Metadata } from "next"
 import { BlockRenderer } from "@/components/BlockRenderer"
 import Header from "@/components/Header"
+import CursorLightLazy from "@/components/CursorLightLazy"
+import BlogParticles from "@/components/BlogParticles"
 import Footer from "@/components/Footer"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { breadcrumbJsonLd } from "@/components/Breadcrumbs"
@@ -130,6 +132,8 @@ export default async function AboutSubPage({ params }: Props) {
   return (
     <>
       <Header />
+      <BlogParticles />
+      <CursorLightLazy />
       <Breadcrumbs items={crumbs} />
       <main style={{ paddingTop: 0, minHeight: "60vh" }}>
         {isEvents && (

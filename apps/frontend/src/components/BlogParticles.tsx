@@ -44,13 +44,14 @@ export default function BlogParticles() {
     if (!ctx) return;
 
     let raf = 0;
+      let lastFrame = 0;
     let paused = false;
     let mouseX = -1000;
     let mouseY = -1000;
     let mouseActive = false;
     const REPEL_RADIUS = 130;
     const REPEL_FORCE = 0.8;
-    const MAX_PARTICLES = 50;
+    const MAX_PARTICLES = 32;
 
     interface Particle {
       x: number;
@@ -141,6 +142,11 @@ export default function BlogParticles() {
         ctx.fillStyle = "hsla(" + p.hue + ", 85%, 72%, " + Math.min(1, p.alpha * 1.2) + ")";
         ctx.fill();
       }
+
+      // FPS cap 30 — экономим main-thread
+      const now = performance.now();
+      if (now - lastFrame < 33) { raf = requestAnimationFrame(draw); return; }
+      lastFrame = now;
 
       raf = requestAnimationFrame(draw);
     }

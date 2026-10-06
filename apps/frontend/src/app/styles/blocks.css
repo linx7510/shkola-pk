@@ -591,3 +591,10 @@
   color: rgba(245,240,232,0.65);
   margin-top: 0.3rem;
 }
+/* Perf: blur дорог на мобильных */
+@media (max-width: 768px) {
+  .c500-glass, .bs-glass, [class*='glass'] {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

@@ -4,6 +4,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import KooperativPodKlyuchLanding from "@/components/KooperativPodKlyuchLanding"
 import AuditUstavaLanding from "@/components/AuditUstavaLanding"
+import Reveal from "@/components/Reveal"
+import CursorLightLazy from "@/components/CursorLightLazy"
+import BlogParticles from "@/components/BlogParticles"
 import Breadcrumbs from "@/components/Breadcrumbs"
 import { breadcrumbJsonLd } from "@/components/Breadcrumbs"
 
@@ -116,6 +119,8 @@ export default async function UslugiPodSlugPage({ params }: Props) {
     return (
       <>
         <Header />
+        <BlogParticles />
+        <CursorLightLazy />
         <style>{`.uslugi-scope{max-width:1280px;margin:0 auto;width:100%}
 .uslugi-scope img{max-width:350px;height:auto}
 @media(max-width:1320px){.uslugi-scope{padding:0 1rem}}
@@ -162,6 +167,8 @@ export default async function UslugiPodSlugPage({ params }: Props) {
     return (
       <>
         <Header />
+        <BlogParticles />
+        <CursorLightLazy />
         <style>{`.uslugi-scope{max-width:1280px;margin:0 auto;width:100%}
 .uslugi-scope img{max-width:350px;height:auto}
 @media(max-width:1320px){.uslugi-scope{padding:0 1rem}}
@@ -190,6 +197,8 @@ export default async function UslugiPodSlugPage({ params }: Props) {
   return (
     <>
       <Header />
+        <BlogParticles />
+        <CursorLightLazy />
       <Breadcrumbs items={[
         { label: "Главная", href: "/" },
         { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
@@ -206,10 +215,14 @@ export default async function UslugiPodSlugPage({ params }: Props) {
           <BlockRenderer blocks={blocks} />
         ) : hasContent ? (
           <section style={{ padding: "0 1.5rem 4rem", maxWidth: 1280, margin: "0 auto" }}>
-            <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2", marginBottom: "1.5rem", fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800 }}>
-              {(page as any).title}
-            </h1>
-            <div className="article-content" style={{ color: "#D6C6B2", lineHeight: 1.8, fontSize: "1.05rem" }} dangerouslySetInnerHTML={{ __html: pageContent }} />
+            <Reveal>
+              <h1 className="heading-sweep" data-text={(page as any).title || ""} style={{ color: "#D6C6B2", marginBottom: "1.5rem", fontSize: "clamp(1.8rem, 4vw, 2.5rem)", fontWeight: 800 }}>
+                {(page as any).title}
+              </h1>
+            </Reveal>
+            <Reveal delay={1}>
+              <div className="article-content" style={{ color: "#D6C6B2", lineHeight: 1.8, fontSize: "1.05rem" }} dangerouslySetInnerHTML={{ __html: pageContent }} />
+            </Reveal>
           </section>
         ) : (
           <section style={{ padding: "0 1.5rem 4rem", maxWidth: 800, margin: "0 auto" }}>

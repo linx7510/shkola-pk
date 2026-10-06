@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import Breadcrumbs from "@/components/Breadcrumbs"
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 import Header from "@/components/Header";
+import CursorLightLazy from "@/components/CursorLightLazy"
+import BlogParticles from "@/components/BlogParticles"
 import Footer from "@/components/Footer";
 import BlogListClient from "./BlogListClient";
 import AIConsultantLazy from "@/components/AIConsultantLazy";
@@ -40,6 +42,8 @@ export default async function BlogPage() {
   return (
     <>
       <Header />
+      <BlogParticles />
+      <CursorLightLazy />
       <Breadcrumbs items={[
         { label: "Главная", href: "/" },
         { label: "Блог" }

@@ -4,6 +4,7 @@ import { BlockRenderer } from '@/components/BlockRenderer'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CursorLightLazy from '@/components/CursorLightLazy'
+import BlogParticles from '@/components/BlogParticles'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import { breadcrumbJsonLd } from '@/components/Breadcrumbs'
 import DonateForm from '@/components/DonateForm'
@@ -200,6 +201,7 @@ export default async function SlugPage({ params }: Props) {
     <>
       <Header />
       <CursorLightLazy />
+      <BlogParticles />
       <Breadcrumbs items={[
         { label: 'Главная', href: '/' },
         { label: (page as any).title || '' }

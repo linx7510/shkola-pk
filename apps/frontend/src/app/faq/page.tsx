@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 export const revalidate = 300; // ISR: revalidate every 5 minutes
 import Breadcrumbs from "@/components/Breadcrumbs"
-import Header from "@/components/Header";
+import Header from "@/components/Header"
+import CursorLightLazy from "@/components/CursorLightLazy"
+import BlogParticles from "@/components/BlogParticles";
 import Footer from "@/components/Footer";
 import FaqListClient from "./FaqListClient";
 
@@ -158,6 +160,8 @@ export default async function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <Header />
+      <BlogParticles />
+      <CursorLightLazy />
       <Breadcrumbs items={[
         { label: "Главная", href: "/" },
         { label: "FAQ" }
