@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Читаем seoHeadCode и headCode из БД — для произвольных мета-тегов
   const headCodeForMeta = (page as any).seoHeadCode || (page as any).headCode || ''
   const metaTags = headCodeForMeta ? parseMetaTags(headCodeForMeta) : {}
-  const description = (page as any).meta?.description || (page as any).metaDescription || (page as any).excerpt || ''
+  const description = (page as any).hero?.description || (page as any).meta?.description || (page as any).metaDescription || (page as any).excerpt || ''
   
   // Для about-us — используем фото Велеслава и type=profile
   const isAboutUs = slug === 'about-us'

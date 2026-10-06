@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
   const isCpp = slug === "celevie-potrebitelskie-programmy"
   const description = isCpp
     ? "Разработка целевых потребительских программ (ЦПП): защита от проверок ФНС, переквалификации и доначислений. 4 тарифа: от 5 000 до 65 000 ₽. Практика с 2015 года, 120+ кооперативов."
-    : (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
+    : (page as any).hero?.description || (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
   
   const BASE_URL = "https://велеслав.рус"
   const finalTitle = isCpp
@@ -122,6 +122,11 @@ export default async function UslugiPodSlugPage({ params }: Props) {
 `}</style>
         <div className="uslugi-scope">
         <KooperativPodKlyuchLanding />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
+        { label: "Главная", href: "/" },
+        { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
+        { label: (page as any).title || "" }
+      ], "https://велеслав.рус")) }} />
         </div>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       </>
@@ -163,6 +168,11 @@ export default async function UslugiPodSlugPage({ params }: Props) {
 `}</style>
         <div className="uslugi-scope">
         <AuditUstavaLanding />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd([
+        { label: "Главная", href: "/" },
+        { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov" },
+        { label: (page as any).title || "" }
+      ], "https://велеслав.рус")) }} />
         </div>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       </>

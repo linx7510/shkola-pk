@@ -11,9 +11,9 @@ const serviceLinks = [
   { label: "Налоговая и судебная практика", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
   { label: "Сопровождение при проверках", href: "/uslugi-dlya-potrebitelskih-kooperativov#tax-practice" },
   { label: "Готовый ПК «под ключ»", href: "/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch" },
-  { label: "Бухгалтерское сопровождение", href: "/uslugi-dlya-potrebitelskih-kooperativov#accounting" },
+  { label: "Бухгалтерское сопровождение", href: "/uslugi-dlya-potrebitelskih-kooperativov/buhgalterskoe-obsluzhivanie" },
   { label: "Обучение председателей", href: "/uslugi-dlya-potrebitelskih-kooperativov#education" },
-  { label: "Сайт для кооператива", href: "/uslugi-dlya-potrebitelskih-kooperativov#website" },
+  { label: "Создание сайта для кооператива", href: "/uslugi-dlya-potrebitelskih-kooperativov/sozdanie-sajta-dlya-kooperativov" },
   { label: "Полный прайс-лист", href: "/uslugi-dlya-potrebitelskih-kooperativov#pricing" },
 ];
 
@@ -26,14 +26,26 @@ const defaultNavItems = [
   { label: "О нас", href: "/about-us" },
 ];
 
+function CabinetLink({ className, onClick }: { className?: string; onClick?: () => void }) {
+  const [href, setHref] = useState("/login");
+  useEffect(() => {
+    try { if (localStorage.getItem("auth_token")) setHref("/dashboard"); } catch {}
+  }, []);
+  return (
+    <Link href={href} prefetch={false} className={className} onClick={onClick}>
+      Кабинет
+    </Link>
+  );
+}
+
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [servicesOpen, setServicesOpen] = useState(false);
+  // какой пункт шапки раскрыт сейчас (по label) — открыт только тот, на который навели
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [navItems, setNavItems] = useState(defaultNavItems);
   const [headerData, setHeaderData] = useState<any>(null);
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -75,12 +87,12 @@ export default function Header() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const handleDropdownEnter = () => {
+  const handleDropdownEnter = (label: string) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setServicesOpen(true);
+    setOpenDropdown(label);
   };
   const handleDropdownLeave = () => {
-    timeoutRef.current = setTimeout(() => setServicesOpen(false), 200);
+    timeoutRef.current = setTimeout(() => setOpenDropdown(null), 200);
   };
 
   return (
@@ -98,8 +110,7 @@ export default function Header() {
                 <div
                   key={item.label}
                   className="header-dropdown-wrap"
-                  ref={dropdownRef}
-                  onMouseEnter={handleDropdownEnter}
+                  onMouseEnter={() => handleDropdownEnter(item.label)}
                   onMouseLeave={handleDropdownLeave}
                 >
                   <Link href={item.href} prefetch={false} className="header-nav-link">
@@ -108,7 +119,7 @@ export default function Header() {
                       <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" />
                     </svg>
                   </Link>
-                  {servicesOpen && (
+                  {openDropdown === item.label && (
                     <div className="header-dropdown">
                       {item.dropdown.map((sub) => (
                         <Link key={sub.label} href={sub.href} prefetch={false} className="header-dropdown-link">
@@ -125,7 +136,7 @@ export default function Header() {
               )
             )}
             {/* Кабинет — рядом с навигацией, как в 033 */}
-            <Link href="/login" prefetch={false} className="header-cta-btn">Кабинет</Link>
+            <CabinetLink className="header-cta-btn" />
           </nav>
 
           {/* Правый верхний угол: телефон + соцсети */}
@@ -186,16 +197,19 @@ export default function Header() {
               <div key={item.label}>
                 <button
                   className="mobile-nav-link mobile-accordion-btn"
-                  onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+                  onClick={() => setOpenMobileDropdown(openMobileDropdown === item.label ? null : item.label)}
                 >
                   {item.label}
-                  <span className={`chevron ${mobileServicesOpen ? "open" : ""}`}>+</span>
+                  <span className={`chevron ${openMobileDropdown === item.label ? "open" : ""}`}>+</span>
                 </button>
-                {mobileServicesOpen && (
+                {openMobileDropdown === item.label && (
                   <div className="mobile-accordion-panel">
-                    <Link href={item.href} prefetch={false} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
-                      Все услуги
-                    </Link>
+                    {/* ссылка на раздел — только если её нет среди подпунктов */}
+                    {!item.dropdown.some((sub) => sub.href === item.href) && (
+                      <Link href={item.href} prefetch={false} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
+                        {item.label.includes("Услуг") ? "Все услуги" : item.label}
+                      </Link>
+                    )}
                     {item.dropdown.map((sub) => (
                       <Link key={sub.label} href={sub.href} prefetch={false} className="mobile-nav-link mobile-sub" onClick={() => setMobileOpen(false)}>
                         {sub.label}
@@ -210,7 +224,7 @@ export default function Header() {
               </Link>
             )
           )}
-          <Link href="/login" prefetch={false} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>Кабинет</Link>
+          <CabinetLink className="mobile-nav-link" onClick={() => setMobileOpen(false)} />
           <a href="tel:+79024720738" className="mobile-phone-link">+7 (902) 472-07-38</a>
           {/* Соцсети в мобильном меню */}
           <div className="mobile-socials">

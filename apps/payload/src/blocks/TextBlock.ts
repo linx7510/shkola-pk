@@ -18,5 +18,6 @@ export const TextBlock: Block = {
       { label: 'Слева', value: 'left' },
     ], defaultValue: 'right' },
     { name: 'imageWidth', type: 'number', label: 'Ширина изображения (px)', defaultValue: 400 },
+    { name: 'imageAlt', type: 'text', label: 'Alt изображения (SEO)' },
   ],
 }

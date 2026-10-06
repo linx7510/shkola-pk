@@ -111,7 +111,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
   const stats = [
     {value:"2015", label:"Работаем с 2015 года"},
-    {value:"100+", label:"успешных кейсов"},
+    {value:"200+", label:"успешных кейсов"},
     {value:"4", label:"пакета обучения"},
     {value:"12 мес", label:"Поддержка до 12 месяцев"},
   ];
@@ -212,6 +212,8 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
 
   const S:React.CSSProperties = {padding:"4rem 0"};
   const I:React.CSSProperties = {maxWidth:"var(--container-max,1600px)",margin:"0 auto",padding:"0 var(--container-px,clamp(1rem,4vw,4rem))"};
+  // Анонс личных встреч в Москве — чтобы убрать с главной, поставить false и пересобрать фронт
+  const SHOW_MOSCOW_ANNOUNCE = true;
 
   return (
     <>
@@ -219,8 +221,40 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       <CursorLight />
       <Header />
 
+      {/* ===== АНОНС: ЛИЧНЫЕ ВСТРЕЧИ В МОСКВЕ 12–13 ОКТЯБРЯ ===== */}
+      {SHOW_MOSCOW_ANNOUNCE && (
+        <section style={{...I, marginTop:"calc(var(--header-h,72px) + 1.25rem)", position:"relative", zIndex:2}}>
+          <Link href="/about-us/meropriyatiya" style={{textDecoration:"none", display:"block"}}>
+            <div style={{
+              background:"linear-gradient(135deg, rgba(201,110,77,0.22), rgba(230,136,99,0.07) 55%, rgba(201,110,77,0.16))",
+              border:"1px solid rgba(230,136,99,0.45)",
+              borderRadius:18,
+              padding:"1.4rem 1.8rem",
+              display:"flex",
+              alignItems:"center",
+              gap:"1.5rem",
+              flexWrap:"wrap",
+              boxShadow:"0 10px 34px rgba(201,110,77,0.18)",
+            }}>
+              <div style={{fontSize:"2.2rem", lineHeight:1}}>🤝</div>
+              <div style={{flex:"1 1 340px"}}>
+                <div style={{color:"#E68863", fontWeight:800, fontSize:"1.15rem", letterSpacing:"0.01em"}}>
+                  Личные встречи в Москве — 12 и 13 октября
+                </div>
+                <div style={{color:"rgba(214,198,178,0.92)", fontSize:"1rem", marginTop:"0.3rem"}}>
+                  Велеслав Старков отвечает лично и конфиденциально: концепция и роли, управление, налоги и обнуление НДС, вертикальная интеграция и группа компаний. Консультации, бизнес-завтраки, встречи в вашем офисе, мозговые штурмы. Места ограничены.
+                </div>
+              </div>
+              <span className="btn-primary" style={{whiteSpace:"nowrap", padding:"0.75rem 1.4rem"}}>
+                Программа и запись →
+              </span>
+            </div>
+          </Link>
+        </section>
+      )}
+
       {/* ===== HERO ===== */}
-      <section id="hero" style={{minHeight:"60vh",display:"flex",alignItems:"center",background:"transparent",paddingTop:"calc(var(--header-h,72px) + 1rem)",position:"relative",overflow:"hidden"}}>
+      <section id="hero" style={{minHeight:"60vh",display:"flex",alignItems:"center",background:"transparent",paddingTop: SHOW_MOSCOW_ANNOUNCE ? "1.5rem" : "calc(var(--header-h,72px) + 1rem)",position:"relative",overflow:"hidden"}}>
         <div className="hero__ambient" />
         <div style={{...I,width:"100%",position:"relative",zIndex:2}}>
           <Reveal>

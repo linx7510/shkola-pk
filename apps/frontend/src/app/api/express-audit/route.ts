@@ -496,21 +496,33 @@ export async function POST(request: NextRequest) {
     /* --- CLIENT-EMAIL 1.3: письмо клиенту с кратким разбором --- */
     try {
       const { sendEmail } = await import('@/lib/email')
-      const riskWord = preview.complianceScore >= 60 ? 'критическое' : preview.complianceScore >= 30 ? 'существенное' : 'незначительное'
-      const html = '<!doctype html><html><body style="margin:0;background:#0a0908"><div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;background:#14110d;border:1px solid #2a2520;border-radius:12px;overflow:hidden">' +
+      const highs = (full.risks || []).filter(r => r.severity === 'high')
+      const mids = (full.risks || []).filter(r => r.severity !== 'high')
+      const riskBlock = (arr: any[]) => arr.map(r =>
+        '<p style="margin:0 0 14px"><b style="color:#E68863">' + r.title + '</b><br>' +
+        (r.category ? '<span style="color:#8B7E6B;font-size:13px">' + r.category + '</span><br>' : '') +
+        r.description + '</p>').join('')
+      const missingList = (full.missing_sections || []).length
+        ? '<p style="color:#D6C6B2;line-height:1.8"><b>И ' + full.missing_sections.length + ' разделов, которые обязаны быть в уставе, но отсутствуют полностью:</b><br>' +
+          full.missing_sections.map((s: string) => '• ' + s).join('<br>') + '</p>'
+        : ''
+      const html = '<!doctype html><html><body style="margin:0;background:#0a0908"><div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;background:#14110d;border:1px solid #2a2520;border-radius:12px;overflow:hidden">' +
         '<div style="padding:24px;text-align:center;border-bottom:1px solid #2a2520"><h2 style="color:#F5E6D3;margin:0">Школа ПК — экспресс-аудит устава</h2></div>' +
         '<div style="padding:28px;color:#D6C6B2;font-size:15px;line-height:1.7">' +
         '<p>Здравствуйте, ' + name + '!</p>' +
-        '<p>Мы проанализировали файл <b>' + fileName + '</b>. Результат:</p>' +
-        '<p style="text-align:center;font-size:42px;color:#E68863;margin:10px 0"><b>' + preview.complianceScore + '/100</b></p>' +
-        '<p>Отклонений от эталона: <b>' + preview.totalIssuesFound + '</b>, отсутствующих разделов: <b>' + preview.missingSectionsCount + '</b>. Это ' + riskWord + ' отставание от редакции, которая проходит проверки ФНС без доначислений.</p>' +
-        '<p>Полный отчёт (по каждому пункту, с готовыми формулировками) разберём на консультации — по итогам вы получите план правок устава.</p>' +
-        '<p style="text-align:center;margin:28px 0"><a href="https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" style="display:inline-block;padding:14px 34px;background:#C96E4D;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold">Записаться на полный аудит</a></p>' +
+        '<p>Вчера мы разобрали ваш устав (файл <b>' + fileName + '</b>). Коротко: <b>классический кооператив по Закону 3085-1 — но с отклонениями, за которые цепляется и налоговая, и банк.</b> Балл <b style="color:#E68863">' + preview.complianceScore + '/100</b>, отклонений — <b>' + preview.totalIssuesFound + '</b>.</p>' +
+        '<p style="color:#F5E6D3;font-weight:bold">Что у вас проседает сильнее всего:</p>' +
+        (highs.length ? riskBlock(highs) : '') +
+        (mids.length ? '<p style="color:#F5E6D3;font-weight:bold;margin-top:18px">Также обращает на себя внимание:</p>' + riskBlock(mids) : '') +
+        missingList +
+        '<p style="color:#D6C6B2;line-height:1.7">Это не придирки: именно на таких строках ФНС и банки строят претензии к кооперативам. Кейс GOLDEN AXIS — 7,3 млн ₽ доначислений — начался с менее болезненного устава, чем ваш сейчас.</p>' +
+        '<p style="color:#D6C6B2;line-height:1.7"><b>Полный разбор с готовыми формулировками под каждую правку — на консультации.</b> После неё у вас будет построчный план, как привести устав в редакцию, которая проходит проверки без вопросов.</p>' +
+        '<p style="text-align:center;margin:28px 0"><a href="https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" style="display:inline-block;padding:14px 34px;background:#C96E4D;color:#1a1511;text-decoration:none;border-radius:8px;font-weight:bold">Записаться на полный аудит</a></p>' +
         '<p style="color:#8B7E6B;font-size:13px">Школа потребительской кооперации · велеслав.рус · 8 902 472-07-38</p>' +
         '</div></div></body></html>'
       await sendEmail({
         to: email,
-        subject: 'Экспресс-аудит вашего устава: ' + preview.complianceScore + '/100 баллов',
+        subject: 'Ваш устав: ' + preview.complianceScore + '/100 — вот где он проседает',
         html,
       })
       console.log('[express-audit] client email sent to', email)
