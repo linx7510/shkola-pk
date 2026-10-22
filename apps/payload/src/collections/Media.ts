@@ -77,7 +77,7 @@ export const Media: CollectionConfig = {
       type: 'ui',
       admin: {
         components: {
-          Field: { path: '../components/DownloadButton', serverProps: {} },
+          Field: { path: '@/components/DownloadButton', serverProps: {} },
         },
       },
     },

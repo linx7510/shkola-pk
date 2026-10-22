@@ -20,6 +20,8 @@ import { Courses } from './src/collections/Courses'
 import { Modules } from './src/collections/Modules'
 import { Lessons } from './src/collections/Lessons'
 import { Leads } from './src/collections/Leads'
+import { Deals } from './src/collections/Deals'
+import { Subscribers } from './src/collections/Subscribers'
 import { ServiceTemplates } from './src/collections/ServiceTemplates'
 import { ClientProjects } from './src/collections/ClientProjects'
 import { Orders } from './src/collections/Orders'
@@ -112,6 +114,16 @@ export default buildConfig({
           Component: '/src/components/CrmView#CrmView',
           meta: { title: 'CRM — Заявки' },
         },
+        deals: {
+          path: '/crm/deals',
+          exact: true,
+          Component: '/src/components/CrmDealsView#CrmDealsView',
+          meta: { title: 'CRM — Воронка сделок' },
+        },
+      },
+      graphics: {
+        Logo: '/src/components/Logo#Logo',
+        Icon: '/src/components/LogoIcon#LogoIcon',
       },
     },
   },
@@ -120,7 +132,7 @@ export default buildConfig({
     fallbackLanguage: 'ru',
   },
   editor: lexicalEditor(),
-  collections: [Pages, Media, BlockTemplates, BlogPosts, Categories, Courses, Modules, Lessons, Enrollments, LessonProgress, Leads, Orders, ConsultationBookings, Services, ServiceTemplates, ClientProjects, GlossaryTerms, FaqItems, Users, AuditLogs],
+  collections: [Pages, Media, BlockTemplates, BlogPosts, Categories, Courses, Modules, Lessons, Enrollments, LessonProgress, Leads, Deals, Subscribers, Orders, ConsultationBookings, Services, ServiceTemplates, ClientProjects, GlossaryTerms, FaqItems, Users, AuditLogs],
   globals: [Settings, Header, Footer],
   // === 20 BLOCKS ===
   blocks: [

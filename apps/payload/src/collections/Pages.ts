@@ -34,29 +34,17 @@ export const Pages: CollectionConfig = {
   access: { read: () => true },
   hooks: {
     ...createAuditHooks('page'),
-    beforeRead: [
-      ({ req }: any) => {
-        // Default sort: home page first (sortOrder=0), then most recently updated
-        if (!req.query || !req.query.sort) {
-          if (!req.query) req.query = {}
-          req.query.sort = 'sortOrder'
+    beforeOperation: [
+      ({ operation, args }: any) => {
+        // Список страниц: Главная (sortOrder=0) всегда сверху, затем по дате правки.
+        // Подменяем только дефолтную сортировку (sort не задан или это дефолтный
+        // '-updatedAt' из админки) — явный клик по другой колонке не трогаем.
+        if (operation !== 'read' || args?.id) return
+        const current = args?.sort
+        const flat = Array.isArray(current) ? current.join(',') : current
+        if (!flat || flat === '-updatedAt') {
+          args.sort = ['sortOrder', '-updatedAt']
         }
-      },
-    ],
-    afterRead: [
-      ({ docs, req }: any) => {
-        // Если это запрос списка (не отдельный документ) — пересортировать
-        if (!docs || !Array.isArray(docs) || docs.length <= 1) return docs
-        // Сортируем: home (sortOrder=0) первым, потом по -updatedAt
-        return docs.sort((a: any, b: any) => {
-          const sa = a.sortOrder ?? 1
-          const sb = b.sortOrder ?? 1
-          if (sa !== sb) return sa - sb
-          // При одинаковом sortOrder — новее первым
-          const da = new Date(a.updatedAt || 0).getTime()
-          const db = new Date(b.updatedAt || 0).getTime()
-          return db - da
-        })
       },
     ],
     afterChange: [
