@@ -23,9 +23,10 @@ interface EmailOptions {
   to: string;
   subject: string;
   html: string;
+  text?: string;
 }
 
-export async function sendEmail({ to, subject, html }: EmailOptions): Promise<boolean> {
+export async function sendEmail({ to, subject, html, text }: EmailOptions): Promise<boolean> {
   // If SMTP is not configured, log instead
   if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.log(`📧 Email would be sent to: ${to}`);
@@ -41,12 +42,45 @@ export async function sendEmail({ to, subject, html }: EmailOptions): Promise<bo
       to,
       subject,
       html,
+      ...(text ? { text } : {}),
     });
     console.log(`📧 Email sent to: ${to}, subject: ${subject}`);
     return true;
   } catch (error) {
     console.error('Email send error:', error);
     return false;
+  }
+}
+
+
+// Личный канал (boss@2980738.ru) — для важных писем клиенту: тёплая репутация у получателей
+let personalTransporter: nodemailer.Transporter | null = null
+export async function sendPersonalEmail({ to, subject, html, text }: {
+  to: string; subject: string; html: string; text?: string
+}): Promise<boolean> {
+  try {
+    if (!personalTransporter) {
+      personalTransporter = nodemailer.createTransport({
+        host: process.env.SMTP_PERSONAL_HOST || 'mail.hosting.reg.ru',
+        port: Number(process.env.SMTP_PERSONAL_PORT || 587),
+        secure: false,
+        auth: {
+          user: process.env.SMTP_PERSONAL_USER || '',
+          pass: process.env.SMTP_PERSONAL_PASS || '',
+        },
+      })
+    }
+    await personalTransporter.sendMail({
+      from: process.env.SMTP_PERSONAL_FROM || process.env.SMTP_PERSONAL_USER,
+      replyTo: 'boss@2980738.ru',
+      to, subject, html,
+      ...(text ? { text } : {}),
+    })
+    console.log(`📧 [personal] Email sent to: ${to}, subject: ${subject}`)
+    return true
+  } catch (error) {
+    console.error('[personal] Email send error:', error)
+    return false
   }
 }
 

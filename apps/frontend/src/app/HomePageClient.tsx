@@ -213,7 +213,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
   const S:React.CSSProperties = {padding:"4rem 0"};
   const I:React.CSSProperties = {maxWidth:"var(--container-max,1600px)",margin:"0 auto",padding:"0 var(--container-px,clamp(1rem,4vw,4rem))"};
   // Анонс личных встреч в Москве — чтобы убрать с главной, поставить false и пересобрать фронт
-  const SHOW_MOSCOW_ANNOUNCE = true;
+  const SHOW_MOSCOW_ANNOUNCE = false;
 
   return (
     <>
@@ -362,7 +362,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       <section style={{padding:"2rem 0", background:"rgba(214,198,178,0.02)"}}>
         <div style={I}>
           <blockquote className="quote-block">
-            <p className="quote-text">{quoteData?.text || "«Кооперация — это не бизнес-модель. Это архитектура доверия.»"}</p>
+            <p className="quote-text">{quoteData?.text || "«Кооператив поможет Бизнесу продавать на 15% дешевле рынка и зарабатывать больше»"}</p>
             <cite className="quote-author">— {quoteData?.author || "Велеслав Старков"}</cite>
           </blockquote>
         </div>
@@ -506,6 +506,31 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
             </div>
           </Reveal>
           <LatestBlogPosts />
+        </div>
+      </section>
+
+      {/* ===== MINIBOOK ANNOUNCE ===== */}
+      <section id="minibook-announce" style={{...S}}>
+        <div style={I}>
+          <Reveal>
+            <div style={{display:"flex", flexWrap:"wrap", gap:"2.5rem", alignItems:"center"}}>
+              <div style={{flex:"0 0 240px", maxWidth:280, margin:"0 auto"}}>
+                <img src="/mini-kniga-cover-v2.webp" alt="Обложка мини-книги «10 причин, почему бизнес открывает потребительский кооператив»" style={{width:"100%", borderRadius:12, boxShadow:"0 18px 50px rgba(0,0,0,0.55)", border:"1px solid rgba(214,198,178,0.18)"}} />
+              </div>
+              <div style={{flex:"1 1 340px", minWidth:300}}>
+                <div className="section-label">МИНИ-КНИГА · PDF</div>
+                <h2 className="section-title heading-sweep" data-text="10 причин, почему бизнес открывает ПК">10 причин, почему бизнес открывает ПК</h2>
+                <p style={{color:"rgba(214,198,178,1)", fontSize:"1.05rem", lineHeight:1.8, margin:"1rem 0 1.4rem"}}>
+                  Механика, цифры и ссылки на Налоговый кодекс — живым соседским языком: от оцифровки клиентской базы и беспроцентных оборотных средств до обнуления исходящего НДС и сквозного расчёта «пять лет завода с ПК». Читайте с карандашом: где узнаете свой бизнес — ставьте галочку.
+                </p>
+                <div style={{display:"flex", gap:"0.8rem", flexWrap:"wrap"}}>
+                  <a href="#minibook-1" className="btn-primary" style={{display:"inline-block", padding:"0.85rem 1.8rem", fontSize:"1rem", textDecoration:"none"}}>📕 Получить часть 1</a>
+                  <a href="#minibook-2" className="c500-btn c500-btn-secondary" style={{display:"inline-block", padding:"0.85rem 1.8rem", fontSize:"1rem", textDecoration:"none"}}>📖 Часть 2 + расчёт завода</a>
+                </div>
+                <p style={{color:"rgba(214,198,178,0.55)", fontSize:"0.85rem", marginTop:"0.9rem"}}>Книга — подарок подписчикам рассылки: оставьте email во всплывающем окне, и ссылка на скачивание придёт письмом.</p>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 

@@ -64,3 +64,7 @@ Disallow: /
 # Sitemap
 Sitemap: https://велеслав.рус/sitemap.xml
 Host: https://велеслав.рус
+
+User-agent: *
+Disallow: /mini-kniga-10-prichin-chast-1.pdf
+Disallow: /mini-kniga-10-prichin-chast-2.pdf

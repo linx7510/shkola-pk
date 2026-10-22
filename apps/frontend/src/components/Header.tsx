@@ -17,10 +17,19 @@ const serviceLinks = [
   { label: "Полный прайс-лист", href: "/uslugi-dlya-potrebitelskih-kooperativov#pricing" },
 ];
 
+const freeLinks = [
+  { label: "ИИ-консультант по ПК", href: "/ai-konsultant" },
+  { label: "Мини-курс «Что такое ПК»", href: "/besplatno" },
+  { label: "Мини-книга «10 причин»", href: "/mini-kniga" },
+  { label: "Вопросы и ответы (FAQ)", href: "/faq" },
+  { label: "Глоссарий терминов", href: "/glossary" },
+  { label: "Аудит вашего устава онлайн", href: "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa#express-audit" },
+];
+
 const defaultNavItems = [
   { label: "Курсы", href: "/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn" },
   { label: "Услуги для ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov", dropdown: serviceLinks },
-  { label: "Бесплатно", href: "/besplatno" },
+  { label: "Бесплатно", href: "/besplatno", dropdown: freeLinks },
   { label: "Консультации", href: "/potrebitelskiy-kooperativ-konsultatsii" },
   { label: "Блог", href: "/blog" },
   { label: "О нас", href: "/about-us" },

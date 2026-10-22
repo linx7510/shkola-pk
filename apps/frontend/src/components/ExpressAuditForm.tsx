@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 
 /**
  * ExpressAuditForm — встраиваемая секция экспресс-аудита устава.
@@ -73,6 +73,36 @@ export default function ExpressAuditForm() {
   const [dragOver, setDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const fileBufferRef = useRef<File | null>(null)
+
+  // Переход по ссылке с якорем #express-audit (например, из меню «Бесплатно»):
+  // гидрация и ленивые блоки выше сбрасывают позицию — скроллим с повторными попытками.
+  useEffect(() => {
+    if (window.location.hash !== "#express-audit") return
+    let tries = 0
+    let settled = false
+    const target = () => {
+      const el = document.getElementById("express-audit")
+      return el ? el.getBoundingClientRect().top + window.scrollY - 72 : null
+    }
+    const stop = () => { settled = true }
+    const iv = setInterval(() => {
+      tries++
+      if (settled || tries > 90) { clearInterval(iv); return }
+      const t = target()
+      if (t == null) return
+      if (Math.abs(window.scrollY - t) <= 3) { clearInterval(iv); return }
+      window.scrollTo({ top: t, behavior: "instant" as ScrollBehavior })
+    }, 500)
+    window.addEventListener("wheel", stop, { passive: true })
+    window.addEventListener("touchmove", stop, { passive: true })
+    window.addEventListener("keydown", stop)
+    return () => {
+      clearInterval(iv)
+      window.removeEventListener("wheel", stop)
+      window.removeEventListener("touchmove", stop)
+      window.removeEventListener("keydown", stop)
+    }
+  }, [])
 
   const handleFile = useCallback((file: File | null) => {
     if (!file) return

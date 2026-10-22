@@ -51,6 +51,9 @@ function parseMetaTags(html: string): Record<string, string> {
   return result;
 }
 
+// Черновики: страницы, скрытые от поисковиков (убрать slug из списка при публикации)
+const NOINDEX_SLUGS = new Set(['kejsy']);
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const page = await fetchPage(slug)
@@ -82,6 +85,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const finalTitle = isAboutUs
     ? 'О нас | Велеслав Старков — Первая онлайн школа Потребкооперации'
     : `${title} | велеслав.рус`
+
+  if (NOINDEX_SLUGS.has(slug)) {
+    return { title: { absolute: finalTitle }, description: finalDescription, robots: { index: false, follow: false } }
+  }
 
   return {
     title: {

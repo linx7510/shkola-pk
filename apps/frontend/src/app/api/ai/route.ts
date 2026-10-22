@@ -1,23 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chatWithAI } from '@/lib/ai-deepseek';
+import { ARTICLES_KNOWLEDGE } from '@/lib/ai/consultant-knowledge';
 
 // POST /api/ai — AI-консультант (реальный DeepSeek)
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || ''
   const userAgent = request.headers.get('user-agent') || ''
-  
+
   try {
-    const { message } = await request.json();
-    
+    const { message, history } = await request.json();
+
     if (!message?.trim()) {
       return NextResponse.json({ error: 'Сообщение обязательно' }, { status: 400 });
     }
 
-    const messages = [
+    // История диалога (последние 6 реплик) — чтобы консультант помнил контекст беседы
+    const dialogue: { role: 'user' | 'assistant'; content: string }[] = Array.isArray(history)
+      ? history.slice(-6).map((m: any) => ({
+          role: m.role === 'user' ? ('user' as const) : ('assistant' as const),
+          content: String(m.text || m.content || '').slice(0, 2000),
+        })).filter((m: any) => m.content)
+      : [];
+
+    // Санитайзер: если человек не спрашивал про книгу — вырезаем рекламу книги из ответа модели
+    const userAskedAboutBook = /книг|10 причин|besplatno|подписк|рассылк|почитать|с чего начать|материалы/i.test(message);
+
+    const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
       {
-        role: 'system' as const,
-        content: `Ты — AI-консультант Школы Потребительских Коопераций (велеслав.рус). Ты отвечаешь на основе знаний о потребительской кооперации в РФ.
+        role: 'system',
+        content: `Ты — AI-консультант Школы Потребительских Коопераций (велеслав.рус), «воспитанный» на более чем 100 уставах потребительских кооперативов, 200+ реальных кейсах, судебной практике и законодательстве РФ. Отвечаешь на основе знаний о потребительской кооперации в РФ.
 
 ТВОЯ БАЗА ЗНАНИЙ (опирайся на эти материалы при ответе):
 
@@ -47,47 +59,66 @@ export async function POST(request: NextRequest) {
 • Кооперативные выплаты ≤ 20%
 • Ликвидационная процедура (ст. 62, 64 ГК РФ)
 • Налоговая безопасность (раздельный учёт)
-
+${ARTICLES_KNOWLEDGE}
 ПРАВИЛА ОТВЕТА:
-• Отвечай кратко (2-5 предложений), по делу, на русском языке
-• Ссылайся на конкретные статьи закона (ГК РФ, НК РФ, Закон 3085-1)
+• Отвечай кратко (2-5 предложений), по делу, на русском языке, живым соседским языком без канцелярита
+• Ссылайся на конкретные статьи закона (ГК РФ, НК РФ, Закон 3085-1) и на кейсы из базы
+• Если вопрос попадает в тему одной из СТАТЕЙ БЛОГА — кратко ответь по её тезисам и дай ссылку на эту статью
 • Если вопрос о конкретном кооперативе — рекомендуй аудит устава
 • Если вопрос вне темы кооперации — вежливо верни к теме
-• НЕ давай советов по обходу закона или незаконным схемам`,
+• НЕ давай советов по обходу закона или незаконным схемам
+
+ГЛАВНОЕ ПРАВИЛО ДИАЛОГА:
+Приоритет №1 — полный и полезный ответ на вопрос пользователя (кейсы, цифры, статьи закона). Предложение мини-книги НИКОГДА не заменяет и не заслоняет ответ.
+
+МИНИ-КНИГА И ПОДПИСКА — ЗАПРЕТ НАВОЯЗЫВАНИЯ:
+• КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО самому предлагать, рекомендовать или упоминать мини-книгу «10 причин», подписку или рассылку в конце ответов. НИКОГДА. Ни на каком вопросе. Просто отвечай на вопрос по существу — страница сама предложит материалы.
+• Отвечать о книге можно ТОЛЬКО если человек сам явно спросил про неё, про «ваши материалы» или «с чего начать изучение» — тогда ответь по базе знаний и дай ссылку: https://велеслав.рус/besplatno
+• Если человек готов к практике (свой бизнес, хочет создать ПК) — порекомендуй консультацию Велеслава Старкова: https://велеслав.рус/potrebitelskiy-kooperativ-konsultatsii и личный кабинет: https://велеслав.рус/register`,
       },
+      ...dialogue,
       {
-        role: 'user' as const,
+        role: 'user',
         content: message,
       },
     ];
 
     const res = await chatWithAI(messages, { temperature: 0.3, maxTokens: 768 });
-    
-    return NextResponse.json({ 
-      response: res.content,
+
+    let reply: string = res.content;
+    if (!userAskedAboutBook) {
+      // режем предложения-рекомендации книги/подписки, если модель их всё же вставила
+      reply = reply
+        .replace(/\n?[^.!?\n]*(?:10 причин|mini-kniga|бесплатную подписку|подписку на рассылку|велеслав\.рус\/besplatno)[^.!?\n]*[.!?]?\s*/gi, '')
+        .replace(/\n?Кстати,?[^.!?\n]*подарок[^.!?\n]*[.!?]?\s*/gi, '')
+        .trim();
+    }
+
+    return NextResponse.json({
+      response: reply,
       tokensUsed: res.tokensIn + res.tokensOut,
       latencyMs: Date.now() - startTime,
     });
   } catch (error: any) {
     console.error('[/api/ai] error:', error);
-    
+
     // Fallback — простая заглушка если DeepSeek недоступен
     let fallback = 'Извините, AI-консультант временно недоступен. Попробуйте позже или задайте вопрос через форму контактов.';
-    
+
     try {
       const body = await request.json();
       const msg = body.message || '';
       const lower = msg.toLowerCase();
-      
+
       if (lower.includes('ндс') || lower.includes('налог')) {
         fallback = 'Потребительский кооператив освобождён от НДС (ст. 149 НК РФ), налога на прибыль и НДФЛ с паевых взносов по закону РФ № 3085-1. Это законно — кооперативная цена равна себестоимости, налоговая база равна нулю.';
       } else if (lower.includes('кооператив') || lower.includes('что такое')) {
         fallback = 'Потребительский кооператив (ПК) — некоммерческая организация, созданная для удовлетворения материальных и иных потребностей участников. В отличие от ООО, ПК не преследует извлечение прибыли и освобождён от ряда налогов.';
       }
     } catch {}
-    
-    return NextResponse.json({ 
-      response: fallback, 
+
+    return NextResponse.json({
+      response: fallback,
       fallback: true,
       latencyMs: Date.now() - startTime,
     });

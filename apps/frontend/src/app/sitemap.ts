@@ -28,6 +28,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/uslugi-dlya-potrebitelskih-kooperativov/celevie-potrebitelskie-programmy`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/uslugi-dlya-potrebitelskih-kooperativov/sozdanie-polnogo-komplekta-polozheniy`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/potrebitelskiy-kooperativ-konsultatsii`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/ai-konsultant`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
+    { url: `${baseUrl}/mini-kniga`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.9 },
     { url: `${baseUrl}/besplatno`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.8 },
     { url: `${baseUrl}/glossary`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
@@ -35,6 +37,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/politika-konfidentsialnosti`, lastModified: new Date(), changeFrequency: "yearly" as const, priority: 0.3 },
     { url: `${baseUrl}/pomosch-proektu`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
   ];
+
+  // Chernoviki: skryt ot poiskovikov do utverzhdeniya
+  const NOINDEX_DRAFTS = new Set(['uslugi-dlya-potrebitelskih-kooperativov/affilirovannoe-ooo-pod-klyuch', 'kejsy']);
 
   const [postsData, termsData, servicesData, uslugiPagesData] = await Promise.all([
     payloadApi("/blog-posts?where[isPublished][equals]=true&sort=-publishedAt&limit=500"),
@@ -64,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const uslugiPages = (uslugiPagesData.docs || [])
+  const uslugiPages = (uslugiPagesData.docs || []).filter((p: any) => !NOINDEX_DRAFTS.has(p.slug))
     .filter((p: any) => typeof p.slug === "string" && p.slug.startsWith("uslugi-dlya-potrebitelskih-kooperativov/"))
     .map((p: any) => ({
       url: `${baseUrl}/${p.slug}`,

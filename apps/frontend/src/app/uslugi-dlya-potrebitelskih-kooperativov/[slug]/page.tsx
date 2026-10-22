@@ -28,6 +28,9 @@ async function fetchPage(slug: string) {
 
 interface Props { params: Promise<{ slug: string }> }
 
+// Черновики: скрыть от поисковиков до утверждения
+const NOINDEX_SLUGS = new Set(['affilirovannoe-ooo-pod-klyuch']);
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params
   const page = await fetchPage(`uslugi-dlya-potrebitelskih-kooperativov/${slug}`)
@@ -38,18 +41,27 @@ export async function generateMetadata({ params }: Props) {
   const title = (page as any).title || "Школа ПК"
   const fullSlug = `uslugi-dlya-potrebitelskih-kooperativov/${slug}`
   const isCpp = slug === "celevie-potrebitelskie-programmy"
+  const isBuh = slug === "buhgalterskoe-obsluzhivanie"
   const description = isCpp
     ? "Разработка целевых потребительских программ (ЦПП): защита от проверок ФНС, переквалификации и доначислений. 4 тарифа: от 5 000 до 65 000 ₽. Практика с 2015 года, 120+ кооперативов."
-    : (page as any).hero?.description || (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
+    : isBuh
+      ? "Ведение учёта некоммерческого ПК: целевые взносы, ЦПП, новация пая, кооперативные выплаты. Тариф Старт для нового ПК — от 9900 руб/мес + вход 20000 руб, для действующих — от 20000 руб/мес."
+      : (page as any).hero?.description || (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
   
   const BASE_URL = "https://велеслав.рус"
   const finalTitle = isCpp
     ? "Целевые потребительские программы (ЦПП) для ПК — разработка под проверку ФНС"
-    : `${title} | велеслав.рус`
+    : isBuh
+      ? "Бухгалтерское обслуживание потребительских кооперативов — от 9 900 ₽/мес | Школа ПК"
+      : `${title} | велеслав.рус`
   // Тематическая og:image для ЦПП
   const ogImage = isCpp
     ? `${BASE_URL}/api/media/file/cpp-cover.webp`
     : `${BASE_URL}/images/og-preview.webp`
+
+  if (NOINDEX_SLUGS.has(slug)) {
+    return { title: { absolute: finalTitle }, description, robots: { index: false, follow: false } }
+  }
 
   return {
     title: { absolute: finalTitle },
@@ -181,6 +193,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         { label: (page as any).title || "" }
       ], "https://велеслав.рус")) }} />
         </div>
+        <Footer />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       </>
     )

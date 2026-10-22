@@ -397,7 +397,8 @@
   font-size: clamp(1.3rem, 3vw, 2rem);
   color: #F5F0E8;
   font-style: italic;
-  line-height: 1.5;
+  line-height: 1.65;
+  letter-spacing: 0.045em;
   margin-bottom: 1rem;
   font-weight: 300;
 }
@@ -405,6 +406,7 @@
   color: #E68863;
   font-size: 1rem;
   font-style: normal;
+  letter-spacing: 0.08em;
 }
 
 

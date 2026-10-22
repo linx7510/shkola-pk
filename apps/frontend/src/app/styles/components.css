@@ -1120,6 +1120,8 @@ a:hover { color: var(--color-orange-400); }
   margin: 1.5rem 0;
   color: rgba(214,198,178,0.85);
   font-style: italic;
+  letter-spacing: 0.03em;
+  line-height: 1.7;
 }
 
 /* FIX: heading-sweep эффект не должен перекрывать картинку в featured карточке */

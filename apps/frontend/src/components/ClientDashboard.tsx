@@ -603,8 +603,32 @@ export default function ClientDashboard() {
 
   if (error || !project) {
     return (
+      <>
+      <Header />
+      <DashboardTopBar />
       <div style={{ minHeight: '100vh', background: '#0D0C0A', color: '#D6C6B2', paddingTop: 'calc(var(--header-h, 72px) + 2rem)', paddingBottom: '4rem' }}>
         <div style={{ maxWidth: 'var(--container-max, 1400px)', margin: '0 auto', padding: '0 var(--container-px, clamp(1rem, 4vw, 4rem))' }}>
+          {/* ─── Кнопка «Выйти» ─── */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+            <button
+              onClick={() => {
+                localStorage.removeItem('auth_token');
+                router.push('/login');
+              }}
+              style={{
+                padding: '0.5rem 1.2rem',
+                background: 'rgba(230,136,99,0.1)',
+                border: '1px solid rgba(230,136,99,0.3)',
+                color: '#E68863',
+                borderRadius: 8,
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              🚪 Выйти
+            </button>
+          </div>
           <div style={{ marginBottom: '2rem' }}>
             <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 800, color: '#D6C6B2', marginBottom: '0.5rem' }}>
               🛒 Заказать услугу
@@ -620,14 +644,7 @@ export default function ClientDashboard() {
               Загрузка услуг...
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
-              {services.map((svc) => (
-                <ServiceCard key={svc.slug} service={svc} token={token} onOrdered={() => {
-                  // Перезагрузить страницу после заказа
-                  window.location.reload();
-                }} />
-              ))}
-            </div>
+            <GroupedServiceCatalog services={services} token={token} />
           )}
 
           {/* Также — ссылка на подробную страницу услуги */}
@@ -641,6 +658,7 @@ export default function ClientDashboard() {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
@@ -1549,14 +1567,7 @@ export default function ClientDashboard() {
                 Загрузка услуг...
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
-                {services.map((svc) => (
-                  <ServiceCard key={svc.slug} service={svc} token={token} onOrdered={() => {
-                    // Перезагрузить страницу после заказа
-                    window.location.reload();
-                  }} />
-                ))}
-              </div>
+              <GroupedServiceCatalog services={services} token={token} />
             )}
 
             <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(214,198,178,0.04)', border: '1px solid rgba(214,198,178,0.12)', borderRadius: 12, textAlign: 'center' }}>
@@ -1879,6 +1890,62 @@ function FeedbackForm({ projectId, stage, stageName, token, onSubmitted }: {
 // ════════════════════════════════════════════════════════════
 // ServiceCard — карточка услуги для заказа из ЛК
 // ════════════════════════════════════════════════════════════
+// Группировка каталога услуг ЛК: порядок секций = порядок в каталоге
+const SERVICE_SECTIONS: { type: string; title: string; desc: string; featured?: boolean }[] = [
+  { type: 'consultation', title: '📞 Консультации', desc: 'Разберём вашу ситуацию и подскажем оптимальную модель — от бесплатных 30 минут до абонемента' },
+  { type: 'audit_ustava', title: '📋 Аудит устава', desc: 'Независимая экспертиза действующего устава: риски, нарушения, рекомендации' },
+  { type: 'pk_creation', title: '🚀 ПК под ключ', desc: 'Создание кооператива с нуля: документы, регистрация, запуск работы с пайщиками', featured: true },
+  { type: 'cpp', title: '🎯 Целевые потребительские программы (ЦПП)', desc: 'Программы с паспортами под ваш бизнес-план' },
+  { type: 'polozheniya', title: '📄 Положения для ПК', desc: 'От одного положения до полного комплекта с консалтингом' },
+];
+
+// Каталог услуг, сгруппированный по секциям
+function GroupedServiceCatalog({ services, token }: { services: ServiceTemplate[]; token: string }) {
+  return (
+    <>
+      {SERVICE_SECTIONS.map((section) => {
+        const items = services
+          .filter((s) => s.serviceType === section.type)
+          .sort((a, b) => a.priceMin - b.priceMin);
+        if (items.length === 0) return null;
+        return (
+          <section key={section.type} style={{ marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#E7DCCF', margin: 0 }}>{section.title}</h3>
+              {section.featured && (
+                <span style={{ background: 'linear-gradient(135deg,#C96E4D,#E68863)', color: '#0D0C0A', borderRadius: 20, padding: '3px 14px', fontSize: '0.78rem', fontWeight: 700 }}>
+                  ⭐ Самая востребованная
+                </span>
+              )}
+            </div>
+            {section.desc && <p style={{ color: 'rgba(214,198,178,0.7)', fontSize: '0.9rem', margin: '0 0 1rem' }}>{section.desc}</p>}
+            <div style={section.featured ? {
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+              gap: '1.5rem',
+              background: 'linear-gradient(135deg, rgba(201,110,77,0.10), rgba(230,136,99,0.04))',
+              border: '1px solid rgba(230,136,99,0.35)',
+              borderRadius: 16,
+              padding: '1.5rem',
+              boxShadow: '0 0 40px rgba(230,136,99,0.08)',
+            } : {
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+              gap: '1.5rem',
+            }}>
+              {items.map((svc) => (
+                <ServiceCard key={svc.slug} service={svc} token={token} onOrdered={() => {
+                  window.location.reload();
+                }} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </>
+  );
+}
+
 function ServiceCard({ service, token, onOrdered }: {
   service: ServiceTemplate;
   token: string;
