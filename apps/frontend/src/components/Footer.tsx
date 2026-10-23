@@ -123,6 +123,16 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Реквизиты ИП — юридический блок */}
+      <div style={{
+        maxWidth: 1600, margin: "0 auto",
+        padding: "0.35rem clamp(1rem, 4vw, 4rem) 1rem",
+        fontSize: "0.75rem", color: "rgba(214,198,178,0.45)", lineHeight: 1.5,
+      }}>
+        ИП Старков Велеслав Владимирович · ИНН 590415054646 · ОГРНИП 322595800045416 · 614002, г. Пермь, ул. Фонтанная, д. 1а/1, кв. 735 ·{" "}
+        <Link href="/politika-konfidentsialnosti" prefetch={false} style={{ color: "rgba(214,198,178,0.55)", textDecoration: "none" }}>Политика конфиденциальности</Link>
+      </div>
+
       <style>{`
         .footer-link:hover { color: #C06030 !important; }
         .footer-social-link:hover { color: #C06030 !important; border-color: rgba(192,96,48,0.4) !important; }

@@ -96,8 +96,8 @@ export const Dashboard: React.FC = () => {
   }, [])
 
   const tiles = [
-    TILE('/admin/crm', '📥', 'CRM — Заявки', 'лиды с сайта и рассылок', leadsNew, '#b45309'),
-    TILE('/admin/crm/deals', '🎯', 'Воронка сделок', 'продающая труба услуг', dealsOpen, '#4f7cff'),
+    TILE('/admin/collections/leads/crm', '📥', 'CRM — Заявки', 'лиды с сайта и рассылок', leadsNew, '#b45309'),
+    TILE('/admin/collections/deals/kanban', '🎯', 'Воронка сделок', 'продающая труба услуг', dealsOpen, '#4f7cff'),
     TILE('/admin/collections/pages', '📄', 'Страницы', 'контент сайта', pagesN),
     TILE('/admin/collections/blog-posts', '✍️', 'Блог', 'статьи и публикации', postsN, '#0e7a5f'),
     TILE('/admin/collections/subscribers', '📬', 'Подписчики', 'база рассылки', subsN, '#7c5cbf'),
@@ -145,7 +145,7 @@ export const Dashboard: React.FC = () => {
         <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.09)', borderRadius: 14, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Последние заявки</h2>
-            <Link href="/admin/crm" style={{ marginLeft: 'auto', fontSize: 12.5, opacity: 0.7 }}>все →</Link>
+            <Link href="/admin/collections/leads/crm" style={{ marginLeft: 'auto', fontSize: 12.5, opacity: 0.7 }}>все →</Link>
           </div>
           {leads === null ? <span style={{ opacity: .5, fontSize: 13 }}>загрузка…</span> : leads.length === 0 ? <span style={{ opacity: .5, fontSize: 13 }}>пока пусто</span> : leads.map((l) => (
             <div key={l.id} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,.06)', fontSize: 13 }}>
@@ -162,7 +162,7 @@ export const Dashboard: React.FC = () => {
         <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.09)', borderRadius: 14, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: 10 }}>
             <h2 style={{ fontSize: 15, fontWeight: 700, margin: 0 }}>Сделки в трубе</h2>
-            <Link href="/admin/crm/deals" style={{ marginLeft: 'auto', fontSize: 12.5, opacity: 0.7 }}>воронка →</Link>
+            <Link href="/admin/collections/deals/kanban" style={{ marginLeft: 'auto', fontSize: 12.5, opacity: 0.7 }}>воронка →</Link>
           </div>
           {deals === null ? <span style={{ opacity: .5, fontSize: 13 }}>загрузка…</span> : deals.length === 0 ? <span style={{ opacity: .5, fontSize: 13 }}>создайте первую сделку</span> : deals.map((d) => (
             <div key={d.id} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,.06)', fontSize: 13 }}>

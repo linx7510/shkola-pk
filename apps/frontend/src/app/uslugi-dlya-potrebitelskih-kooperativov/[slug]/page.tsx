@@ -36,35 +36,28 @@ export async function generateMetadata({ params }: Props) {
   const page = await fetchPage(`uslugi-dlya-potrebitelskih-kooperativov/${slug}`)
   if (!page) return { title: "Страница не найдена" }
   
-  // meta_title и meta_description есть в БД, но Payload API их не возвращает
-  // (нет полей в схеме Pages). Используем title + кастомный description.
-  const title = (page as any).title || "Школа ПК"
+  // meta-поля объявлены в коллекции Pages (22.10.2026) и приходят из БД
+  const title = (page as any).meta?.title || (page as any).title || "Школа ПК"
   const fullSlug = `uslugi-dlya-potrebitelskih-kooperativov/${slug}`
   const isCpp = slug === "celevie-potrebitelskie-programmy"
   const isBuh = slug === "buhgalterskoe-obsluzhivanie"
-  const description = isCpp
-    ? "Разработка целевых потребительских программ (ЦПП): защита от проверок ФНС, переквалификации и доначислений. 4 тарифа: от 5 000 до 65 000 ₽. Практика с 2015 года, 120+ кооперативов."
-    : isBuh
-      ? "Ведение учёта некоммерческого ПК: целевые взносы, ЦПП, новация пая, кооперативные выплаты. Тариф Старт для нового ПК — от 9900 руб/мес + вход 20000 руб, для действующих — от 20000 руб/мес."
-      : (page as any).hero?.description || (page as any).meta?.description || "Услуга для потребительских кооперативов от Школы ПК"
+  const description = (page as any).meta?.description
+    || (page as any).hero?.description
+    || "Услуга для потребительских кооперативов от Школы ПК"
   
   const BASE_URL = "https://велеслав.рус"
-  const finalTitle = isCpp
-    ? "Целевые потребительские программы (ЦПП) для ПК — разработка под проверку ФНС"
-    : isBuh
-      ? "Бухгалтерское обслуживание потребительских кооперативов — от 9 900 ₽/мес | Школа ПК"
-      : `${title} | велеслав.рус`
-  // Тематическая og:image для ЦПП
+  // title строкой — layout-шаблон добавит "| Школа ПК" (meta_title в БД без суффиксов)
+  const finalTitle = title  // Тематическая og:image для ЦПП
   const ogImage = isCpp
     ? `${BASE_URL}/api/media/file/cpp-cover.webp`
     : `${BASE_URL}/images/og-preview.webp`
 
   if (NOINDEX_SLUGS.has(slug)) {
-    return { title: { absolute: finalTitle }, description, robots: { index: false, follow: false } }
+    return { title: finalTitle, description, robots: { index: false, follow: false } }
   }
 
   return {
-    title: { absolute: finalTitle },
+    title: finalTitle,
     description,
     openGraph: {
       title: finalTitle,
@@ -94,6 +87,34 @@ export default async function UslugiPodSlugPage({ params }: Props) {
   const fullSlug = `uslugi-dlya-potrebitelskih-kooperativov/${slug}`
   const page = await fetchPage(fullSlug)
   if (!page) notFound()
+
+  // Server-рендер Service + Offer для страниц услуг. Для kpk/audit дублирует клиентскую
+  // вставку лендингов (useEffect невидим роботам) — серверная версия главная.
+  const SERVICE_OFFERS: Record<string, { low: number; high: number; name: string }> = {
+    "celevie-potrebitelskie-programmy": { low: 5000, high: 65000, name: "Разработка целевых потребительских программ" },
+    "sozdanie-polnogo-komplekta-polozheniy": { low: 16000, high: 65000, name: "Комплект Положений для потребительского кооператива" },
+    "sozdanie-sajta-dlya-kooperativov": { low: 50000, high: 390000, name: "Создание сайта для потребительского кооператива" },
+    "kooperativ-pod-klyuch": { low: 90000, high: 125000, name: "Кооператив под ключ — регистрация потребительского кооператива" },
+    "audit-ustava-potrebitelskogo-kooperativa": { low: 15000, high: 25000, name: "Аудит устава потребительского кооператива" },
+  }
+  const serviceOffer = SERVICE_OFFERS[slug]
+  const serviceSchema = serviceOffer ? {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: serviceOffer.name,
+    serviceType: "Услуги для потребительских кооперативов",
+    areaServed: "RU",
+    provider: { "@type": "Organization", name: "Школа потребительской кооперации", url: "https://велеслав.рус" },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "RUB",
+      lowPrice: serviceOffer.low,
+      highPrice: serviceOffer.high,
+      availability: "https://schema.org/InStock",
+      url: `https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/${slug}`,
+    },
+  } : null
+
 
   // Special landing page for kooperativ-pod-klyuch
   if (slug === "kooperativ-pod-klyuch") {
@@ -127,7 +148,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         "@id": "https://велеслав.рус/uslugi-dlya-potrebitelskih-kooperativov/kooperativ-pod-klyuch"
       }
     }
-    
+
     return (
       <>
         <Header />
@@ -146,6 +167,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
       ], "https://велеслав.рус")) }} />
         </div>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+        {serviceSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />}
       </>
     )
   }
@@ -195,6 +217,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
         </div>
         <Footer />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+        {serviceSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />}
       </>
     )
   }
@@ -206,6 +229,8 @@ export default async function UslugiPodSlugPage({ params }: Props) {
   const hasContent = typeof pageContent === "string" && pageContent.length > 0
   // headCode — JSON-LD микроразметка (Service schema и др.) для SEO
   const headCode = (page as any).headCode || ''
+
+
 
   return (
     <>
@@ -252,6 +277,7 @@ export default async function UslugiPodSlugPage({ params }: Props) {
       ], "https://велеслав.рус")) }} />
       {/* headCode — Service schema и другая микроразметка из Payload */}
       {headCode && <div dangerouslySetInnerHTML={{ __html: headCode }} />}
+      {serviceSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />}
     </>
   )
 }

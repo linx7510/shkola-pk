@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 
 export const CrmNavLink: React.FC = () => {
   const pathname = usePathname()
-  const active = pathname === '/admin/crm' || pathname === '/admin/crm/'
+  const active = pathname === '/admin/collections/leads/crm'
 
   return (
     <nav className="skpk-navlink">
@@ -17,7 +17,7 @@ export const CrmNavLink: React.FC = () => {
         .skpk-navlink__item--active { background: var(--theme-elevation-150); color: var(--theme-text); }
         [data-theme="dark"] .skpk-navlink__item { color: var(--theme-elevation-200); }
       `}</style>
-      <Link href="/admin/crm" className={`skpk-navlink__item${active ? ' skpk-navlink__item--active' : ''}`}>
+      <Link href="/admin/collections/leads/crm" className={`skpk-navlink__item${active ? ' skpk-navlink__item--active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
           <rect x="3" y="4" width="18" height="16" rx="2" />
           <path d="M3 10h18" />

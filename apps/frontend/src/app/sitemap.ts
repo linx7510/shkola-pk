@@ -41,26 +41,53 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Chernoviki: skryt ot poiskovikov do utverzhdeniya
   const NOINDEX_DRAFTS = new Set(['uslugi-dlya-potrebitelskih-kooperativov/affilirovannoe-ooo-pod-klyuch', 'kejsy']);
 
-  const [postsData, termsData, servicesData, uslugiPagesData] = await Promise.all([
-    payloadApi("/blog-posts?where[isPublished][equals]=true&sort=-publishedAt&limit=500"),
-    payloadApi("/glossary-terms?where[isPublished][equals]=true&limit=100"),
+  const [postsData, servicesData, uslugiPagesData, termsData] = await Promise.all([
+    payloadApi("/blog-posts-light"),
     payloadApi("/services?where[isPublished][equals]=true&limit=100"),
     payloadApi("/pages?where[slug][like]=uslugi-dlya-potrebitelskih-kooperativov%25&where[isPublished][equals]=true&limit=100"),
+    payloadApi("/glossary-terms?where[isPublished][equals]=true&limit=200"),
   ]);
 
-  const blogPages = (postsData.docs || []).map((p: any) => ({
-    url: `${baseUrl}/blog/${p.slug || p.id}`,
-    lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
-    changeFrequency: "monthly" as const,
+  // хабы-темы блога (кластеризация, утверждена 24.10 — состав в blog-shared BLOG_CLUSTERS)
+  const blogTopicPages = ["nds", "zapusk", "pravo", "nalogi", "novichkam"].map((t) => ({
+    url: `${baseUrl}/blog/tema/${t}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
 
-  const glossaryPages = (termsData.docs || []).map((t: any) => ({
-    url: `${baseUrl}/glossary/${t.slug || t.id}`,
-    lastModified: t.updatedAt ? new Date(t.updatedAt) : new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }));
+  // страницы терминов глоссария — только с полным определением (как в glossary/[slug])
+  const glossaryPages = (termsData.docs || [])
+    .filter((t: any) => (t.definition || "").length >= 150)
+    .map((t: any) => ({
+      url: `${baseUrl}/glossary/${t.slug}`,
+      lastModified: t.updatedAt ? new Date(t.updatedAt) : new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.4,
+    }));
+
+  const blogPages = (postsData.docs || []).map((p: any) => {
+    const cover = p.coverImage;
+    const coverUrl = cover ? (typeof cover === "object" ? cover.url : cover) : null;
+    return {
+      url: `${baseUrl}/blog/${p.slug || p.id}`,
+      lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+      // image sitemap: обложка статьи для поиска по картинкам
+      ...(coverUrl ? { images: [coverUrl.startsWith("http") ? coverUrl : `${baseUrl}${coverUrl}`] } : {}),
+    };
+  });
+
+  // страницы пагинации блога (24 поста на страницу — как в blog/page.tsx)
+  const blogPaginationPages = (() => {
+    const totalPages = Math.ceil((postsData.docs || []).length / 24);
+    const pages: { url: string; lastModified: Date; changeFrequency: "weekly"; priority: number }[] = [];
+    for (let i = 2; i <= totalPages; i++) {
+      pages.push({ url: `${baseUrl}/blog/page/${i}`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.4 });
+    }
+    return pages;
+  })();
 
   const servicePages = (servicesData.docs || []).map((s: any) => ({
     url: `${baseUrl}/uslugi/${s.slug || s.id}`,
@@ -80,7 +107,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Дедупликация по url (статические + динамические)
   const seen = new Set<string>();
-  const all = [...staticPages, ...blogPages, ...glossaryPages, ...servicePages, ...uslugiPages].filter((e: any) => {
+  const all = [...staticPages, ...blogPages, ...blogPaginationPages, ...blogTopicPages, ...servicePages, ...uslugiPages, ...glossaryPages].filter((e: any) => {
     if (seen.has(e.url)) return false;
     seen.add(e.url);
     return true;

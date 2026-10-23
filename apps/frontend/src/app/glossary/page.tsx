@@ -20,12 +20,12 @@ async function payloadApi(path: string) {
 }
 
 const PAGE_URL = "https://велеслав.рус/glossary";
-const PAGE_TITLE = "Глоссарий — ключевые термины потребительской кооперации";
+const PAGE_TITLE = "Глоссарий — термины потребительской кооперации | Школа ПК";
 const PAGE_DESCRIPTION = "102 термина потребительской кооперации с определениями: общие понятия, правовые термины, финансовые термины, управление ПК. Поиск по алфавиту и категориям.";
 const PAGE_IMAGE = "https://велеслав.рус/images/og-preview.webp";
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESCRIPTION,
   keywords: [
     "глоссарий кооперации",
@@ -74,14 +74,11 @@ export const metadata: Metadata = {
     ],
   },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
     "max-video-preview": -1,
     "max-image-preview": "large",
     "max-snippet": -1,
-    noarchive: true,
-    nosnippet: true,
-    noimageindex: true,
   },
 };
 

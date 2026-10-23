@@ -69,8 +69,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isAboutUs = slug === 'about-us'
   // Fallback description для about-us если не получен из БД
   const finalDescription = description || (isAboutUs 
-    ? 'Велеслав Старков — председатель Правления ПК с 2015 года. Основатель Первой онлайн Школы потребительской кооперации. 120+ зарегистрированных ПК, регистрация под ключ, аудит устава, налоговая оптимизация.'
-    : `Страница «${title}» — Школа Потребительской Кооперации. Обучение, услуги и консультации по созданию потребительских кооперативов по закону РФ № 3085-1.`)
+    ? 'Велеслав Старков — председатель Правления ПК с 2015 года, основатель Первой онлайн Школы потребительской кооперации. 120+ открытых кооперативов.'
+    : 'Школа потребительской кооперации: обучение, регистрация ПК, аудит устава, консультации по закону № 3085-1.')
   const defaultOgImage = isAboutUs 
     ? `${BASE_URL}/images/starkov_portrait.webp` 
     : `${BASE_URL}/images/og-preview.webp`
@@ -82,22 +82,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Для about-us — используем полный title как на велеслав.рус
   // Для остальных страниц — добавляем бренд
+  // about-us — absolute (готовый суффикс); остальные — строка, layout-шаблон добавит "| Школа ПК"
   const finalTitle = isAboutUs
-    ? 'О нас | Велеслав Старков — Первая онлайн школа Потребкооперации'
-    : `${title} | велеслав.рус`
+    ? { absolute: 'О нас — Велеслав Старков | Школа ПК' }
+    : title
 
   if (NOINDEX_SLUGS.has(slug)) {
-    return { title: { absolute: finalTitle }, description: finalDescription, robots: { index: false, follow: false } }
+    return { title: finalTitle, description: finalDescription, robots: { index: false, follow: false } }
   }
 
   return {
-    title: {
-      absolute: finalTitle,
-    },
+    title: finalTitle,
     description: finalDescription,
     keywords: 'потребительский кооператив, кооперация, онлайн-обучение, защита активов, налоговая оптимизация, Велеслав Старков, регистрация ПК, обнуление НДС, паевой взнос',
     openGraph: {
-      title: isAboutUs ? 'Велеслав Старков — эксперт по потребительской кооперации | Школа ПК' : `${title} | велеслав.рус`,
+      title: isAboutUs ? 'Велеслав Старков — эксперт по потребительской кооперации | Школа ПК' : title,
       description: finalDescription,
       url: `${BASE_URL}/${slug}`,
       type: isAboutUs ? 'profile' : 'website',
@@ -107,16 +106,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: ogImage, 
         width: isAboutUs ? 380 : 1200, 
         height: isAboutUs ? 507 : 630, 
-        alt: isAboutUs ? 'Велеслав Старков — основатель Школы ПК' : `${title} | велеслав.рус`
+        alt: isAboutUs ? 'Велеслав Старков — основатель Школы ПК' : title
       }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} | велеслав.рус`,
+      title: title,
       description: finalDescription,
       images: [{
         url: ogImage,
-        alt: `${title} | велеслав.рус`,
+        alt: title,
       }],
       site: '@Veles_ST',
       creator: '@Veles_ST',
@@ -206,6 +205,29 @@ export default async function SlugPage({ params }: Props) {
 
   return (
     <>
+      {slug === 'kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn' && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Course",
+          name: "Онлайн-курсы по потребительской кооперации",
+          description: "Обучение созданию и управлению потребительским кооперативом: закон № 3085-1, налоги, защита активов. Методика Велеслава Старкова, практика с 2015 года.",
+          inLanguage: "ru-RU",
+          provider: {
+            "@type": "Organization",
+            name: "Школа потребительской кооперации",
+            sameAs: "https://велеслав.рус",
+          },
+          offers: {
+            "@type": "AggregateOffer",
+            priceCurrency: "RUB",
+            lowPrice: 16000,
+            highPrice: 485000,
+            offerCount: 4,
+            availability: "https://schema.org/InStock",
+            url: "https://велеслав.рус/kursy-obuchenie-potrebitelskoy-kooperatsii-onlayn",
+          },
+        }) }} />
+      )}
       <Header />
       <CursorLightLazy />
       <BlogParticles />

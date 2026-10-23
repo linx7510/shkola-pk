@@ -41,6 +41,7 @@ import { sendTestEmailEndpoint } from './src/endpoints/send-test-email'
 import { crmDashboardEndpoint } from './src/endpoints/crm-dashboard'
 import { leadCountEndpoint } from './src/endpoints/lead-count'
 import { mfaLoginPageEndpoint, mfaLoginEndpoint, mfaSetupEndpoint, mfaConfirmEndpoint, mfaDisableEndpoint } from './src/endpoints/mfa'
+import { blogPostsLightEndpoint } from './src/endpoints/blog-posts-light'
 
 // === Стандартные 9 блоков ===
 import { HeroBlock } from './src/blocks/HeroBlock'
@@ -102,25 +103,12 @@ const plugins: any[] = [
 export default buildConfig({
   admin: {
     user: Users.slug,
+    theme: 'dark',
     meta: { titleSuffix: ' — Школа ПК', description: 'Панель управления платформой Школа ПК' },
     dateFormat: 'dd.MM.yyyy',
     components: {
       beforeDashboard: ['/src/components/Dashboard#Dashboard'],
       afterNavLinks: ['/src/components/CrmNavLink#CrmNavLink'],
-      views: {
-        crm: {
-          path: '/crm',
-          exact: true,
-          Component: '/src/components/CrmView#CrmView',
-          meta: { title: 'CRM — Заявки' },
-        },
-        deals: {
-          path: '/crm/deals',
-          exact: true,
-          Component: '/src/components/CrmDealsView#CrmDealsView',
-          meta: { title: 'CRM — Воронка сделок' },
-        },
-      },
       graphics: {
         Logo: '/src/components/Logo#Logo',
         Icon: '/src/components/LogoIcon#LogoIcon',
@@ -172,6 +160,7 @@ export default buildConfig({
     }
   },
   endpoints: [
+    blogPostsLightEndpoint,
     updateProjectProgressEndpoint,
     sendTestEmailEndpoint,
     crmDashboardEndpoint,

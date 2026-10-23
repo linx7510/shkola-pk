@@ -362,7 +362,7 @@ export default function HomePageClient({ homeData }: { homeData: HomePageData | 
       <section style={{padding:"2rem 0", background:"rgba(214,198,178,0.02)"}}>
         <div style={I}>
           <blockquote className="quote-block">
-            <p className="quote-text">{quoteData?.text || "«Кооператив поможет Бизнесу продавать на 15% дешевле рынка и зарабатывать больше»"}</p>
+            <p className="quote-text">{quoteData?.text || "«Кооператив поможет Бизнесу продавать на 11% дешевле рынка и зарабатывать больше»"}</p>
             <cite className="quote-author">— {quoteData?.author || "Велеслав Старков"}</cite>
           </blockquote>
         </div>

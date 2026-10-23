@@ -4,6 +4,8 @@ import { Metadata } from "next";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
+import { clusterOfArticle } from "../blog-shared";
 import CursorLightLazy from "@/components/CursorLightLazy";
 const BlogParticles = dynamic(() => import("@/components/BlogParticles"));
 import Link from "next/link";
@@ -138,10 +140,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? String(post.tags).split(',').map((t: string) => t.trim()).filter(Boolean)
     : [];
 
-  // Сокращённый SEO-title (≤ 70 символов). Без шаблона layout (absolute).
-  // Если полный title длиннее 70 символов — обрезаем по слову.
-  const seoTitle = title.length > 70
-    ? title.slice(0, 67).replace(/\s+\S*$/, "") + "…"
+  // Сокращённый SEO-title (≤ 60 символов). Без шаблона layout (absolute).
+  // Если полный title длиннее 60 символов — обрезаем по слову.
+  const seoTitle = title.length > 60
+    ? title.slice(0, 57).replace(/\s+\S*$/, "") + "…"
     : title;
 
   return {
@@ -198,6 +200,20 @@ export default async function BlogPostPage({ params }: Props) {
   const post = data?.docs?.[0]
   if (!post || !post.isPublished) notFound();
 
+  // Связанные статьи для блока «Читать далее»: та же категория, добор свежими
+  // (лечит статьи-сироты — у 6 статей не было ни одной входящей ссылки)
+  const allData = await payloadApi("/blog-posts-light");
+  const currentCat = typeof post.category === "object" ? post.category?.title : post.category;
+  const others = (allData?.docs || []).filter((p: any) => p.slug !== post.slug);
+  const catOf = (p: any) => (typeof p.category === "object" ? p.category?.title : p.category);
+  const byCategory = others.filter((p: any) => currentCat && catOf(p) === currentCat);
+  const relatedPosts = [...byCategory, ...others.filter((p: any) => !byCategory.includes(p))]
+    .slice(0, 5)
+    .map((p: any) => ({ slug: p.slug, title: p.title, publishedAt: p.publishedAt, createdAt: p.createdAt, categoryTitle: catOf(p) }));
+
+  // Кластеризация (утверждена 24.10): плашка темы — сателлиты ссылаются на главную
+  const clusterInfo = clusterOfArticle(slug);
+
   // === JSON-LD: Article + BreadcrumbList + Person ===
   const articleUrl = `${BASE_URL}/blog/${slug}`;
   const coverUrl = resolveCoverUrl(post);
@@ -221,6 +237,7 @@ export default async function BlogPostPage({ params }: Props) {
       "@type": "Person",
       "name": "Велеслав Старков",
       "url": `${BASE_URL}/about-us`,
+      "image": `${BASE_URL}/images/starkov_portrait.webp`,
       "jobTitle": "Председатель Правления Потребительского кооператива",
       "sameAs": ["https://t.me/Veles_ST"]
     },
@@ -258,7 +275,7 @@ export default async function BlogPostPage({ params }: Props) {
     "@type": "Person",
     "name": "Велеслав Старков",
     "url": `${BASE_URL}/about-us`,
-    "image": `${BASE_URL}/images/og-preview.webp`,
+    "image": `${BASE_URL}/images/starkov_portrait.webp`,
     "jobTitle": "Председатель Правления Потребительского кооператива",
     "worksFor": {
       "@type": "Organization",
@@ -328,6 +345,21 @@ export default async function BlogPostPage({ params }: Props) {
     return `<img${attrs} ${loadingAttr} />`;
   });
 
+  // Оглавление для длинных статей: якоря на h2 + время чтения
+  const tocItems: { id: string; text: string }[] = [];
+  if (contentHtml) {
+    contentHtml = contentHtml.replace(/<h2([^>]*)>(.*?)<\/h2>/g, (match: string, attrs: string, inner: string) => {
+      const text = String(inner).replace(/<[^>]+>/g, "").trim();
+      if (!text) return match;
+      const id = `sec-${tocItems.length + 1}`;
+      tocItems.push({ id, text });
+      return `<h2${attrs} id="${id}" style="scroll-margin-top:80px;">${inner}</h2>`;
+    });
+  }
+  const wordCount = (contentHtml || "").replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length;
+  const readMinutes = Math.max(1, Math.round(wordCount / 180));
+  const showToc = tocItems.length >= 3 && wordCount > 2500;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
@@ -395,6 +427,21 @@ export default async function BlogPostPage({ params }: Props) {
 
           {/* Cover image убран — дублирует фото из статьи */}
 
+          {showToc && (
+            <nav aria-label="Оглавление" style={{ margin: "0 0 2rem", padding: "1.25rem 1.5rem", borderRadius: 12, border: "1px solid rgba(214,198,178,0.12)", background: "rgba(214,198,178,0.03)" }}>
+              <div style={{ fontSize: "0.95rem", color: "rgba(214,198,178,0.6)", marginBottom: "0.5rem" }}>
+                📖 {readMinutes} мин чтения · {wordCount.toLocaleString("ru-RU")} слов
+              </div>
+              <h2 style={{ fontSize: "1.15rem", fontWeight: 700, color: "#E68863", margin: "0 0 0.6rem" }}>Содержание</h2>
+              <ol style={{ margin: 0, paddingLeft: "1.25rem", color: "rgba(214,198,178,0.85)" }}>
+                {tocItems.map((t) => (
+                  <li key={t.id} style={{ marginBottom: "0.3rem" }}>
+                    <a href={`#${t.id}`} style={{ color: "rgba(214,198,178,0.85)", textDecoration: "none" }}>{t.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )}
           {contentHtml && (
             <div
               className="article-content"
@@ -439,9 +486,51 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </article>
 
+        {/* Плашка темы (кластеризация) */}
+        {clusterInfo && (
+          <div style={{ margin: "2rem 0 0", padding: "1rem 1.4rem", borderRadius: 12, border: "1px solid rgba(230,136,99,0.35)", background: "rgba(230,136,99,0.07)", fontSize: "1.02rem", lineHeight: 1.6 }}>
+            {clusterInfo.isMain ? (
+              <>📍 Это главная статья темы «<strong style={{ color: "#E68863" }}>{clusterInfo.cluster.title}</strong>».{" "}
+                <Link href={`/blog/tema/${clusterInfo.cluster.slug}`} prefetch={false} style={{ color: "#E68863", textDecoration: "none" }}>Все статьи цикла →</Link></>
+            ) : (
+              <>📍 Статья входит в тему «<strong style={{ color: "#E68863" }}>{clusterInfo.cluster.title}</strong>».{" "}
+                Начните с главной:{" "}
+                <Link href={`/blog/${clusterInfo.cluster.main}`} prefetch={false} style={{ color: "#E68863", textDecoration: "none" }}>обзор темы →</Link>{" · "}
+                <Link href={`/blog/tema/${clusterInfo.cluster.slug}`} prefetch={false} style={{ color: "rgba(214,198,178,0.85)", textDecoration: "none" }}>все статьи цикла</Link></>
+            )}
+          </div>
+        )}
+
+        {/* Читать далее — связанные статьи */}
+        {relatedPosts.length > 0 && (
+          <section style={{ maxWidth: 900, margin: "0 auto", padding: "2.5rem 0 1rem" }}>
+            <h2 className="heading-sweep" data-text="Читать далее" style={{ fontSize: "1.8rem", fontWeight: 800, color: "#E7DCCF", marginBottom: "1.25rem" }}>
+              Читать далее
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1rem" }}>
+              {relatedPosts.map((rp: any) => (
+                <Link key={rp.slug} href={`/blog/${rp.slug}`} prefetch={false} style={{
+                  display: "block", padding: "1rem 1.1rem", borderRadius: 10,
+                  border: "1px solid rgba(214,198,178,0.12)", background: "rgba(214,198,178,0.03)",
+                  textDecoration: "none",
+                }}>
+                  {rp.categoryTitle && (
+                    <span style={{ fontSize: "0.85rem", color: "#E68863", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{rp.categoryTitle}</span>
+                  )}
+                  <div style={{ fontSize: "1.05rem", fontWeight: 600, color: "#E7DCCF", lineHeight: 1.4, margin: "0.35rem 0 0.5rem" }}>{rp.title}</div>
+                  <div style={{ fontSize: "0.9rem", color: "rgba(214,198,178,0.65)" }}>
+                    {new Date(rp.publishedAt || rp.createdAt).toLocaleDateString("ru-RU")}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* AI-консультант — точная копия блока с главной страницы */}
             <Footer />
     </main>
+      <BackToTop />
     </>
   );
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Страница не найдена — 404 | Школа ПК</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: #0d0c0a; color: #d6c6b2;
+    font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+    padding: 2rem;
+  }
+  .box { max-width: 640px; text-align: center; }
+  .code { font-size: 5rem; font-weight: 800; color: #e68863; line-height: 1; }
+  h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; color: #d6c6b2; margin: 1rem 0; }
+  p { color: rgba(214,198,178,0.75); font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.6; }
+  nav { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+  a {
+    padding: 0.6rem 1.2rem; border-radius: 999px; text-decoration: none; font-size: 1.05rem;
+    border: 1px solid rgba(230,136,99,0.5); background: rgba(230,136,99,0.1); color: #e68863;
+  }
+  a:hover { background: rgba(230,136,99,0.2); }
+  .small { margin-top: 2.5rem; font-size: 0.85rem; color: rgba(214,198,178,0.4); }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="code">404</div>
+    <h1>Страница не найдена</h1>
+    <p>Возможно, страница переехала или в адресе опечатка.<br>Или поищите по сайту:</p>
+    <form action="/search" method="get" style="max-width:420px;margin:0 auto 2rem;display:flex;gap:.6rem">
+      <input type="text" name="q" placeholder="Например: НДС, паевой взнос…" style="flex:1;padding:.65rem 1rem;border-radius:10px;border:1px solid rgba(214,198,178,.2);background:rgba(214,198,178,.05);color:#d6c6b2;font-size:1rem;outline:none">
+      <button type="submit" style="padding:.65rem 1.3rem;border-radius:10px;border:1px solid rgba(230,136,99,.5);background:rgba(230,136,99,.15);color:#e68863;font-size:1rem;cursor:pointer">Найти</button>
+    </form>
+    <nav>
+      <a href="/">Главная</a>
+      <a href="/blog">Блог</a>
+      <a href="/glossary">Глоссарий</a>
+      <a href="/uslugi-dlya-potrebitelskih-kooperativov">Услуги</a>
+      <a href="/ai-konsultant">ИИ-консультант</a>
+    </nav>
+    <p class="small">Школа потребительской кооперации — велеслав.рус</p>
+  </div>
+</body>
+</html>

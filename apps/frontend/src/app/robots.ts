@@ -6,10 +6,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // /api/media/ — картинки блога: этот префикс длиннее /api, поэтому у Google
+        // и Яндекса разрешение выигрывает у Disallow: /api (правило длиннейшего префикса).
+        // Next.js выводит из allow только последнюю строку — "/" не пишем, всё и так разрешено.
+        allow: ["/api/media/"],
         disallow: ["/admin", "/api", "/dashboard", "/login", "/register"],
       },
-      // AI-боты — ЗАПРЕЩЕНЫ (защита контента)
+      // AI-боты — ЗАПРЕЩЕНЫ (защита контента); смена политики — решение владельца
       { userAgent: "GPTBot", disallow: "/" },
       { userAgent: "ChatGPT-User", disallow: "/" },
       { userAgent: "Google-Extended", disallow: "/" },

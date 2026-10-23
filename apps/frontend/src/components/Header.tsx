@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const serviceLinks = [
   { label: "Аудит устава ПК", href: "/uslugi-dlya-potrebitelskih-kooperativov/audit-ustava-potrebitelskogo-kooperativa" },
@@ -50,6 +51,19 @@ function CabinetLink({ className, onClick }: { className?: string; onClick?: () 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q.length >= 2) {
+      router.push(`/search?q=${encodeURIComponent(q)}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+      setMobileOpen(false);
+    }
+  };
   // какой пункт шапки раскрыт сейчас (по label) — открыт только тот, на который навели
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [navItems, setNavItems] = useState(defaultNavItems);
@@ -147,6 +161,25 @@ export default function Header() {
             {/* Кабинет — рядом с навигацией, как в 033 */}
             <CabinetLink className="header-cta-btn" />
           </nav>
+          <form onSubmit={submitSearch} style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 8 }}>
+            {searchOpen && (
+              <input
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Поиск…"
+                aria-label="Поиск по сайту"
+                style={{ padding: "0.4rem 0.7rem", borderRadius: 8, border: "1px solid rgba(214,198,178,0.2)", background: "rgba(214,198,178,0.06)", color: "#D6C6B2", fontSize: "0.95rem", outline: "none", width: 150 }}
+                onBlur={() => { if (!searchQuery) setSearchOpen(false); }}
+              />
+            )}
+            <button
+              type={searchOpen ? "submit" : "button"}
+              onClick={() => { if (!searchOpen) setSearchOpen(true); }}
+              aria-label="Поиск по сайту"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#D6C6B2", fontSize: "1.15rem", padding: "0.3rem", lineHeight: 1 }}
+            >🔍</button>
+          </form>
 
           {/* Правый верхний угол: телефон + соцсети */}
           <div className="header-right-cluster">
@@ -201,6 +234,16 @@ export default function Header() {
           <button className="mobile-close" onClick={() => setMobileOpen(false)}>&times;</button>
         </div>
         <nav className="mobile-nav">
+        <form onSubmit={submitSearch} style={{ display: "flex", gap: 6, padding: "0.5rem 1.25rem 1rem" }}>
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Поиск по сайту…"
+            aria-label="Поиск по сайту"
+            style={{ flex: 1, padding: "0.55rem 0.8rem", borderRadius: 8, border: "1px solid rgba(214,198,178,0.2)", background: "rgba(214,198,178,0.06)", color: "#D6C6B2", fontSize: "1rem", outline: "none" }}
+          />
+          <button type="submit" aria-label="Найти" style={{ background: "none", border: "1px solid rgba(230,136,99,0.4)", borderRadius: 8, color: "#E68863", padding: "0 0.8rem", cursor: "pointer" }}>🔍</button>
+        </form>
           {navItems.map((item) =>
             item.dropdown ? (
               <div key={item.label}>

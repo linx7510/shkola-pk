@@ -29,9 +29,9 @@ async function fetchPage(slug: string) {
 
 export async function generateMetadata(): Promise<Metadata> {
   const page: any = await fetchPage("besplatno");
-  if (!page) return { title: "Бесплатно | Школа ПК" };
+  if (!page) return { title: { absolute: "Бесплатно | Школа ПК" }, description: "Бесплатные материалы Школы ПК: мини-курс, мини-книга и глоссарий." };
   const title = page.meta?.title || page.title || "Бесплатные материалы — Школа ПК";
-  const description = page.meta?.description || "";
+  const description = page.meta?.description || "Мини-курс из 13 уроков, мини-книга «10 причин открыть ПК» и глоссарий на 100 терминов — бесплатно.";
   const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://велеслав.рус";
   return {
     title,
@@ -92,6 +92,14 @@ export default async function BesplatnoPage() {
   }
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Главная", item: "https://велеслав.рус/" },
+          { "@type": "ListItem", position: 2, name: "Бесплатные материалы", item: "https://велеслав.рус/besplatno" },
+        ],
+      }) }} />
       <Header />
       <BlogParticles />
       <CursorLightLazy />

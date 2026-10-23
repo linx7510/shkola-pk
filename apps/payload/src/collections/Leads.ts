@@ -9,6 +9,16 @@ export const Leads: CollectionConfig = {
     defaultColumns: ['name', 'phone', 'email', 'source', 'status', 'createdAt'],
     group: 'CRM',
     listSearchableFields: ['name', 'email', 'phone'],
+    components: {
+      views: {
+        crm: {
+          path: '/crm',
+          exact: true,
+          Component: '/src/components/CrmView#CrmView',
+          meta: { title: 'CRM — Заявки' },
+        },
+      },
+    },
   },
   access: {
     read: ({ req }) => {

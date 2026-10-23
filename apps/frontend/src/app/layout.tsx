@@ -54,10 +54,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
       default: "Потребительский кооператив | Школа ПК — Велеслав Старков",
-      template: "%s | Школа ПК — Велеслав Старков",
+      template: "%s | Школа ПК",
     },
     description:
-      "Потребительский кооператив — защита активов и ставка 0%. Обучение, услуги по закону РФ № 3085-1. Аудит устава ПК, регистрация под ключ, сопровождение при проверках ФНС.",
+      "Первая онлайн Школа потребительской кооперации с 2015 года: обучение, регистрация ПК под ключ, аудит устава. Более 120 открытых кооперативов.",
     keywords:
       "потребительский кооператив, кооперация, школа кооперативов, Велеслав Старков, регистрация кооператива, аудит устава, Закон 3085-1, обнуление НДС, паевой взнос",
     openGraph: {
@@ -103,6 +103,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <meta name="twitter:data2" content="@Veles_ST" />
       </head>
       <body className="antialiased"><script dangerouslySetInnerHTML={{__html:"document.documentElement.classList.add('js')"}} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "велеслав.рус — Школа потребительской кооперации",
+        url: "https://велеслав.рус",
+        inLanguage: "ru-RU",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: "https://велеслав.рус/search?q={search_term_string}" },
+          "query-input": "required name=search_term_string",
+        },
+      }) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "EducationalOrganization",
@@ -164,6 +176,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`https://mc.yandex.ru/watch/${METRIKA_ID}`}
+              width={1}
+              height={1}
               style={{ position: 'absolute', left: '-9999px' }}
               alt=""
             />

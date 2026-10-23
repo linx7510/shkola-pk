@@ -103,6 +103,16 @@ export const Pages: CollectionConfig = {
     { name: 'title', type: 'text', required: true, label: 'Заголовок' },
     { name: 'slug', type: 'text', required: true, unique: true, label: 'URL-слаг', admin: { position: 'sidebar' } },
     { name: 'isPublished', type: 'checkbox', defaultValue: false, label: 'Опубликована', admin: { position: 'sidebar' } },
+    {
+      name: 'meta',
+      type: 'group',
+      label: 'SEO-мета',
+      admin: { position: 'sidebar' },
+      fields: [
+        { name: 'title', type: 'text', label: 'Meta title (до 60 символов)' },
+        { name: 'description', type: 'textarea', label: 'Meta description (140–160 символов)' },
+      ],
+    },
     // sortOrder: 0 = главная (всегда первая), 1 = остальные. Сортировка: sortOrder, -updatedAt
     { name: 'sortOrder', type: 'number', defaultValue: 1, label: 'Порядок сортировки', admin: { position: 'sidebar', description: '0 = всегда первой (для главной), 1 = обычная' } },
     {

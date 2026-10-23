@@ -24,13 +24,13 @@ import { FixedToolbarFeatureClient as FixedToolbarFeatureClient_e70f5e05f09f93e0
 import { BlocksLibraryButton as BlocksLibraryButton_811c765ef7a832182a7f66140151a887 } from '../../../../src/components/BlocksLibraryButton'
 import { default as default_ba5593385c4e6ab429d0921aacbf5e30 } from '@/components/DownloadButton'
 import { ImageInsertButton as ImageInsertButton_9470b7a9baf8dd65394edeb1a4977132 } from '@/components/ImageInsertButton'
+import { CrmView as CrmView_6781eb3e4d1cd0e12f60d8c520057a0d } from '../../../../src/components/CrmView'
+import { CrmDealsView as CrmDealsView_b14c12fe7fcc965848a7dac05a3f89d1 } from '../../../../src/components/CrmDealsView'
 import { RelationshipFeatureClient as RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { LogoIcon as LogoIcon_bb6bc2c1bc85b812c8d6d5971f925226 } from '../../../../src/components/LogoIcon'
 import { Logo as Logo_d05dcd2df632bb7cb811a750e82b802a } from '../../../../src/components/Logo'
 import { CrmNavLink as CrmNavLink_06be71afa2ba4686349c815b52e4964d } from '../../../../src/components/CrmNavLink'
 import { Dashboard as Dashboard_e1aaac9d73a3992d50b4a18beefc4f4e } from '../../../../src/components/Dashboard'
-import { CrmView as CrmView_6781eb3e4d1cd0e12f60d8c520057a0d } from '../../../../src/components/CrmView'
-import { CrmDealsView as CrmDealsView_b14c12fe7fcc965848a7dac05a3f89d1 } from '../../../../src/components/CrmDealsView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -61,12 +61,12 @@ export const importMap = {
   "/src/components/BlocksLibraryButton#BlocksLibraryButton": BlocksLibraryButton_811c765ef7a832182a7f66140151a887,
   "@/components/DownloadButton#default": default_ba5593385c4e6ab429d0921aacbf5e30,
   "@/components/ImageInsertButton#ImageInsertButton": ImageInsertButton_9470b7a9baf8dd65394edeb1a4977132,
+  "/src/components/CrmView#CrmView": CrmView_6781eb3e4d1cd0e12f60d8c520057a0d,
+  "/src/components/CrmDealsView#CrmDealsView": CrmDealsView_b14c12fe7fcc965848a7dac05a3f89d1,
   "@payloadcms/richtext-lexical/client#RelationshipFeatureClient": RelationshipFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/src/components/LogoIcon#LogoIcon": LogoIcon_bb6bc2c1bc85b812c8d6d5971f925226,
   "/src/components/Logo#Logo": Logo_d05dcd2df632bb7cb811a750e82b802a,
   "/src/components/CrmNavLink#CrmNavLink": CrmNavLink_06be71afa2ba4686349c815b52e4964d,
   "/src/components/Dashboard#Dashboard": Dashboard_e1aaac9d73a3992d50b4a18beefc4f4e,
-  "/src/components/CrmView#CrmView": CrmView_6781eb3e4d1cd0e12f60d8c520057a0d,
-  "/src/components/CrmDealsView#CrmDealsView": CrmDealsView_b14c12fe7fcc965848a7dac05a3f89d1,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

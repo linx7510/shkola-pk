@@ -5,7 +5,7 @@ export async function fetchHomeData(): Promise<any | null> {
     const res = await fetch(
       `${PAYLOAD_API_URL}/api/pages?where[slug][equals]=home&depth=1&draft=false`,
       { 
-        next: { revalidate: 86400 }
+        next: { revalidate: 300 } // 5 минут: правки главной из админки видны без пересборки
       }
     );
     if (!res.ok) return null;

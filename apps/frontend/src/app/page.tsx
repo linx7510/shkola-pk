@@ -3,7 +3,7 @@ import { fetchHomeData } from "./fetchHomeData";
 import HomePageClient from "./HomePageClient";
 
 // ISR cache 24h
-export const revalidate = 86400;
+export const revalidate = 300  // 5 минут: правки из админки видны на сайте без пересборки (компромисс P2);
 
 function parseMetaTags(html: string): Record<string, string> {
   const result: Record<string, string> = {};
@@ -59,8 +59,15 @@ const FAQ_JSON_LD = {
 
 export default async function Page() {
   const homeData = await fetchHomeData();
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ "@type": "ListItem", position: 1, name: "Главная", item: "https://велеслав.рус/" }],
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }} />
       <HomePageClient homeData={homeData} />
     </>

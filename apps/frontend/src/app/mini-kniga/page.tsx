@@ -7,14 +7,12 @@ import Breadcrumbs, { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 export const revalidate = 3600; // ISR: раз в час
 
 const PAGE_URL = "https://велеслав.рус/mini-kniga";
-const PAGE_TITLE =
-  "Мини-книга «10 причин, почему бизнес открывает потребительский кооператив» — скачать бесплатно PDF | велеслав.рус";
-const PAGE_DESCRIPTION =
-  "Мини-книга Школы Кооперативов: 10 причин открыть потребительский кооператив по модели С500 — обнуление НДС, оборотные средства без банков, расчёт «пять лет завода с ПК». Квинтессенция опыта с 2015 года: 200+ кейсов и 100+ уставов. Скачайте PDF бесплатно за подписку на рассылку.";
+const PAGE_TITLE = "Мини-книга «10 причин открыть ПК» — PDF бесплатно | Школа ПК";
+const PAGE_DESCRIPTION = "10 причин открыть потребительский кооператив по модели С500: обнуление НДС, оборотные средства без кредитов, кейсы с 2015 года. PDF бесплатно за подписку.";
 const PAGE_IMAGE = "https://велеслав.рус/mini-kniga-cover-v2.webp";
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESCRIPTION,
   keywords: [
     "мини-книга потребительский кооператив",

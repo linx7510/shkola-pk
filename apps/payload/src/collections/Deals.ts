@@ -9,6 +9,16 @@ export const Deals: CollectionConfig = {
     defaultColumns: ['title', 'service', 'stage', 'amount', 'clientName', 'source', 'updatedAt'],
     group: 'CRM',
     listSearchableFields: ['title', 'clientName', 'clientContact'],
+    components: {
+      views: {
+        kanban: {
+          path: '/kanban',
+          exact: true,
+          Component: '/src/components/CrmDealsView#CrmDealsView',
+          meta: { title: 'Воронка сделок' },
+        },
+      },
+    },
   },
   access: {
     read: ({ req }) => {

@@ -20,12 +20,12 @@ async function payloadApi(path: string) {
 }
 
 const PAGE_URL = "https://велеслав.рус/faq";
-const PAGE_TITLE = "FAQ — Частые вопросы о потребительских кооперативах";
+const PAGE_TITLE = "FAQ — вопросы о потребительских кооперативах | Школа ПК";
 const PAGE_DESCRIPTION = "162 ответа на вопросы о потребительских кооперативах: налоги, устав, регистрация, субсидиарная ответственность, целевые программы, проверки ФНС и мошенничество.";
 const PAGE_IMAGE = "https://велеслав.рус/images/og-preview.webp";
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESCRIPTION,
   keywords: [
     "FAQ потребительский кооператив",

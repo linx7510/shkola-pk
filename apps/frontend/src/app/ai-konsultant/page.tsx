@@ -8,14 +8,12 @@ import AiConsultantLanding from "./AiConsultantLanding";
 export const revalidate = 3600; // ISR: раз в час
 
 const PAGE_URL = "https://велеслав.рус/ai-konsultant";
-const PAGE_TITLE =
-  "ИИ-консультант по потребительским кооперативам — бесплатный онлайн-чат | велеслав.рус";
-const PAGE_DESCRIPTION =
-  "Задайте вопрос ИИ-консультанту по потребительским кооперативам: воспитан на 100+ уставах, 200+ кейсах, судебной практике и Законе № 3085-1. Налоги, НДС, паевые взносы, риски — ответы с цифрами и статьями закона. В подарок — мини-книга «10 причин, почему бизнес открывает ПК».";
+const PAGE_TITLE = "ИИ-консультант по потребительским кооперативам | Школа ПК";
+const PAGE_DESCRIPTION = "Бесплатный ИИ-чат по потребительским кооперативам: 100+ уставов, 200+ кейсов, закон № 3085-1. Задайте вопрос — ответ со ссылками на нормы права.";
 const PAGE_IMAGE = "https://велеслав.рус/images/og-preview.webp";
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESCRIPTION,
   keywords: [
     "ИИ-консультант по потребительским кооперативам",
